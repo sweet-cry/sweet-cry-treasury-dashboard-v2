@@ -743,22 +743,22 @@ async function loadQRA(){
       const tc=x.security_type==='Bill'?'badge badge-blue':x.security_type==='Note'?'badge badge-green':'badge badge-red';
       return`<tr><td>${x.auction_date}</td><td><span class="${tc}">${x.security_type}</span></td><td>${x.security_term}</td><td>${a}</td></tr>`;
     }).join('');
-    // 경매 결과 테이블 (낙찰금리·BTC)
+    // 경매 결과 테이블 (auction_data - 낙찰금리·BTC)
     const arBody=document.getElementById('auctionResultTbody');
     if(arBody){
-      const recent=d.data.filter(x=>x.offering_amt&&x.offering_amt!=='null'&&x.high_yield&&x.high_yield!=='null').slice(0,10);
-      if(recent.length){
-        arBody.innerHTML=recent.map(x=>{
-          const amt=N(Math.round(parseFloat(x.offering_amt)/1e9))+'B$';
+      const results=d.results||[];
+      if(results.length){
+        arBody.innerHTML=results.slice(0,10).map(x=>{
+          const amt=x.offering_amt&&x.offering_amt!=='null'?N(Math.round(parseFloat(x.offering_amt)/1e9))+'B$':'—';
           const tc=x.security_type==='Bill'?'badge badge-blue':x.security_type==='Note'?'badge badge-green':'badge badge-red';
           const yld=x.high_yield&&x.high_yield!=='null'?parseFloat(x.high_yield).toFixed(3)+'%':'—';
           const btc=x.bid_to_cover_ratio&&x.bid_to_cover_ratio!=='null'?parseFloat(x.bid_to_cover_ratio).toFixed(2):'—';
-          const btcCls=btc!=='—'?(parseFloat(btc)>=2.0?'up':parseFloat(btc)<1.8?'dn':''):'';
-          const wi=x.price_per100&&x.price_per100!=='null'?x.price_per100:'';
+          const btcNum=btc!=='—'?parseFloat(btc):null;
+          const btcCls=btcNum!==null?(btcNum>=2.0?'up':btcNum<1.8?'dn':''):'';
           return`<tr><td>${x.auction_date}</td><td><span class="${tc}">${x.security_type}</span></td><td>${x.security_term}</td><td>${amt}</td><td>${yld}</td><td class="${btcCls}">${btc}</td><td>—</td></tr>`;
         }).join('');
       } else {
-        arBody.innerHTML='<tr><td colspan="7" class="loading">경매 결과 데이터 없음</td></tr>';
+        arBody.innerHTML='<tr><td colspan="7" class="loading">경매 결과 없음 (90일)</td></tr>';
       }
     }
 
