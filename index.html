@@ -290,9 +290,10 @@ tr:hover td{background:var(--surf2)}
     <div class="sec">
       <div class="stitle">최근 30일 데이터</div>
       <div class="tw"><table>
-        <thead><tr><th>날짜</th><th>WALCL (B)<br><span id="th-walcl" style="font-size:9px;font-weight:400;color:var(--muted)">—</span></th><th>TGA (B)<br><span id="th-tga" style="font-size:9px;font-weight:400;color:var(--muted)">—</span></th><th>RRP (B)<br><span id="th-rrp" style="font-size:9px;font-weight:400;color:var(--muted)">—</span></th><th>NL (B)</th><th>DoD</th></tr></thead>
+        <thead><tr><th>날짜</th><th>WALCL (B) *<br><span id="th-walcl" style="font-size:9px;font-weight:400;color:var(--muted)">—</span></th><th>TGA (B)<br><span id="th-tga" style="font-size:9px;font-weight:400;color:var(--muted)">—</span></th><th>RRP (B)<br><span id="th-rrp" style="font-size:9px;font-weight:400;color:var(--muted)">—</span></th><th>NL (B)</th><th>DoD</th></tr></thead>
         <tbody id="nlTbody"><tr><td colspan="6" class="loading">로딩 중...</td></tr></tbody>
       </table></div>
+      <div style="font-size:10px;color:var(--muted);margin-top:6px;padding:0 4px">* WALCL은 주간 발표(매주 수요일). 발표일 사이 행은 직전 주간값 유지.</div>
     </div>
   </div>
 
@@ -581,10 +582,29 @@ _sigData.nl={val:B(nlV*1e6),dod:dod*1e6};
       {label:'준비금',data:res.map(x=>x.v),borderColor:'#3fb950',backgroundColor:'rgba(63,185,80,0.06)',borderWidth:2,pointRadius:0,fill:true,tension:0.3},
       {label:'LCLoR',data:res.map(()=>3000),borderColor:'#f85149',borderWidth:1,borderDash:[5,4],pointRadius:0}
     ]);
-    const sl=w.slice(-30).reverse();
-    document.getElementById('nlTbody').innerHTML=sl.map((x,i)=>{
-      const n2=nl(x),px=sl[i+1],d2=px?n2-nl(px):0;
-      return`<tr><td>${x.date}</td><td>${N(Math.round(x.v/1000))}</td><td>${N(Math.round((tM[x.date]||lt.v)/1000))}</td><td>${N(Math.round((rM[x.date]||lr.v)/1000))}</td><td><b>${N(Math.round(n2/1000))}</b></td><td class="${d2>=0?'up':'dn'}">${d2>=0?'▲':'▼'}${N(Math.abs(Math.round(d2/1000)))}</td></tr>`;
+    // TGA 일간 기준으로 테이블 생성 (WALCL은 가장 가까운 주간값 사용)
+    const tDates=t.slice(-30).reverse();
+    const wMap={};w.forEach(x=>wMap[x.date]=x.v);
+    // WALCL: 날짜 이전 가장 최근 주간값 찾기
+    const getWalcl=date=>{
+      const sorted=w.filter(x=>x.date<=date).sort((a,b)=>b.date.localeCompare(a.date));
+      return sorted.length?sorted[0].v:lw.v;
+    };
+    const nlFromDate=date=>{
+      const wv=getWalcl(date);
+      const tv=tM[date]||lt.v;
+      const rv=rM[date]||lr.v;
+      return wv-tv-rv;
+    };
+    document.getElementById('nlTbody').innerHTML=tDates.map((x,i)=>{
+      const wv=getWalcl(x.date);
+      const tv=tM[x.date]||lt.v;
+      const rv=rM[x.date]||lr.v;
+      const n2=wv-tv-rv;
+      const px=tDates[i+1];
+      const d2=px?n2-nlFromDate(px.date):0;
+      const walclMark=wMap[x.date]?'':'<span style="font-size:9px;color:var(--muted)">*</span>';
+      return`<tr><td>${x.date}</td><td>${N(Math.round(wv/1000))}${walclMark}</td><td>${N(Math.round(tv/1000))}</td><td>${N(Math.round(rv/1000))}</td><td><b>${N(Math.round(n2/1000))}</b></td><td class="${d2>=0?'up':'dn'}">${d2>=0?'▲':'▼'}${N(Math.abs(Math.round(d2/1000)))}</td></tr>`;
     }).join('');
   }catch(e){console.error('NL:',e);}
 }
