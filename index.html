@@ -435,6 +435,24 @@ tr:hover td{background:var(--surf2)}
       <div style="position:relative;height:200px"><canvas id="ticBarChart"></canvas></div>
     </div>
   </div>
+
+  <!-- ── CALENDAR ── -->
+  <div id="t-cal" style="display:none">
+  <div class="tdesc"><div class="tdesc-hdr"><div class="tdesc-icon">CAL</div><div><div class="tdesc-title">재정 캘린더 — 유동성 이벤트 일정</div><div class="tdesc-src">FOMC · H.4.1 · QRA · Tax Day · 국채 만기</div></div></div><div class="tdesc-body">유동성에 영향을 미치는 주요 재정·통화 이벤트를 한눈에. FOMC → 금리 방향, H.4.1(매주 수요일) → QT 진행 확인, QRA → 발행 구성, Tax Day → TGA 급증.</div><div class="tdesc-tags"><span class="tdesc-tag b">FOMC</span><span class="tdesc-tag b">H.4.1 수요일</span><span class="tdesc-tag r">Tax Day</span><span class="tdesc-tag a">QRA 발표</span><span class="tdesc-tag g">국채 만기</span></div></div>
+  <div class="cal">
+    <div class="cal-hdr"><h2>재정 캘린더</h2><div class="cal-nav"><button onclick="calMove(-1)">‹</button><span id="cal-month-label"></span><button onclick="calMove(1)">›</button></div></div>
+    <div class="cal-dow-row"><div class="cal-dow">일</div><div class="cal-dow">월</div><div class="cal-dow">화</div><div class="cal-dow">수</div><div class="cal-dow">목</div><div class="cal-dow">금</div><div class="cal-dow">토</div></div>
+    <div class="cal-grid" id="cal-grid"></div>
+    <div class="cal-leg">
+      <div class="cl-item"><span class="cl-dot" style="background:rgba(163,113,247,0.5)"></span>FOMC</div>
+      <div class="cl-item"><span class="cl-dot" style="background:rgba(248,81,73,0.5)"></span>Tax Day</div>
+      <div class="cl-item"><span class="cl-dot" style="background:rgba(210,153,34,0.5)"></span>QRA 발표</div>
+      <div class="cl-item"><span class="cl-dot" style="background:rgba(63,185,80,0.4)"></span>국채 만기</div>
+      <div class="cl-item"><span class="cl-dot" style="background:rgba(88,166,255,0.4)"></span>H.4.1</div>
+    </div>
+    <div class="ev-list" id="ev-list"></div>
+  </div>
+  </div>
 </div>
 
 <div class="tip" id="tipEl"></div>
