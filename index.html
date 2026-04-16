@@ -447,6 +447,42 @@ tr:hover td{background:var(--surf2)}
         <tbody id="qraTbody"><tr><td colspan="4" class="loading">로딩 중...</td></tr></tbody>
       </table></div>
     </div>
+    <div class="two">
+      <div class="cc">
+        <div class="ct">최근 경매 결과 (10건) <button class="ib" onclick="tip('btc',this)">i</button></div>
+        <div class="tw"><table>
+          <thead><tr><th>날짜</th><th>종류</th><th>만기</th><th>발행액</th><th>낙찰금리 <button class="ib" onclick="tip('stopout',this)">i</button></th><th>BTC <button class="ib" onclick="tip('btc',this)">i</button></th><th>테일 <button class="ib" onclick="tip('tail',this)">i</button></th></tr></thead>
+          <tbody id="auctionResultTbody"><tr><td colspan="7" class="loading">로딩 중...</td></tr></tbody>
+        </table></div>
+      </div>
+      <div class="cc">
+        <div class="ct">더치옥션 방식</div>
+        <div class="auction-explain">
+          <h3>더치옥션 (Dutch Auction)</h3>
+          <div class="auction-step"><div class="auction-step-num">1</div><div>재무부가 발행 규모·만기 공고. 딜러·기관·개인이 수익률(금리) 제시 입찰.</div></div>
+          <div class="auction-step"><div class="auction-step-num">2</div><div>낮은 수익률(높은 가격)부터 순서대로 낙찰. 발행액 소진 시점 수익률 = <b style="color:var(--tx)">낙찰금리(Stop-out Rate)</b>.</div></div>
+          <div class="auction-step"><div class="auction-step-num">3</div><div>모든 낙찰자는 낙찰금리로 동일 적용 — 입찰 금리 무관. 더치옥션 핵심.</div></div>
+          <div class="auction-step"><div class="auction-step-num">4</div><div><b style="color:var(--tx)">BTC(응찰률)</b> = 총 입찰액 ÷ 발행액. 2.0↑ = 수요 양호. 1.5↓ = 부진.</div></div>
+          <div class="auction-step"><div class="auction-step-num">5</div><div><b style="color:var(--tx)">테일(Tail)</b> = 낙찰금리 − WI 금리(bp). 양수·확대 = 시장 소화 불량.</div></div>
+          <div class="auction-step"><div class="auction-step-num">6</div><div><b style="color:var(--tx)">간접 입찰(Indirect)</b> = 해외 중앙은행 포함. 비중 높을수록 글로벌 달러 수요 건재.</div></div>
+          <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--brd);font-size:10px">
+            <span style="color:var(--green);font-weight:500">우호</span>: BTC↑ + 낙찰금리 &lt; WI → 수요 강함<br>
+            <span style="color:var(--red);font-weight:500">경고</span>: BTC↓ + 테일 발생 → 장기금리 급등 촉매
+          </div>
+        </div>
+        <div style="margin-top:10px">
+          <div class="stitle" style="margin-bottom:8px">T-Bill 정기 경매 패턴</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.8">
+            <span style="color:var(--tx)">4주·8주:</span> 화 발표 → 목 경매 → 다음 화 정산<br>
+            <span style="color:var(--tx)">6주:</span> 목 발표 → 다음 화 경매 → 그 다음 목 정산<br>
+            <span style="color:var(--tx)">13주·26주:</span> 목 발표 → 다음 월 경매 → 그 다음 목 정산<br>
+            <span style="color:var(--tx)">52주:</span> 격주 화 발표 → 격주 목 경매<br>
+            <span style="color:var(--tx)">2·3·5·7·10Y Note:</span> 월 중순 경매, 15일·말일 정산<br>
+            <span style="color:var(--tx)">20Y·30Y Bond:</span> 분기 신규 + 나머지 달 리오프닝
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- ── TIC ── -->
@@ -731,6 +767,24 @@ async function loadQRA(){
       const tc=x.security_type==='Bill'?'badge badge-blue':x.security_type==='Note'?'badge badge-green':'badge badge-red';
       return`<tr><td>${x.auction_date}</td><td><span class="${tc}">${x.security_type}</span></td><td>${x.security_term}</td><td>${a}</td></tr>`;
     }).join('');
+    // 경매 결과 테이블 (낙찰금리·BTC)
+    const arBody=document.getElementById('auctionResultTbody');
+    if(arBody){
+      const recent=d.data.filter(x=>x.offering_amt&&x.offering_amt!=='null'&&x.high_yield&&x.high_yield!=='null').slice(0,10);
+      if(recent.length){
+        arBody.innerHTML=recent.map(x=>{
+          const amt=N(Math.round(parseFloat(x.offering_amt)/1e9))+'B$';
+          const tc=x.security_type==='Bill'?'badge badge-blue':x.security_type==='Note'?'badge badge-green':'badge badge-red';
+          const yld=x.high_yield&&x.high_yield!=='null'?parseFloat(x.high_yield).toFixed(3)+'%':'—';
+          const btc=x.bid_to_cover_ratio&&x.bid_to_cover_ratio!=='null'?parseFloat(x.bid_to_cover_ratio).toFixed(2):'—';
+          const btcCls=btc!=='—'?(parseFloat(btc)>=2.0?'up':parseFloat(btc)<1.8?'dn':''):'';
+          const wi=x.price_per100&&x.price_per100!=='null'?x.price_per100:'';
+          return`<tr><td>${x.auction_date}</td><td><span class="${tc}">${x.security_type}</span></td><td>${x.security_term}</td><td>${amt}</td><td>${yld}</td><td class="${btcCls}">${btc}</td><td>—</td></tr>`;
+        }).join('');
+      } else {
+        arBody.innerHTML='<tr><td colspan="7" class="loading">경매 결과 데이터 없음</td></tr>';
+      }
+    }
     // 캘린더 경매 결과 테이블도 업데이트
     const aBody=document.getElementById('auction-tbody');
     if(aBody){
@@ -788,7 +842,10 @@ const TIPS={
 'qra-note':['Notes 발행 (2~10Y)','fiscaldata','2·3·5·7·10년 중기채. 은행·연기금이 주 매수자 → 준비금 직접 흡수 → NL 감소 압박.','Notes 비중 증가 = NL 직접 압박. 금리 상승 시 발행 비용 증가 → 재정 이자 부담 확대.'],
 'qra-bond':['Bonds 발행 (20~30Y)','fiscaldata','20·30년 장기채. 보험·연기금·해외 중앙은행이 주 매수자. 발행 증가 시 장기금리 상방 압력.','30Y 금리 6% 접근 시 시장 흡수 한계 우려. 수급 불균형 → 장기금리 변동성 확대 → 밸류에이션 압박.'],
 'qra-total':['총 국채 발행','fiscaldata','T-Bill+Notes+Bonds 합계. 재정적자 + 만기 차환 수요 반영. 연간 $20T 이상 규모.','총 발행 증가 = 시장 자금 흡수 → 민간 투자 구축. 발행 구성(T-Bill vs 쿠폰채)의 NL 영향 차이 중요.'],
-'tic':['TIC — 국가별 미국채 보유','미 재무부 월간','Treasury International Capital. 외국 정부·기관 미국채 보유 현황. 약 6주 후행 발표.','일본·중국 보유 감소 = 달러 약세 + 미국채 금리 상승 압력. 지정학 위기 시 보유국 매도(무기화) 우려.']
+'tic':['TIC — 국가별 미국채 보유','미 재무부 월간','Treasury International Capital. 외국 정부·기관 미국채 보유 현황. 약 6주 후행 발표.','일본·중국 보유 감소 = 달러 약세 + 미국채 금리 상승 압력. 지정학 위기 시 보유국 매도(무기화) 우려.'],
+'btc':['응찰률 (BTC, Bid-to-Cover)','경매 지표','총 입찰액 ÷ 발행액. 경쟁 강도 지표. 2.0 이상 = 수요 양호, 1.5 이하 = 소화 부진 신호.','높은 BTC = 수요 > 공급 → 낙찰금리 WI보다 낮게 형성. 낮은 BTC = 테일 발생 위험. 외국인·간접 입찰자 비중도 함께 봐야 함.'],
+'stopout':['낙찰금리 (Stop-out Rate)','경매 지표','더치옥션 방식에서 발행액이 소진되는 시점의 수익률. 모든 낙찰자가 이 금리로 동일 적용.','낙찰금리 < WI(When-Issued) = 강한 수요 → 시장 우호. 낙찰금리 > WI = 테일 발생 → 소화 불량 신호. 장기채 테일은 금리 급등 촉매.'],
+'tail':['테일 (Tail)','경매 지표','낙찰금리(Stop-out Rate)와 발행 전 WI 금리의 차이(bp). 양수 = 시장이 예상보다 높은 금리 요구 → 수요 부족.','테일 1bp 이상 = 경고. 3bp 이상 = 심각한 소화 불량. 장기채(20Y·30Y) 테일은 NL·글로벌 수요 약화 신호로 시장에 충격.']
 };
 function tip(key,btn){
   const el=document.getElementById('tipEl');
