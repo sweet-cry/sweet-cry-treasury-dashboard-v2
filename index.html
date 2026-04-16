@@ -62,7 +62,12 @@ a{color:var(--blue);text-decoration:none}
 .ib:hover{border-color:var(--blue);color:var(--blue)}
 
 /* tooltip */
-.tip{position:fixed;background:var(--surf2);border:1px solid #444c56;border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--muted);max-width:260px;z-index:9999;line-height:1.6;display:none;pointer-events:none}
+.tip{position:fixed;background:var(--surf2);border:1px solid #444c56;border-radius:var(--rl);padding:0;font-size:12px;color:var(--muted);max-width:300px;z-index:9999;display:none;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+.tip-hd{padding:10px 14px 8px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:8px}
+.tip-name{font-size:12px;font-weight:600;color:var(--tx)}
+.tip-tag{font-size:9px;font-weight:500;padding:2px 7px;border-radius:4px;background:rgba(88,166,255,.15);color:var(--blue);flex-shrink:0}
+.tip-bd{padding:8px 14px;font-size:11px;color:var(--muted);line-height:1.7}
+.tip-insight{margin:6px 14px 10px;font-size:11px;color:#c9d1d9;background:rgba(88,166,255,.07);border-left:2px solid var(--blue);padding:6px 10px;border-radius:0 4px 4px 0;line-height:1.6}
 
 /* table */
 .tw{overflow-x:auto;border-radius:var(--r);border:1px solid var(--brd)}
@@ -94,6 +99,67 @@ tr:hover td{background:var(--surf2)}
 @media(max-width:400px){
   .cards{grid-template-columns:1fr}
 }
+
+.sp{background:var(--surf);border:1px solid var(--brd);border-radius:var(--rl);padding:14px 16px;margin-bottom:18px}
+.sp-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sp-hdr h2{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+.sp-overall{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:500}
+.sp-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.sp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.sig{background:var(--surf2);border-radius:var(--r);padding:10px 12px}
+.sig-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.sig-name{font-size:10px;color:var(--muted);font-weight:500}
+.sig-led{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.sig-val{font-size:16px;font-weight:600;color:var(--tx);letter-spacing:-.02em;margin-bottom:3px}
+.sig-desc{font-size:10px;color:var(--muted);line-height:1.5}
+.sig-bar{height:2px;background:var(--brd);border-radius:1px;margin-top:8px;overflow:hidden}
+.sig-bar-f{height:100%;border-radius:1px}
+.tdesc{background:rgba(88,166,255,0.04);border:1px solid rgba(88,166,255,0.18);border-radius:var(--rl);padding:14px 16px;margin-bottom:18px}
+.tdesc-hdr{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.tdesc-icon{width:30px;height:30px;border-radius:var(--r);background:rgba(88,166,255,0.12);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--blue);flex-shrink:0}
+.tdesc-title{font-size:13px;font-weight:600;color:var(--tx)}
+.tdesc-src{font-size:10px;color:var(--blue);margin-top:2px}
+.tdesc-body{font-size:11px;color:var(--muted);line-height:1.7;margin-bottom:10px}
+.tdesc-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.tdesc-tag{font-size:10px;padding:2px 8px;border-radius:4px;background:var(--surf2);color:var(--muted);border:1px solid var(--brd)}
+.tdesc-tag.b{background:rgba(88,166,255,0.08);color:var(--blue);border-color:rgba(88,166,255,0.2)}
+.tdesc-tag.g{background:rgba(63,185,80,0.08);color:var(--green);border-color:rgba(63,185,80,0.2)}
+.tdesc-tag.r{background:rgba(248,81,73,0.08);color:var(--red);border-color:rgba(248,81,73,0.2)}
+.tdesc-tag.a{background:rgba(210,153,34,0.08);color:var(--amber);border-color:rgba(210,153,34,0.2)}
+.tdesc-rels{display:flex;flex-wrap:wrap;gap:14px;font-size:10px;color:var(--muted);padding-top:10px;border-top:1px solid var(--brd)}
+.cal{background:var(--surf);border:1px solid var(--brd);border-radius:var(--rl);padding:14px 16px;margin-bottom:18px}
+.cal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.cal-hdr h2{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+.cal-nav{display:flex;align-items:center;gap:8px}
+.cal-nav span{font-size:12px;font-weight:500;color:var(--tx);min-width:84px;text-align:center}
+.cal-nav button{font-size:12px;padding:3px 10px;border:1px solid var(--brd);border-radius:6px;background:transparent;color:var(--muted);cursor:pointer}
+.cal-nav button:hover{background:var(--surf2);color:var(--tx)}
+.cal-dow-row{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px}
+.cal-dow{font-size:9px;color:var(--muted);text-align:center;padding:3px 0;font-weight:500}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:12px}
+.cd{aspect-ratio:1;border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;color:var(--muted);background:var(--surf2);cursor:default;position:relative}
+.cd.empty{background:transparent}
+.cd.today{border:1px solid var(--blue);color:var(--blue);font-weight:600}
+.cd.fomc{background:rgba(163,113,247,0.2);color:#a371f7;font-weight:600}
+.cd.tax{background:rgba(248,81,73,0.2);color:var(--red);font-weight:600}
+.cd.qra{background:rgba(210,153,34,0.2);color:var(--amber);font-weight:600}
+.cd.matur{background:rgba(63,185,80,0.14);color:var(--green)}
+.cd .ev{width:3px;height:3px;border-radius:50%;margin-top:1px}
+.cal-leg{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px}
+.cl-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)}
+.cl-dot{width:8px;height:8px;border-radius:2px}
+.ev-list{display:flex;flex-direction:column;gap:5px;padding-top:12px;border-top:1px solid var(--brd)}
+.ev-item{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--surf2);border-radius:7px}
+.ev-date{font-size:10px;color:var(--muted);width:36px;flex-shrink:0;font-weight:500}
+.ev-dot2{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.ev-name{font-size:11px;color:var(--tx);flex:1}
+.ev-badge{font-size:9px;padding:2px 6px;border-radius:4px;font-weight:500;flex-shrink:0}
+.eb-fomc{background:rgba(163,113,247,0.15);color:#a371f7}
+.eb-tax{background:rgba(248,81,73,0.15);color:var(--red)}
+.eb-qra{background:rgba(210,153,34,0.15);color:var(--amber)}
+.eb-matur{background:rgba(63,185,80,0.15);color:var(--green)}
+.ev-days{font-size:10px;color:var(--muted);flex-shrink:0}
+@media(max-width:700px){.sp-grid{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
@@ -109,6 +175,19 @@ tr:hover td{background:var(--surf2)}
     </div>
   </div>
 
+  <div class="sp">
+    <div class="sp-hdr">
+      <h2>신호 판독 요약</h2>
+      <div class="sp-overall" id="sp-overall"><span class="sp-dot" style="background:var(--amber)"></span><span style="color:var(--amber)">로딩 중...</span></div>
+    </div>
+    <div class="sp-grid">
+      <div class="sig"><div class="sig-top"><span class="sig-name">Net Liquidity</span><span class="sig-led" id="led-nl" style="background:var(--muted)"></span></div><div class="sig-val" id="sp-nl">—</div><div class="sig-desc" id="sp-nl-desc">로딩 중...</div><div class="sig-bar"><div class="sig-bar-f" id="sp-nl-bar" style="width:0%;background:var(--green)"></div></div></div>
+      <div class="sig"><div class="sig-top"><span class="sig-name">단기금리 (SOFR)</span><span class="sig-led" id="led-rates" style="background:var(--muted)"></span></div><div class="sig-val" id="sp-sofr">—</div><div class="sig-desc" id="sp-rates-desc">로딩 중...</div><div class="sig-bar"><div class="sig-bar-f" id="sp-rates-bar" style="width:0%;background:var(--amber)"></div></div></div>
+      <div class="sig"><div class="sig-top"><span class="sig-name">재정 수급 (DTS)</span><span class="sig-led" id="led-dts" style="background:var(--muted)"></span></div><div class="sig-val" id="sp-dts">—</div><div class="sig-desc" id="sp-dts-desc">로딩 중...</div><div class="sig-bar"><div class="sig-bar-f" id="sp-dts-bar" style="width:0%;background:var(--amber)"></div></div></div>
+      <div class="sig"><div class="sig-top"><span class="sig-name">QRA 발행 구성</span><span class="sig-led" id="led-qra" style="background:var(--muted)"></span></div><div class="sig-val" id="sp-qra">—</div><div class="sig-desc" id="sp-qra-desc">로딩 중...</div><div class="sig-bar"><div class="sig-bar-f" id="sp-qra-bar" style="width:0%;background:var(--green)"></div></div></div>
+    </div>
+  </div>
+
   <div class="tabs">
     <button class="tab on" onclick="sw('nl',this)">Net Liquidity</button>
     <button class="tab" onclick="sw('rates',this)">단기금리</button>
@@ -117,38 +196,41 @@ tr:hover td{background:var(--surf2)}
     <button class="tab" onclick="sw('dts',this)">DTS</button>
     <button class="tab" onclick="sw('qra',this)">QRA</button>
     <button class="tab" onclick="sw('tic',this)">TIC</button>
+    <button class="tab" onclick="sw('cal',this)">캘린더</button>
   </div>
 
   <!-- ── NL ── -->
   <div id="t-nl">
+  <div class="tdesc"><div class="tdesc-hdr"><div class="tdesc-icon">NL</div><div><div class="tdesc-title">Net Liquidity — 연준 실질 유동성</div><div class="tdesc-src">WALCL − TGA − RRP · FRED 주간/일간</div></div></div><div class="tdesc-body">Fed가 공급하는 유동성에서 재무부(TGA)와 MMF(RRP)가 흡수한 부분을 차감한 실질 시중 유동성. SPX와 약 0.7 상관관계. NL 방향 전환이 SPX 조정을 2~6주 선행. RRP가 $0에 수렴한 현재, NL 변화는 오직 WALCL(QT 속도)과 TGA(재정 수급)에 의해 결정됩니다.</div><div class="tdesc-tags"><span class="tdesc-tag b">QT 중단 시 NL↑</span><span class="tdesc-tag r">TGA 재충전 시 NL↓</span><span class="tdesc-tag g">RRP 소진 완료</span><span class="tdesc-tag ">부채한도 연동</span><span class="tdesc-tag a">Tax Day 계절성</span></div><div class="tdesc-rels"><span><span style="color:#58a6ff">→</span> NL↑ 시 SPX 우호</span><span><span style="color:#f85149">→</span> NL↓ 시 조정 선행</span><span><span style="color:#d29922">→</span> QRA 발행 구성과 연동</span></div></div>
+
     <div class="sec">
       <div class="stitle">핵심 유동성 지표</div>
       <div class="cards">
         <div class="card">
-          <div class="cl">Net Liquidity <button class="ib" onclick="tip(this,'NL = WALCL − TGA − RRP. 시중 실질 유동성. 상승 → 위험자산 우호.')">i</button></div>
+          <div class="cl">Net Liquidity <button class="ib" onclick="tip('nl',this)">i</button></div>
           <div class="cv" id="c-nl">—</div><div class="cs" id="c-nl-dod">—</div>
         </div>
         <div class="card">
-          <div class="cl">WALCL <button class="ib" onclick="tip(this,'Fed 총자산. QE 시 증가 / QT 시 감소. 주간 H.4.1.')">i</button></div>
+          <div class="cl">WALCL <button class="ib" onclick="tip('walcl',this)">i</button></div>
           <div class="cv" id="c-walcl">—</div><div class="cs" id="c-walcl-d">—</div>
         </div>
         <div class="card">
-          <div class="cl">TGA <button class="ib" onclick="tip(this,'재무부 당좌계좌. 지출↓ → NL↑ / 세수·발행↑ → NL↓')">i</button></div>
+          <div class="cl">TGA <button class="ib" onclick="tip('tga',this)">i</button></div>
           <div class="cv" id="c-tga">—</div><div class="cs" id="c-tga-d">—</div>
         </div>
         <div class="card">
-          <div class="cl">RRP <button class="ib" onclick="tip(this,'역레포. MMF 여유자금 흡수. 잔액↓ → NL↑')">i</button></div>
+          <div class="cl">RRP <button class="ib" onclick="tip('rrp',this)">i</button></div>
           <div class="cv" id="c-rrp">—</div><div class="cs" id="c-rrp-d">—</div>
         </div>
         <div class="card">
-          <div class="cl">준비금 WRESBAL <button class="ib" onclick="tip(this,'은행 지급준비금. 3T$ 이하 시 repo 압력(LCLoR).')">i</button></div>
+          <div class="cl">준비금 WRESBAL <button class="ib" onclick="tip('wresbal',this)">i</button></div>
           <div class="cv" id="c-res">—</div><div class="cs" id="c-res-d">—</div>
         </div>
       </div>
     </div>
     <div class="two">
       <div class="cc full">
-        <div class="ct">NL vs S&P 500 <button class="ib" onclick="tip(this,'NL(좌축)와 SPX(우축). 괴리 확대 시 평균회귀 가능성.')">i</button></div>
+        <div class="ct">NL vs S&P 500 <button class="ib" onclick="tip('nl',this)">i</button></div>
         <div class="leg">
           <span><span class="ld" style="background:#58a6ff"></span>Net Liquidity (B$)</span>
           <span><span class="ld" style="background:#f85149;height:2px;border-radius:0"></span>S&P 500</span>
@@ -156,7 +238,7 @@ tr:hover td{background:var(--surf2)}
         <div style="position:relative;height:260px"><canvas id="nlChart"></canvas></div>
       </div>
       <div class="cc">
-        <div class="ct">NL 구성 분해 <button class="ib" onclick="tip(this,'WALCL − TGA − RRP 각 구성요소 추이.')">i</button></div>
+        <div class="ct">NL 구성 분해 <button class="ib" onclick="tip('sofr_chart',this)">i</button></div>
         <div class="leg">
           <span><span class="ld" style="background:#58a6ff"></span>WALCL</span>
           <span><span class="ld" style="background:#f85149"></span>TGA</span>
@@ -165,7 +247,7 @@ tr:hover td{background:var(--surf2)}
         <div style="position:relative;height:220px"><canvas id="compChart"></canvas></div>
       </div>
       <div class="cc">
-        <div class="ct">지급준비금 (WRESBAL) <button class="ib" onclick="tip(this,'LCLoR ~3T$ 아래 → repo 시장 압력. 2019년 9월 사례.')">i</button></div>
+        <div class="ct">지급준비금 (WRESBAL) <button class="ib" onclick="tip('wresbal',this)">i</button></div>
         <div class="leg">
           <span><span class="ld" style="background:#3fb950"></span>준비금</span>
           <span><span class="ld" style="background:#f85149;height:2px;border-radius:0"></span>LCLoR ~3T</span>
@@ -187,11 +269,11 @@ tr:hover td{background:var(--surf2)}
     <div class="sec">
       <div class="stitle">단기금리 · 스프레드</div>
       <div class="cards">
-        <div class="card"><div class="cl">SOFR <button class="ib" onclick="tip(this,'익일물 담보금리. LIBOR 대체. 단기자금 기준.')">i</button></div><div class="cv" id="c-sofr">—</div><div class="cs">Secured Overnight</div></div>
-        <div class="card"><div class="cl">IORB <button class="ib" onclick="tip(this,'지급준비금 이자율. Fed 기준금리 하단.')">i</button></div><div class="cv" id="c-iorb">—</div><div class="cs">Interest on Reserves</div></div>
-        <div class="card"><div class="cl">T-Bill 3M <button class="ib" onclick="tip(this,'3개월 국채금리. RRP 대비 스프레드가 MMF 자금 방향 결정.')">i</button></div><div class="cv" id="c-tbill">—</div><div class="cs">DTB3</div></div>
-        <div class="card"><div class="cl">EFFR <button class="ib" onclick="tip(this,'실효 연방기금금리. FOMC 목표범위 유지 여부.')">i</button></div><div class="cv" id="c-effr">—</div><div class="cs">Fed Funds Rate</div></div>
-        <div class="card"><div class="cl">SOFR − IORB <button class="ib" onclick="tip(this,'음수 확대 → 담보 자금 수요 감소 → 유동성 완화 신호.')">i</button></div><div class="cv" id="c-spread">—</div><div class="cs">bp</div></div>
+        <div class="card"><div class="cl">SOFR <button class="ib" onclick="tip('sofr',this)">i</button></div><div class="cv" id="c-sofr">—</div><div class="cs">Secured Overnight</div></div>
+        <div class="card"><div class="cl">IORB <button class="ib" onclick="tip('iorb',this)">i</button></div><div class="cv" id="c-iorb">—</div><div class="cs">Interest on Reserves</div></div>
+        <div class="card"><div class="cl">T-Bill 3M <button class="ib" onclick="tip('tbill',this)">i</button></div><div class="cv" id="c-tbill">—</div><div class="cs">DTB3</div></div>
+        <div class="card"><div class="cl">EFFR <button class="ib" onclick="tip('effr',this)">i</button></div><div class="cv" id="c-effr">—</div><div class="cs">Fed Funds Rate</div></div>
+        <div class="card"><div class="cl">SOFR − IORB <button class="ib" onclick="tip('spread',this)">i</button></div><div class="cv" id="c-spread">—</div><div class="cs">bp</div></div>
       </div>
     </div>
     <div class="cc">
@@ -205,7 +287,7 @@ tr:hover td{background:var(--surf2)}
       <div style="position:relative;height:280px"><canvas id="ratesChart"></canvas></div>
     </div>
     <div class="cc">
-      <div class="ct">10Y − 2Y 장단기 금리차 <button class="ib" onclick="tip(this,'음수(역전) → 경기침체 선행지표. 재역전 후 실업률 상승 패턴.')">i</button></div>
+      <div class="ct">10Y − 2Y 장단기 금리차 <button class="ib" onclick="tip('yield',this)">i</button></div>
       <div class="leg"><span><span class="ld" style="background:#58a6ff"></span>10Y−2Y (%)</span></div>
       <div style="position:relative;height:200px"><canvas id="yieldChart"></canvas></div>
     </div>
@@ -216,10 +298,10 @@ tr:hover td{background:var(--surf2)}
     <div class="sec">
       <div class="stitle">H.4.1 — 연준 대차대조표</div>
       <div class="cards">
-        <div class="card"><div class="cl">UST 보유 <button class="ib" onclick="tip(this,'연준 보유 미국채. QT로 감축 진행 중.')">i</button></div><div class="cv" id="c-ust">—</div><div class="cs" id="c-ust-d">TREAST</div></div>
-        <div class="card"><div class="cl">MBS 보유 <button class="ib" onclick="tip(this,'주택저당증권. 만기 도래분 재투자 중단.')">i</button></div><div class="cv" id="c-mbs">—</div><div class="cs" id="c-mbs-d">MBST</div></div>
-        <div class="card"><div class="cl">BTFP <button class="ib" onclick="tip(this,'Bank Term Funding Program. 2023년 은행위기 대응. 만료.')">i</button></div><div class="cv" id="c-btfp">—</div><div class="cs" id="c-btfp-d">BTFP</div></div>
-        <div class="card"><div class="cl">Discount Window <button class="ib" onclick="tip(this,'재할인창구 대출. 급증 시 은행 유동성 스트레스 신호.')">i</button></div><div class="cv" id="c-dw">—</div><div class="cs" id="c-dw-d">DISCBORR</div></div>
+        <div class="card"><div class="cl">UST 보유 <button class="ib" onclick="tip('ust',this)">i</button></div><div class="cv" id="c-ust">—</div><div class="cs" id="c-ust-d">TREAST</div></div>
+        <div class="card"><div class="cl">MBS 보유 <button class="ib" onclick="tip('mbs',this)">i</button></div><div class="cv" id="c-mbs">—</div><div class="cs" id="c-mbs-d">MBST</div></div>
+        <div class="card"><div class="cl">BTFP <button class="ib" onclick="tip('btfp',this)">i</button></div><div class="cv" id="c-btfp">—</div><div class="cs" id="c-btfp-d">BTFP</div></div>
+        <div class="card"><div class="cl">Discount Window <button class="ib" onclick="tip('dw',this)">i</button></div><div class="cv" id="c-dw">—</div><div class="cs" id="c-dw-d">DISCBORR</div></div>
       </div>
     </div>
     <div class="two">
@@ -241,7 +323,7 @@ tr:hover td{background:var(--surf2)}
     <div class="sec">
       <div class="stitle">M2 통화량</div>
       <div class="cards">
-        <div class="card"><div class="cl">M2 최신 <button class="ib" onclick="tip(this,'M2 = 현금+요구불+저축성예금+MMF. YoY가 인플레 선행.')">i</button></div><div class="cv" id="c-m2">—</div><div class="cs" id="c-m2-d">—</div></div>
+        <div class="card"><div class="cl">M2 최신 <button class="ib" onclick="tip('m2',this)">i</button></div><div class="cv" id="c-m2">—</div><div class="cs" id="c-m2-d">—</div></div>
         <div class="card"><div class="cl">M2 YoY</div><div class="cv" id="c-m2yoy">—</div><div class="cs">전년 동월 대비</div></div>
       </div>
     </div>
@@ -262,9 +344,9 @@ tr:hover td{background:var(--surf2)}
     <div class="sec">
       <div class="stitle">DTS — 일별 세수 · 지출</div>
       <div class="cards">
-        <div class="card"><div class="cl">최근일 세수 <button class="ib" onclick="tip(this,'Deposits: 세금+국채발행 등 TGA 유입.')">i</button></div><div class="cv up" id="c-dts-dep">—</div><div class="cs" id="c-dts-dep-d">—</div></div>
-        <div class="card"><div class="cl">최근일 지출 <button class="ib" onclick="tip(this,'Withdrawals: 지출+이자 등 TGA 유출.')">i</button></div><div class="cv dn" id="c-dts-wdl">—</div><div class="cs" id="c-dts-wdl-d">—</div></div>
-        <div class="card"><div class="cl">순수지 (D−W) <button class="ib" onclick="tip(this,'양수 → TGA 증가 → NL 감소 압력. 음수 → NL 증가 우호.')">i</button></div><div class="cv" id="c-dts-net">—</div><div class="cs">당일</div></div>
+        <div class="card"><div class="cl">최근일 세수 <button class="ib" onclick="tip('dts-dep',this)">i</button></div><div class="cv up" id="c-dts-dep">—</div><div class="cs" id="c-dts-dep-d">—</div></div>
+        <div class="card"><div class="cl">최근일 지출 <button class="ib" onclick="tip('dts-wdl',this)">i</button></div><div class="cv dn" id="c-dts-wdl">—</div><div class="cs" id="c-dts-wdl-d">—</div></div>
+        <div class="card"><div class="cl">순수지 (D−W) <button class="ib" onclick="tip('dts-net',this)">i</button></div><div class="cv" id="c-dts-net">—</div><div class="cs">당일</div></div>
       </div>
     </div>
     <div class="cc">
@@ -276,7 +358,7 @@ tr:hover td{background:var(--surf2)}
       <div style="position:relative;height:280px"><canvas id="dtsChart"></canvas></div>
     </div>
     <div class="cc">
-      <div class="ct">순수지 추이 <button class="ib" onclick="tip(this,'양수 = 세수 > 지출 → TGA 증가 압력.')">i</button></div>
+      <div class="ct">순수지 추이 <button class="ib" onclick="tip('dts-net',this)" data-x=" → TGA 증가 압력.')">i</button></div>
       <div class="leg"><span><span class="ld" style="background:#58a6ff"></span>순수지 (B$)</span></div>
       <div style="position:relative;height:200px"><canvas id="dtsNetChart"></canvas></div>
     </div>
@@ -294,9 +376,9 @@ tr:hover td{background:var(--surf2)}
     <div class="sec">
       <div class="stitle">QRA — 국채 발행 현황 (90일)</div>
       <div class="cards">
-        <div class="card"><div class="cl">T-Bill <button class="ib" onclick="tip(this,'단기채(1년 미만). T-Bill 위주 → RRP↓ 상쇄, NL 중립.')">i</button></div><div class="cv" id="c-qra-bill">—</div><div class="cs">유동성 중립↔</div></div>
-        <div class="card"><div class="cl">Notes (2~10Y) <button class="ib" onclick="tip(this,'중기채. 은행 준비금 흡수 → NL 압박.')">i</button></div><div class="cv" id="c-qra-note">—</div><div class="cs">NL 압박↓</div></div>
-        <div class="card"><div class="cl">Bonds (20~30Y) <button class="ib" onclick="tip(this,'장기채. 시장 흡수력 필요. 금리 상방 압력.')">i</button></div><div class="cv" id="c-qra-bond">—</div><div class="cs">NL 압박↓</div></div>
+        <div class="card"><div class="cl">T-Bill <button class="ib" onclick="tip('qra-bill',this)">i</button></div><div class="cv" id="c-qra-bill">—</div><div class="cs">유동성 중립↔</div></div>
+        <div class="card"><div class="cl">Notes (2~10Y) <button class="ib" onclick="tip('qra-note',this)">i</button></div><div class="cv" id="c-qra-note">—</div><div class="cs">NL 압박↓</div></div>
+        <div class="card"><div class="cl">Bonds (20~30Y) <button class="ib" onclick="tip('qra-bond',this)">i</button></div><div class="cv" id="c-qra-bond">—</div><div class="cs">NL 압박↓</div></div>
         <div class="card"><div class="cl">총 발행</div><div class="cv" id="c-qra-total">—</div><div class="cs">시장 흡수 규모</div></div>
       </div>
     </div>
@@ -377,6 +459,7 @@ async function loadNL(){
     const tM={},rM={};t.forEach(x=>tM[x.date]=x.v);r.forEach(x=>rM[x.date]=x.v);
     const nl=ww=>ww.v-(tM[ww.date]||lt.v)-(rM[ww.date]||lr.v);
     const nlV=nl(lw),dod=w.length>1?nlV-nl(w[w.length-2]):0;
+_sigData.nl={val:B(nlV*1e6),dod:dod*1e6};
     document.getElementById('c-nl').textContent=B(nlV*1e6);
     const de=document.getElementById('c-nl-dod');
     de.textContent=(dod>=0?'▲':'▼')+B(Math.abs(dod)*1e6)+' DoD';
@@ -408,12 +491,13 @@ async function loadNL(){
     }).join('');
   }catch(e){console.error('NL:',e);}
 }
+let _sigData={};
 
 async function loadRates(){
   try{
     const[sofr,iorb,tbill,effr,t10y2y]=await Promise.all([fred('SOFR',90),fred('IORB',90),fred('DTB3',90),fred('EFFR',90),fred('T10Y2Y',90)]);
     const ls=last(sofr),li=last(iorb),lt=last(tbill),le=last(effr);
-    if(ls)document.getElementById('c-sofr').textContent=ls.v.toFixed(2)+'%';
+    if(ls){document.getElementById('c-sofr').textContent=ls.v.toFixed(2)+'%';_sigData.sofr=ls.v;}
     if(li)document.getElementById('c-iorb').textContent=li.v.toFixed(2)+'%';
     if(lt)document.getElementById('c-tbill').textContent=lt.v.toFixed(2)+'%';
     if(le)document.getElementById('c-effr').textContent=le.v.toFixed(2)+'%';
@@ -478,6 +562,7 @@ async function loadDTS(){
     });
     const dates=[...new Set(d.data.map(x=>x.record_date))].sort().reverse();
     const lat=dates[0],dep=dM[lat]||0,wdl=wM[lat]||0,net=dep-wdl;
+    _sigData.dts={net};
     document.getElementById('c-dts-dep').textContent=N(Math.round(dep/1000))+'B$';
     document.getElementById('c-dts-dep-d').textContent=lat;
     document.getElementById('c-dts-wdl').textContent=N(Math.round(wdl/1000))+'B$';
@@ -511,6 +596,7 @@ async function loadQRA(){
       else if(x.security_type==='Bond')bond+=a;
     });
     const tot=bill+note+bond;
+    _sigData.qra={billPct:tot>0?bill/tot*100:50};
     document.getElementById('c-qra-bill').textContent=N(Math.round(bill))+'B$';
     document.getElementById('c-qra-note').textContent=N(Math.round(note))+'B$';
     document.getElementById('c-qra-bond').textContent=N(Math.round(bond))+'B$';
@@ -543,29 +629,189 @@ async function loadTIC(){
     ]);
   }catch(e){console.error('tic:',e);}
 }
+function _updateSignals(){updateSignalPanel(_sigData);}
 
-function tip(btn,txt){
+const TIPS={
+'nl':['Net Liquidity','FRED','NL = WALCL − TGA − RRP. Fed 대차대조표에서 재무부(TGA)와 MMF(RRP)가 흡수한 자금을 차감한 실질 시중 유동성.','NL 상승 → 은행 준비금 증가 → 위험자산 매수 여력 확대. SPX와 약 0.7 상관관계. NL 감소 전환 시 주식 조정 선행 신호.'],
+'walcl':['WALCL — Fed 총자산','FRED 주간','연준이 보유한 국채·MBS·대출 등 모든 자산의 합계. QE 시 자산매입으로 증가, QT 시 만기도래분 미재투자로 감소.','QT 속도 $600B/년 → 주 ~$115B 감소. WALCL 감소 = NL 직접 감소. 속도 둔화·중단 뉴스 → 시장 유동성 기대 상승.'],
+'tga':['TGA — 재무부 당좌계좌','FRED 일간','재무부가 Fed에 보유한 운영계좌. 세수 유입·국채 발행 시 증가(NL↓), 재정 지출 시 감소(NL↑). 부채한도 협상과 직결.','TGA 고갈 → NL 인위 상승(착시). 해소 후 TGA 재충전 → NL 급감 위험. 4월·9월 세금 납부 시즌 전후 급등락 주의.'],
+'rrp':['RRP — 역레포 잔액','FRED 일간','MMF가 Fed에 단기 예치하는 자금. 잔액 증가 = 시중 자금이 Fed로 흡수. T-Bill 금리 > RRP 금리 시 잔액 감소 → NL 증가.','RRP 잔액 $0 접근 = 유동성 추가 공급 여력 소진 신호. 잔액 재증가 = MMF가 Fed 선호 → 시장 유동성 축소.'],
+'wresbal':['WRESBAL — 은행 지급준비금','FRED 주간','시중은행이 Fed에 예치한 준비금. 최저 적정 준비금(LCLoR) ~$3T 이하 시 repo 금리 급등 위험. 2019년 9월 repo 대란 사례.','준비금 감소 추세 + repo 스프레드 확대 = QT 한계 도달 신호. Fed QT 속도 조절·중단 검토 기준선.'],
+'sofr':['SOFR — 담보부 익일물 금리','FRED 일간','국채 담보 overnight repo 거래 가중 중앙값. LIBOR 공식 대체(2023). 파생상품·대출 기준금리로 광범위 사용.','SOFR < IORB 크게 하락 = 담보 수요 약화 → 유동성 완화. SOFR 급등 = repo 시장 경색 → 단기 자금 압박.'],
+'iorb':['IORB — 준비금 이자율','FRED','Fed가 은행 준비금에 지급하는 이자율. 사실상 Fed Funds Rate 하단. IORB 이하로 금리 하락 시 은행이 준비금 공급 확대.','IORB = 단기금리 바닥. SOFR < IORB 시 Fed 정책 의도 이탈. 금리 인하 시 IORB도 동일 폭 하향 조정.'],
+'tbill':['T-Bill 3M — 3개월 국채','FRED 일간','만기 3개월 미국 국채 수익률(DTB3). RRP 금리보다 높을 때 MMF 자금이 T-Bill로 이동 → RRP 잔액 감소 → NL 증가.','T-Bill > RRP = MMF→시장 자금 이동 → 유동성 공급. T-Bill < RRP = MMF가 Fed 선호 → 시장 유동성 축소.'],
+'effr':['EFFR — 실효 연방기금금리','FRED 일간','Fed 기준금리 목표범위의 실제 거래 가중평균. FOMC 목표범위(±12.5bp) 내 유지가 정상.','EFFR 목표 상단 초과 = 시중 달러 부족 → 긴축 압력. FOMC 결정의 실행 결과물.'],
+'spread':['SOFR−IORB 스프레드','계산값','SOFR에서 IORB를 뺀 값(bp). 음수 확대 = repo 시장 자금 공급 과잉 → 유동성 완화 환경.','음수 심화 → 유동성 완화. 양수 급등 → repo 스트레스 → 2019년 9월 패턴 주의.'],
+'sofr_chart':['금리 4종 추이','FRED','SOFR·IORB·T-Bill·EFFR 동시 표시. 4개 금리 수렴 = 정책 의도대로 작동 중.','금리 간 스프레드 확대 = 시장 마찰 증가. SOFR 급등 = repo 경색 신호.'],
+'yield':['10Y−2Y 장단기 금리차','FRED 일간','10년물−2년물 금리 차이. 역전(음수) = 경기침체 선행지표. 역사적으로 역전 후 12~18개월 내 침체.','역전 해소(재역전) 후 실업률 상승 본격화 패턴. 현재 금리차 방향이 경기 사이클 위치 확인 핵심.'],
+'ust':['UST — 연준 미국채 보유','FRED H.4.1 주간','Fed 보유 미국채 총액(TREAST). QT로 만기도래분 미재투자 중. 상한 $600B/년.','보유액 감소 둔화·중단 = QT 종료 신호 → 시장 유동성 기대 상승.'],
+'mbs':['MBS — 연준 주택저당증권','FRED H.4.1 주간','Fed 보유 MBS(MBST). 만기 도래분 재투자 중단으로 자연 감소. 능동 매각 없음.','MBS 감소 속도가 UST보다 느림. 30Y 모기지 금리와 연동.'],
+'btfp':['BTFP — Bank Term Funding','FRED','2023년 SVB 사태 후 긴급 은행 지원 창구. 국채·MBS 액면가 담보 1년 대출. 2024년 3월 만료.','잔액 0 수렴 = 은행 위기 완화 확인. 잔액 재증가 = 은행권 유동성 스트레스 재발 신호.'],
+'dw':['Discount Window — 재할인창구','FRED','Fed 최후 대출자. 담보 제공 후 단기 자금 조달. 정책금리 +0.1%. 사용 시 시장에 스트레스 신호.','DW 잔액 급증 = 은행 유동성 압박. 2023년 이후 낙인 효과 감소 중.'],
+'m2':['M2 통화량','FRED 월간','현금+요구불+저축성예금+MMF+소액 정기예금. YoY 성장률이 인플레이션 6~12개월 선행.','M2 YoY +5% 이상 = 인플레 상방 압력. 2022~2023 마이너스 = 통화 수축 → 경기 냉각 선행.'],
+'m2yoy':['M2 YoY 성장률','계산값','전년 동월 대비 M2 증감률. 정상 ±2~8%. -5% 이하는 1930년대 이후 처음(2023).','YoY 플러스 전환 = 통화 정상화 신호. 급격한 반등 시 인플레 재점화 우려.'],
+'dts-dep':['세수 (Deposits)','fiscaldata 일간','TGA 유입: 법인세·개인소득세·관세·국채발행 대금. 4월 15일 전후 급등.','세수 급증 → TGA 증가 → NL 감소 압력. 세수 부진 → 재정적자 → 국채 추가 발행 필요.'],
+'dts-wdl':['지출 (Withdrawals)','fiscaldata 일간','TGA 유출: 사회보장·국방·이자 지급. 월초(이자·급여), 월말(소셜시큐리티) 집중.','지출 > 세수 = 재정적자 → TGA 소진 → NL 상승. 재정 지출 확대 = 유동성 공급 채널.'],
+'dts-net':['순수지 (D−W)','계산값','일별 TGA 순변동. 양수 = TGA 증가 → NL↓. 음수 = TGA 소진 → NL↑.','분기 말 대규모 양수 이후 재정 지출 시기 음수 전환 = NL 상승 기회. 달력 기반 패턴 추적 유용.'],
+'qra-bill':['T-Bill 발행','fiscaldata','만기 4주~52주 단기채. T-Bill 위주 → MMF RRP 자금이 T-Bill로 이동 → RRP 잔액 감소 → NL 상쇄.','T-Bill 비중 높을수록 NL 중립~유입. 재무부 T-Bill 비중 확대 = 시장 유동성 압박 완화 신호.'],
+'qra-note':['Notes 발행 (2~10Y)','fiscaldata','2·3·5·7·10년 중기채. 은행·연기금이 주 매수자 → 준비금 직접 흡수 → NL 감소 압박.','Notes 비중 증가 = NL 직접 압박. 금리 상승 시 발행 비용 증가 → 재정 이자 부담 확대.'],
+'qra-bond':['Bonds 발행 (20~30Y)','fiscaldata','20·30년 장기채. 보험·연기금·해외 중앙은행이 주 매수자. 발행 증가 시 장기금리 상방 압력.','30Y 금리 6% 접근 시 시장 흡수 한계 우려. 수급 불균형 → 장기금리 변동성 확대 → 밸류에이션 압박.'],
+'qra-total':['총 국채 발행','fiscaldata','T-Bill+Notes+Bonds 합계. 재정적자 + 만기 차환 수요 반영. 연간 $20T 이상 규모.','총 발행 증가 = 시장 자금 흡수 → 민간 투자 구축. 발행 구성(T-Bill vs 쿠폰채)의 NL 영향 차이 중요.'],
+'tic':['TIC — 국가별 미국채 보유','미 재무부 월간','Treasury International Capital. 외국 정부·기관 미국채 보유 현황. 약 6주 후행 발표.','일본·중국 보유 감소 = 달러 약세 + 미국채 금리 상승 압력. 지정학 위기 시 보유국 매도(무기화) 우려.']
+};
+function tip(key,btn){
   const el=document.getElementById('tipEl');
   if(el.style.display==='block'&&el._s===btn){el.style.display='none';return;}
-  el.textContent=txt;el._s=btn;el.style.display='block';
+  const t=TIPS[key];
+  if(!t){el.style.display='none';return;}
+  el.innerHTML='<div class="tip-hd"><span class="tip-name">'+t[0]+'</span><span class="tip-tag">'+t[1]+'</span></div><div class="tip-bd">'+t[2]+'</div><div class="tip-insight">'+t[3]+'</div>';
+  el._s=btn;el.style.display='block';
   const rc=btn.getBoundingClientRect();
-  el.style.top=(rc.bottom+6)+'px';
-  el.style.left=Math.min(rc.left,window.innerWidth-270)+'px';
+  let left=rc.left;
+  if(left+300>window.innerWidth-10)left=window.innerWidth-310;
+  el.style.top=(rc.bottom+8)+'px';
+  el.style.left=left+'px';
 }
 document.addEventListener('click',e=>{const el=document.getElementById('tipEl');if(el&&!e.target.classList.contains('ib'))el.style.display='none';});
 
-const TABS=['nl','rates','h41','m2','dts','qra','tic'];
+
+const TABS=['nl','rates','h41','m2','dts','qra','tic','cal'];
 function sw(name,btn){
   TABS.forEach(t=>{const el=document.getElementById('t-'+t);if(el)el.style.display=t===name?'':'none';});
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
   if(btn)btn.classList.add('on');
+  if(name==='cal')renderCal();
+}
+
+function setSig(id,val,desc,pct,color){
+  const led=document.getElementById('led-'+id);
+  const bar=document.getElementById('sp-'+id+'-bar');
+  if(led)led.style.background=color;
+  if(bar){bar.style.width=pct+'%';bar.style.background=color;}
+  const vEl=document.getElementById('sp-'+id==='nl'?'sp-nl':id==='rates'?'sp-sofr':id==='dts'?'sp-dts':'sp-qra');
+  const dEl=document.getElementById('sp-'+id+'-desc');
+  if(vEl)vEl.textContent=val;
+  if(dEl)dEl.textContent=desc;
+}
+
+function updateSignalPanel(data){
+  const scores=[];
+  if(data.nl){
+    const dod=data.nl.dod||0;
+    const col=dod>0?'#3fb950':dod<-100?'#f85149':'#d29922';
+    const pct=Math.min(100,Math.max(20,50+(dod/50)));
+    setSig('nl',data.nl.val,dod>0?'NL 증가 추세. 위험자산 우호 환경.':dod<-100?'NL 감소 추세. 유동성 압박.':'NL 보합. 방향 주시.',pct,col);
+    scores.push(dod>0?2:dod<-100?0:1);
+  }
+  if(data.sofr){
+    const v=data.sofr;
+    const col=v<4.5?'#3fb950':v>5.0?'#f85149':'#d29922';
+    setSig('rates',v.toFixed(2)+'%',v<4.5?'SOFR 안정. 단기자금 정상 작동.':v>5.0?'SOFR 상승. 단기금리 압박.':'SOFR 중립 수준.',65,col);
+    scores.push(v<4.5?2:v>5.0?0:1);
+  }
+  if(data.dts){
+    const net=data.dts.net;
+    const col=net>50?'#f85149':net<-50?'#3fb950':'#d29922';
+    const sign=net>0?'+':'';
+    setSig('dts',sign+Math.round(net/1000)+'B$',net>50?'세수 우세. TGA 증가 → NL 압박.':net<-50?'지출 우세. TGA 소진 → NL 우호.':'세수·지출 균형.',net>0?40:70,col);
+    scores.push(net>50?0:net<-50?2:1);
+  }
+  if(data.qra){
+    const billPct=data.qra.billPct;
+    const col=billPct>50?'#3fb950':billPct<30?'#f85149':'#d29922';
+    setSig('qra','T-Bill '+Math.round(billPct)+'%',billPct>50?'T-Bill 위주. NL 영향 중립~우호.':billPct<30?'쿠폰채 위주. NL 압박 확대.':'발행 구성 균형.',billPct,col);
+    scores.push(billPct>50?2:billPct<30?0:1);
+  }
+  const avg=scores.length?scores.reduce((a,b)=>a+b,0)/scores.length:1;
+  const overall=document.getElementById('sp-overall');
+  if(overall){
+    const col=avg>=1.5?'#3fb950':avg>=0.8?'#d29922':'#f85149';
+    const label=avg>=1.5?'우호 — 유동성 공급 환경':avg>=0.8?'중립 — 혼재 신호':'주의 — 유동성 압박';
+    overall.innerHTML='<span class="sp-dot" style="background:'+col+'"></span><span style="color:'+col+'">'+label+'</span>';
+  }
+}
+
+const FISCAL_EVENTS = [
+  {y:2026,m:1,d:29,type:'fomc',name:'FOMC 회의 (1/28~29)',badge:'eb-fomc'},
+  {y:2026,m:3,d:20,type:'fomc',name:'FOMC 회의 (3/18~19)',badge:'eb-fomc'},
+  {y:2026,m:4,d:15,type:'tax',name:'Tax Day — 개인소득세 마감',badge:'eb-tax'},
+  {y:2026,m:4,d:9,type:'tax',name:'법인세 분납 (1분기)',badge:'eb-tax'},
+  {y:2026,m:4,d:24,type:'fomc',name:'FOMC 회의 (4/24~25)',badge:'eb-fomc'},
+  {y:2026,m:4,d:27,type:'qra',name:'QRA 분기 차입 수요 발표',badge:'eb-qra'},
+  {y:2026,m:4,d:30,type:'matur',name:'국채 만기 집중 (~$420B)',badge:'eb-matur'},
+  {y:2026,m:5,d:15,type:'tax',name:'법인세 분납 (Q1 추가)',badge:'eb-tax'},
+  {y:2026,m:6,d:10,type:'fomc',name:'FOMC 회의 (6/9~10)',badge:'eb-fomc'},
+  {y:2026,m:6,d:15,type:'tax',name:'법인세 분납 (2분기)',badge:'eb-tax'},
+  {y:2026,m:6,d:30,type:'matur',name:'국채 만기 집중',badge:'eb-matur'},
+  {y:2026,m:7,d:27,type:'qra',name:'QRA 발표 (Q3)',badge:'eb-qra'},
+  {y:2026,m:7,d:29,type:'fomc',name:'FOMC 회의 (7/28~29)',badge:'eb-fomc'},
+  {y:2026,m:9,d:15,type:'tax',name:'법인세 분납 (3분기)',badge:'eb-tax'},
+  {y:2026,m:9,d:16,type:'fomc',name:'FOMC 회의 (9/15~16)',badge:'eb-fomc'},
+  {y:2026,m:10,d:26,type:'qra',name:'QRA 발표 (Q4)',badge:'eb-qra'},
+  {y:2026,m:11,d:4,type:'fomc',name:'FOMC 회의 (11/3~4)',badge:'eb-fomc'},
+  {y:2026,m:12,d:15,type:'tax',name:'법인세 분납 (4분기)',badge:'eb-tax'},
+  {y:2026,m:12,d:16,type:'fomc',name:'FOMC 회의 (12/15~16)',badge:'eb-fomc'},
+];
+
+let calYear=2026, calMonth=4;
+
+function calMove(dir){
+  calMonth+=dir;
+  if(calMonth>12){calMonth=1;calYear++;}
+  if(calMonth<1){calMonth=12;calYear--;}
+  renderCal();
+}
+
+function renderCal(){
+  const label=document.getElementById('cal-month-label');
+  if(label)label.textContent=calYear+'년 '+calMonth+'월';
+  const grid=document.getElementById('cal-grid');
+  if(!grid)return;
+  const today=new Date();
+  const firstDay=new Date(calYear,calMonth-1,1).getDay();
+  const daysInMonth=new Date(calYear,calMonth,0).getDate();
+  const evMap={};
+  FISCAL_EVENTS.filter(e=>e.y===calYear&&e.m===calMonth).forEach(e=>{
+    evMap[e.d]=(evMap[e.d]||[]);evMap[e.d].push(e);
+  });
+  let html='';
+  for(let i=0;i<firstDay;i++)html+='<div class="cd empty"></div>';
+  for(let d=1;d<=daysInMonth;d++){
+    const evs=evMap[d]||[];
+    const isToday=today.getFullYear()===calYear&&today.getMonth()===calMonth-1&&today.getDate()===d;
+    let cls='cd';
+    if(isToday)cls+=' today';
+    if(evs.some(e=>e.type==='fomc'))cls+=' fomc';
+    else if(evs.some(e=>e.type==='tax'))cls+=' tax';
+    else if(evs.some(e=>e.type==='qra'))cls+=' qra';
+    else if(evs.some(e=>e.type==='matur'))cls+=' matur';
+    const dot=evs.length?'<div class="ev" style="background:'+(evs[0].type==='fomc'?'#a371f7':evs[0].type==='tax'?'#f85149':evs[0].type==='qra'?'#d29922':'#3fb950')+'"></div>':'';
+    html+='<div class="'+cls+'">'+d+dot+'</div>';
+  }
+  grid.innerHTML=html;
+  const evList=document.getElementById('ev-list');
+  if(!evList)return;
+  const now=new Date();
+  const upcoming=FISCAL_EVENTS.filter(e=>{
+    const d=new Date(e.y,e.m-1,e.d);return d>=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  }).slice(0,5);
+  evList.innerHTML=upcoming.map(e=>{
+    const d=new Date(e.y,e.m-1,e.d);
+    const diff=Math.round((d-new Date(now.getFullYear(),now.getMonth(),now.getDate()))/(86400000));
+    const diffStr=diff===0?'오늘':diff===1?'내일':diff+'일 후';
+    const col=e.type==='fomc'?'#a371f7':e.type==='tax'?'#f85149':e.type==='qra'?'#d29922':'#3fb950';
+    return '<div class="ev-item"><span class="ev-date">'+e.m+'/'+e.d+'</span><span class="ev-dot2" style="background:'+col+'"></span><span class="ev-name">'+e.name+'</span><span class="ev-badge '+e.badge+'">'+((e.type==='fomc'?'FOMC':e.type==='tax'?'Tax':e.type==='qra'?'QRA':'만기'))+'</span><span class="ev-days">'+diffStr+'</span></div>';
+  }).join('');
 }
 
 async function loadAll(){
   document.getElementById('ts').textContent='업데이트 중...';
+  _sigData={};
   await Promise.all([loadNL(),loadRates(),loadH41(),loadM2(),loadDTS(),loadQRA(),loadTIC()]);
+  _updateSignals();
   const kst=new Date(Date.now()+9*3600*1000);
   document.getElementById('ts').textContent='업데이트: '+kst.toISOString().slice(0,16).replace('T',' ')+' KST';
+  renderCal();
 }
 loadAll();
 </script>
