@@ -743,19 +743,22 @@ async function loadQRA(){
       const tc=x.security_type==='Bill'?'badge badge-blue':x.security_type==='Note'?'badge badge-green':'badge badge-red';
       return`<tr><td>${x.auction_date}</td><td><span class="${tc}">${x.security_type}</span></td><td>${x.security_term}</td><td>${a}</td></tr>`;
     }).join('');
-    // 경매 결과 테이블 (upcoming_auctions - 완료된 경매)
+    // 경매 결과 테이블 (TreasuryDirect API)
     const arBody=document.getElementById('auctionResultTbody');
     if(arBody){
-      const results=(d.data||[]).filter(x=>x.offering_amt&&x.offering_amt!=='null').slice(0,10);
+      const results=(d.results||[]).filter(x=>x.auctionDate).slice(0,10);
       if(results.length){
         arBody.innerHTML=results.map(x=>{
-          const amt=N(Math.round(parseFloat(x.offering_amt)/1e9))+'B$';
-          const tc=x.security_type==='Bill'?'badge badge-blue':x.security_type==='Note'?'badge badge-green':'badge badge-red';
-          const yld=x.high_yield&&x.high_yield!=='null'?parseFloat(x.high_yield).toFixed(3)+'%':'—';
-          const btc=x.bid_to_cover_ratio&&x.bid_to_cover_ratio!=='null'?parseFloat(x.bid_to_cover_ratio).toFixed(2):'—';
+          const amt=x.offeringAmount?N(Math.round(parseFloat(x.offeringAmount)/1e9))+'B$':'—';
+          const type=x.securityType||'—';
+          const tc=type==='Bill'?'badge badge-blue':type==='Note'?'badge badge-green':'badge badge-red';
+          const yld=x.highYield?parseFloat(x.highYield).toFixed(3)+'%':(x.highDiscountRate?parseFloat(x.highDiscountRate).toFixed(3)+'%':'—');
+          const btc=x.bidToCoverRatio?parseFloat(x.bidToCoverRatio).toFixed(2):'—';
           const btcNum=btc!=='—'?parseFloat(btc):null;
           const btcCls=btcNum!==null?(btcNum>=2.0?'up':btcNum<1.8?'dn':''):'';
-          return`<tr><td>${x.auction_date}</td><td><span class="${tc}">${x.security_type}</span></td><td>${x.security_term}</td><td>${amt}</td><td>${yld}</td><td class="${btcCls}">${btc}</td><td>—</td></tr>`;
+          const term=x.securityTerm||'—';
+          const date=x.auctionDate?x.auctionDate.slice(0,10):'—';
+          return`<tr><td>${date}</td><td><span class="${tc}">${type}</span></td><td>${term}</td><td>${amt}</td><td>${yld}</td><td class="${btcCls}">${btc}</td><td>—</td></tr>`;
         }).join('');
       } else {
         arBody.innerHTML='<tr><td colspan="7" class="loading">경매 결과 없음</td></tr>';
