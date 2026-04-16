@@ -128,31 +128,20 @@ tr:hover td{background:var(--color-surface2)}
 <div class="tip" id="tipEl"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-const FRED_KEY='3d022b35a44eabf7bb45dbdd9a1cfa01';
 const charts={};
 const fmt=(v,d=0)=>v==null||isNaN(v)?'—':new Intl.NumberFormat('ko-KR',{maximumFractionDigits:d}).format(v);
 const fmtB=v=>{if(!v||isNaN(v))return'—';const b=v/1e9;if(b>=1000)return(b/1000).toFixed(2)+'T$';if(b>=1)return Math.round(b)+'B$';return Math.round(v/1e6)+'M$';};
 
-function fred(series,count=90,freq=''){
-  return new Promise(resolve=>{
-    const cb='_fred_'+series.replace(/\W/g,'')+'_'+Date.now();
-    let url=`https://api.stlouisfed.org/fred/series/observations?series_id=${series}&api_key=${FRED_KEY}&file_type=json&sort_order=desc&limit=${count}&callback=${cb}`;
-    if(freq)url+=`&frequency=${freq}`;
-    window[cb]=d=>{
-      try{document.head.removeChild(document.head.querySelector(`script[src*="${cb}"]`));}catch(e){}
-      delete window[cb];
-      if(!d||!d.observations){resolve([]);return;}
-      resolve(d.observations.filter(o=>o.value!=='.').map(o=>({date:o.date,value:parseFloat(o.value)})).reverse());
-    };
-    const s=document.createElement('script');
-    s.src=url;
-    s.onerror=()=>{delete window[cb];resolve([]);};
-    document.head.appendChild(s);
-  });
+async function fred(series,count=90,freq=''){
+  let url=`/api/fred?series=${series}&count=${count}`;
+  if(freq)url+=`&freq=${freq}`;
+  const r=await fetch(url);
+  const d=await r.json();
+  if(!d.observations)return[];
+  return d.observations.filter(o=>o.value!=='.').map(o=>({date:o.date,value:parseFloat(o.value)})).reverse();
 }
 
 const last=arr=>arr&&arr.length?arr[arr.length-1]:null;
-
 function mkChart(id,type,labels,datasets,extra={}){
   if(charts[id])charts[id].destroy();
   const ctx=document.getElementById(id);if(!ctx)return;
