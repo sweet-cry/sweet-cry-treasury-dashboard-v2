@@ -72,7 +72,7 @@ a{color:var(--blue);text-decoration:none}
 /* table */
 .tw{overflow-x:auto;border-radius:var(--r);border:1px solid var(--brd)}
 table{width:100%;border-collapse:collapse;font-size:12px}
-th{text-align:right;padding:8px 12px;background:var(--surf2);border-bottom:1px solid var(--brd);color:var(--muted);font-weight:500;white-space:nowrap}
+th{text-align:right;padding:8px 12px;background:var(--surf2);border-bottom:1px solid var(--brd);color:var(--muted);font-weight:500;white-space:nowrap;line-height:1.4}
 th:first-child{text-align:left}
 td{text-align:right;padding:7px 12px;border-bottom:1px solid #21262d;color:var(--tx);font-variant-numeric:tabular-nums}
 td:first-child{text-align:left;color:var(--muted)}
@@ -290,7 +290,7 @@ tr:hover td{background:var(--surf2)}
     <div class="sec">
       <div class="stitle">최근 30일 데이터</div>
       <div class="tw"><table>
-        <thead><tr><th>날짜</th><th>WALCL (B)</th><th>TGA (B)</th><th>RRP (B)</th><th>NL (B)</th><th>DoD</th></tr></thead>
+        <thead><tr><th>날짜</th><th>WALCL (B)<br><span id="th-walcl" style="font-size:9px;font-weight:400;color:var(--muted)">—</span></th><th>TGA (B)<br><span id="th-tga" style="font-size:9px;font-weight:400;color:var(--muted)">—</span></th><th>RRP (B)<br><span id="th-rrp" style="font-size:9px;font-weight:400;color:var(--muted)">—</span></th><th>NL (B)</th><th>DoD</th></tr></thead>
         <tbody id="nlTbody"><tr><td colspan="6" class="loading">로딩 중...</td></tr></tbody>
       </table></div>
     </div>
@@ -558,6 +558,10 @@ _sigData.nl={val:B(nlV*1e6),dod:dod*1e6};
     de.textContent=(dod>=0?'▲':'▼')+B(Math.abs(dod)*1e6)+' DoD';
     de.className='cs '+(dod>=0?'up':'dn');
     document.getElementById('c-walcl').textContent=B(lw.v*1e6);document.getElementById('c-walcl-d').textContent=lw.date;
+    const thW=document.getElementById('th-walcl');const thT=document.getElementById('th-tga');const thR=document.getElementById('th-rrp');
+    if(thW)thW.textContent=lw.date.slice(5);
+    if(thT)thT.textContent=lt.date.slice(5);
+    if(thR)thR.textContent=lr.date.slice(5);
     document.getElementById('c-tga').textContent=B(lt.v*1e6);document.getElementById('c-tga-d').textContent=lt.date;
     document.getElementById('c-rrp').textContent=B(lr.v*1e6);document.getElementById('c-rrp-d').textContent=lr.date;
     const lr2=last(res);
