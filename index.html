@@ -6,235 +6,405 @@
 <title>Fed Liquidity Dashboard</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--color-bg:#0d1117;--color-surface:#161b22;--color-surface2:#21262d;--color-border:#30363d;--color-text:#e6edf3;--color-muted:#8b949e;--color-blue:#58a6ff;--color-green:#3fb950;--color-red:#f85149;--color-orange:#d29922;--color-purple:#a371f7;--radius:8px;--radius-lg:12px;}
-body{background:var(--color-bg);color:var(--color-text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px}
-.dash{padding:20px;max-width:1200px;margin:0 auto}
-.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:14px;border-bottom:1px solid var(--color-border)}
-.header h1{font-size:16px;font-weight:500;color:var(--color-text);display:flex;align-items:center;gap:10px}
-.live-dot{width:7px;height:7px;border-radius:50%;background:var(--color-green);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.ts{font-size:12px;color:var(--color-muted)}
-.refresh-btn{font-size:12px;padding:5px 14px;border:1px solid var(--color-border);border-radius:var(--radius);background:transparent;color:var(--color-text);cursor:pointer}
-.refresh-btn:hover{background:var(--color-surface2)}
-.tabs{display:flex;gap:0;margin-bottom:24px;border-bottom:1px solid var(--color-border);overflow-x:auto}
-.tab{font-size:13px;padding:9px 18px;cursor:pointer;color:var(--color-muted);border-bottom:2px solid transparent;margin-bottom:-1px;background:transparent;border-top:none;border-left:none;border-right:none;white-space:nowrap}
-.tab.active{color:var(--color-text);border-bottom:2px solid var(--color-blue);font-weight:500}
-.tab:hover{color:var(--color-text)}
-.section-title{font-size:11px;font-weight:500;color:var(--color-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:20px}
-.card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:14px 16px}
-.card-label{font-size:11px;color:var(--color-muted);margin-bottom:6px;display:flex;align-items:center;gap:5px}
-.card-value{font-size:20px;font-weight:500;color:var(--color-text);line-height:1.2}
-.card-sub{font-size:11px;color:var(--color-muted);margin-top:5px}
-.up{color:var(--color-green)}.down{color:var(--color-red)}
-.chart-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:16px;margin-bottom:16px}
-.chart-title{font-size:13px;font-weight:500;color:var(--color-text);margin-bottom:12px;display:flex;align-items:center;gap:8px}
-.legend{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:10px;font-size:11px;color:var(--color-muted)}
-.legend span{display:flex;align-items:center;gap:5px}
-.ld{width:10px;height:10px;border-radius:2px;flex-shrink:0}
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+:root{
+  --bg:#0d1117;--surf:#161b22;--surf2:#21262d;--brd:#30363d;
+  --tx:#e6edf3;--muted:#8b949e;
+  --blue:#58a6ff;--green:#3fb950;--red:#f85149;--amber:#d29922;--purple:#a371f7;
+  --r:8px;--rl:12px;
+}
+body{background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;font-size:14px;line-height:1.5}
+a{color:var(--blue);text-decoration:none}
+.wrap{padding:20px;max-width:1280px;margin:0 auto}
+
+/* header */
+.hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--brd)}
+.hdr-left{display:flex;align-items:center;gap:10px}
+.hdr h1{font-size:15px;font-weight:600;letter-spacing:-.01em}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.ts{font-size:11px;color:var(--muted)}
+.rbtn{font-size:12px;padding:5px 12px;border:1px solid var(--brd);border-radius:var(--r);background:transparent;color:var(--tx);cursor:pointer;transition:background .15s}
+.rbtn:hover{background:var(--surf2)}
+
+/* tabs */
+.tabs{display:flex;border-bottom:1px solid var(--brd);margin-bottom:20px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{font-size:13px;padding:8px 16px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;background:transparent;border-top:none;border-left:none;border-right:none;white-space:nowrap;transition:color .15s}
+.tab.on{color:var(--tx);border-bottom-color:var(--blue);font-weight:500}
+.tab:hover{color:var(--tx)}
+
+/* section */
+.stitle{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
+.sec{margin-bottom:24px}
+
+/* cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:16px}
+.card{background:var(--surf);border:1px solid var(--brd);border-radius:var(--rl);padding:14px 16px;transition:border-color .15s}
+.card:hover{border-color:#444c56}
+.cl{font-size:11px;color:var(--muted);margin-bottom:5px;display:flex;align-items:center;gap:5px}
+.cv{font-size:21px;font-weight:600;color:var(--tx);letter-spacing:-.02em;line-height:1.2}
+.cs{font-size:11px;color:var(--muted);margin-top:4px}
+.up{color:var(--green)}.dn{color:var(--red)}
+
+/* chart card */
+.cc{background:var(--surf);border:1px solid var(--brd);border-radius:var(--rl);padding:16px;margin-bottom:14px}
+.ct{font-size:13px;font-weight:500;color:var(--tx);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.leg{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:10px;font-size:11px;color:var(--muted)}
+.leg span{display:flex;align-items:center;gap:5px}
+.ld{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+
+/* layout */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .full{grid-column:1/-1}
-.info-btn{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;border:1px solid var(--color-border);font-size:9px;color:var(--color-muted);cursor:pointer;background:transparent;flex-shrink:0}
-.info-btn:hover{border-color:var(--color-blue);color:var(--color-blue)}
-.tip{position:fixed;background:var(--color-surface2);border:1px solid var(--color-border);border-radius:var(--radius);padding:10px 14px;font-size:12px;color:var(--color-muted);max-width:260px;z-index:999;line-height:1.6;display:none}
-.table-wrap{overflow-x:auto}
+
+/* info btn */
+.ib{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;border:1px solid var(--brd);font-size:9px;color:var(--muted);cursor:pointer;background:transparent;flex-shrink:0;transition:all .15s}
+.ib:hover{border-color:var(--blue);color:var(--blue)}
+
+/* tooltip */
+.tip{position:fixed;background:var(--surf2);border:1px solid #444c56;border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--muted);max-width:260px;z-index:9999;line-height:1.6;display:none;pointer-events:none}
+
+/* table */
+.tw{overflow-x:auto;border-radius:var(--r);border:1px solid var(--brd)}
 table{width:100%;border-collapse:collapse;font-size:12px}
-th{text-align:right;padding:8px 10px;border-bottom:1px solid var(--color-border);color:var(--color-muted);font-weight:500}
+th{text-align:right;padding:8px 12px;background:var(--surf2);border-bottom:1px solid var(--brd);color:var(--muted);font-weight:500;white-space:nowrap}
 th:first-child{text-align:left}
-td{text-align:right;padding:8px 10px;border-bottom:1px solid var(--color-border);color:var(--color-text)}
-td:first-child{text-align:left;color:var(--color-muted)}
-tr:hover td{background:var(--color-surface2)}
-.loading{color:var(--color-muted);font-size:13px;padding:24px;text-align:center}
-.section{margin-bottom:28px}
-@media(max-width:640px){.two-col{grid-template-columns:1fr}.cards{grid-template-columns:1fr 1fr}}
+td{text-align:right;padding:7px 12px;border-bottom:1px solid #21262d;color:var(--tx);font-variant-numeric:tabular-nums}
+td:first-child{text-align:left;color:var(--muted)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--surf2)}
+
+.loading{color:var(--muted);font-size:13px;padding:24px;text-align:center}
+
+/* badge */
+.badge{font-size:9px;padding:2px 6px;border-radius:4px;font-weight:500}
+.badge-green{background:rgba(63,185,80,.15);color:var(--green)}
+.badge-red{background:rgba(248,81,73,.15);color:var(--red)}
+.badge-blue{background:rgba(88,166,255,.15);color:var(--blue)}
+
+/* divider */
+.divider{height:1px;background:var(--brd);margin:20px 0}
+
+@media(max-width:700px){
+  .two{grid-template-columns:1fr}
+  .cards{grid-template-columns:1fr 1fr}
+  .wrap{padding:14px}
+  .cv{font-size:18px}
+}
+@media(max-width:400px){
+  .cards{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
-<div class="dash">
-  <div class="header">
-    <h1><span class="live-dot"></span>Fed Liquidity Dashboard</h1>
+<div class="wrap">
+  <div class="hdr">
+    <div class="hdr-left">
+      <span class="dot"></span>
+      <h1>Fed Liquidity Dashboard</h1>
+    </div>
     <div style="display:flex;align-items:center;gap:12px">
       <span class="ts" id="ts">로딩 중...</span>
-      <button class="refresh-btn" onclick="loadAll()">↻ 새로고침</button>
+      <button class="rbtn" onclick="loadAll()">↻ 새로고침</button>
     </div>
   </div>
+
   <div class="tabs">
-    <button class="tab active" onclick="switchTab('nl',this)">Net Liquidity</button>
-    <button class="tab" onclick="switchTab('rates',this)">단기금리</button>
-    <button class="tab" onclick="switchTab('h41',this)">H.4.1 상세</button>
-    <button class="tab" onclick="switchTab('m2',this)">M2 · 준비금</button>
-    <button class="tab" onclick="switchTab('dts',this)">DTS</button>
-    <button class="tab" onclick="switchTab('qra',this)">QRA</button>
-    <button class="tab" onclick="switchTab('tic',this)">TIC</button>
+    <button class="tab on" onclick="sw('nl',this)">Net Liquidity</button>
+    <button class="tab" onclick="sw('rates',this)">단기금리</button>
+    <button class="tab" onclick="sw('h41',this)">H.4.1</button>
+    <button class="tab" onclick="sw('m2',this)">M2 · 준비금</button>
+    <button class="tab" onclick="sw('dts',this)">DTS</button>
+    <button class="tab" onclick="sw('qra',this)">QRA</button>
+    <button class="tab" onclick="sw('tic',this)">TIC</button>
   </div>
-  <div id="tab-nl">
-    <div class="section"><div class="section-title">핵심 지표</div>
+
+  <!-- ── NL ── -->
+  <div id="t-nl">
+    <div class="sec">
+      <div class="stitle">핵심 유동성 지표</div>
       <div class="cards">
-        <div class="card"><div class="card-label">Net Liquidity <button class="info-btn" onclick="tip(this,'NL = WALCL − TGA − RRP.')">i</button></div><div class="card-value" id="c-nl">—</div><div class="card-sub" id="c-nl-dod">—</div></div>
-        <div class="card"><div class="card-label">WALCL</div><div class="card-value" id="c-walcl">—</div><div class="card-sub" id="c-walcl-d">—</div></div>
-        <div class="card"><div class="card-label">TGA</div><div class="card-value" id="c-tga">—</div><div class="card-sub" id="c-tga-d">—</div></div>
-        <div class="card"><div class="card-label">RRP</div><div class="card-value" id="c-rrp">—</div><div class="card-sub" id="c-rrp-d">—</div></div>
-        <div class="card"><div class="card-label">준비금(WRESBAL)</div><div class="card-value" id="c-res">—</div><div class="card-sub" id="c-res-d">—</div></div>
+        <div class="card">
+          <div class="cl">Net Liquidity <button class="ib" onclick="tip(this,'NL = WALCL − TGA − RRP. 시중 실질 유동성. 상승 → 위험자산 우호.')">i</button></div>
+          <div class="cv" id="c-nl">—</div><div class="cs" id="c-nl-dod">—</div>
+        </div>
+        <div class="card">
+          <div class="cl">WALCL <button class="ib" onclick="tip(this,'Fed 총자산. QE 시 증가 / QT 시 감소. 주간 H.4.1.')">i</button></div>
+          <div class="cv" id="c-walcl">—</div><div class="cs" id="c-walcl-d">—</div>
+        </div>
+        <div class="card">
+          <div class="cl">TGA <button class="ib" onclick="tip(this,'재무부 당좌계좌. 지출↓ → NL↑ / 세수·발행↑ → NL↓')">i</button></div>
+          <div class="cv" id="c-tga">—</div><div class="cs" id="c-tga-d">—</div>
+        </div>
+        <div class="card">
+          <div class="cl">RRP <button class="ib" onclick="tip(this,'역레포. MMF 여유자금 흡수. 잔액↓ → NL↑')">i</button></div>
+          <div class="cv" id="c-rrp">—</div><div class="cs" id="c-rrp-d">—</div>
+        </div>
+        <div class="card">
+          <div class="cl">준비금 WRESBAL <button class="ib" onclick="tip(this,'은행 지급준비금. 3T$ 이하 시 repo 압력(LCLoR).')">i</button></div>
+          <div class="cv" id="c-res">—</div><div class="cs" id="c-res-d">—</div>
+        </div>
       </div>
     </div>
-    <div class="two-col">
-      <div class="chart-card full"><div class="chart-title">NL vs S&P 500 — 이중축</div><div class="legend"><span><span class="ld" style="background:#58a6ff"></span>NL</span><span><span class="ld" style="background:#f85149"></span>S&P 500</span></div><div style="position:relative;height:260px"><canvas id="nlChart"></canvas></div></div>
-      <div class="chart-card"><div class="chart-title">NL 구성 분해</div><div class="legend"><span><span class="ld" style="background:#58a6ff"></span>WALCL</span><span><span class="ld" style="background:#f85149"></span>TGA</span><span><span class="ld" style="background:#d29922"></span>RRP</span></div><div style="position:relative;height:220px"><canvas id="compChart"></canvas></div></div>
-      <div class="chart-card"><div class="chart-title">준비금 (WRESBAL)</div><div class="legend"><span><span class="ld" style="background:#3fb950"></span>준비금</span><span><span class="ld" style="background:#f85149;height:2px;border-radius:0"></span>LCLoR ~3T</span></div><div style="position:relative;height:220px"><canvas id="resChart"></canvas></div></div>
-    </div>
-    <div class="section"><div class="section-title">최근 30일 테이블</div><div class="table-wrap"><table><thead><tr><th>날짜</th><th>WALCL(B)</th><th>TGA(B)</th><th>RRP(B)</th><th>NL(B)</th><th>DoD</th></tr></thead><tbody id="nlTbody"><tr><td colspan="6" class="loading">로딩 중...</td></tr></tbody></table></div></div>
-  </div>
-  <div id="tab-rates" style="display:none">
-    <div class="section"><div class="section-title">단기금리 · 스프레드</div>
-      <div class="cards">
-        <div class="card"><div class="card-label">SOFR</div><div class="card-value" id="c-sofr">—</div><div class="card-sub">Secured Overnight</div></div>
-        <div class="card"><div class="card-label">IORB</div><div class="card-value" id="c-iorb">—</div><div class="card-sub">Interest on Reserves</div></div>
-        <div class="card"><div class="card-label">T-Bill 3M</div><div class="card-value" id="c-tbill">—</div><div class="card-sub">DTB3</div></div>
-        <div class="card"><div class="card-label">EFFR</div><div class="card-value" id="c-effr">—</div><div class="card-sub">Fed Funds Rate</div></div>
-        <div class="card"><div class="card-label">SOFR−IORB</div><div class="card-value" id="c-spread">—</div><div class="card-sub">스프레드(bp)</div></div>
+    <div class="two">
+      <div class="cc full">
+        <div class="ct">NL vs S&P 500 <button class="ib" onclick="tip(this,'NL(좌축)와 SPX(우축). 괴리 확대 시 평균회귀 가능성.')">i</button></div>
+        <div class="leg">
+          <span><span class="ld" style="background:#58a6ff"></span>Net Liquidity (B$)</span>
+          <span><span class="ld" style="background:#f85149;height:2px;border-radius:0"></span>S&P 500</span>
+        </div>
+        <div style="position:relative;height:260px"><canvas id="nlChart"></canvas></div>
+      </div>
+      <div class="cc">
+        <div class="ct">NL 구성 분해 <button class="ib" onclick="tip(this,'WALCL − TGA − RRP 각 구성요소 추이.')">i</button></div>
+        <div class="leg">
+          <span><span class="ld" style="background:#58a6ff"></span>WALCL</span>
+          <span><span class="ld" style="background:#f85149"></span>TGA</span>
+          <span><span class="ld" style="background:#d29922"></span>RRP</span>
+        </div>
+        <div style="position:relative;height:220px"><canvas id="compChart"></canvas></div>
+      </div>
+      <div class="cc">
+        <div class="ct">지급준비금 (WRESBAL) <button class="ib" onclick="tip(this,'LCLoR ~3T$ 아래 → repo 시장 압력. 2019년 9월 사례.')">i</button></div>
+        <div class="leg">
+          <span><span class="ld" style="background:#3fb950"></span>준비금</span>
+          <span><span class="ld" style="background:#f85149;height:2px;border-radius:0"></span>LCLoR ~3T</span>
+        </div>
+        <div style="position:relative;height:220px"><canvas id="resChart"></canvas></div>
       </div>
     </div>
-    <div class="chart-card"><div class="chart-title">SOFR / IORB / T-Bill / EFFR 추이</div><div class="legend"><span><span class="ld" style="background:#58a6ff"></span>SOFR</span><span><span class="ld" style="background:#3fb950"></span>IORB</span><span><span class="ld" style="background:#d29922"></span>T-Bill</span><span><span class="ld" style="background:#f85149"></span>EFFR</span></div><div style="position:relative;height:280px"><canvas id="ratesChart"></canvas></div></div>
-    <div class="chart-card"><div class="chart-title">10Y−2Y 장단기 금리차</div><div class="legend"><span><span class="ld" style="background:#58a6ff"></span>10Y−2Y (%)</span></div><div style="position:relative;height:200px"><canvas id="yieldChart"></canvas></div></div>
-  </div>
-  <div id="tab-h41" style="display:none">
-    <div class="section"><div class="section-title">H.4.1 상세</div>
-      <div class="cards">
-        <div class="card"><div class="card-label">UST 보유</div><div class="card-value" id="c-ust">—</div><div class="card-sub" id="c-ust-d">—</div></div>
-        <div class="card"><div class="card-label">MBS 보유</div><div class="card-value" id="c-mbs">—</div><div class="card-sub" id="c-mbs-d">—</div></div>
-        <div class="card"><div class="card-label">BTFP</div><div class="card-value" id="c-btfp">—</div><div class="card-sub" id="c-btfp-d">—</div></div>
-        <div class="card"><div class="card-label">Discount Window</div><div class="card-value" id="c-dw">—</div><div class="card-sub" id="c-dw-d">—</div></div>
-      </div>
-    </div>
-    <div class="two-col">
-      <div class="chart-card"><div class="chart-title">UST + MBS</div><div class="legend"><span><span class="ld" style="background:#58a6ff"></span>UST</span><span><span class="ld" style="background:#3fb950"></span>MBS</span></div><div style="position:relative;height:220px"><canvas id="ustChart"></canvas></div></div>
-      <div class="chart-card"><div class="chart-title">BTFP + DW</div><div class="legend"><span><span class="ld" style="background:#f85149"></span>BTFP</span><span><span class="ld" style="background:#d29922"></span>DW</span></div><div style="position:relative;height:220px"><canvas id="btfpChart"></canvas></div></div>
+    <div class="sec">
+      <div class="stitle">최근 30일 데이터</div>
+      <div class="tw"><table>
+        <thead><tr><th>날짜</th><th>WALCL (B)</th><th>TGA (B)</th><th>RRP (B)</th><th>NL (B)</th><th>DoD</th></tr></thead>
+        <tbody id="nlTbody"><tr><td colspan="6" class="loading">로딩 중...</td></tr></tbody>
+      </table></div>
     </div>
   </div>
-  <div id="tab-m2" style="display:none">
-    <div class="section"><div class="section-title">M2 통화량</div>
+
+  <!-- ── RATES ── -->
+  <div id="t-rates" style="display:none">
+    <div class="sec">
+      <div class="stitle">단기금리 · 스프레드</div>
       <div class="cards">
-        <div class="card"><div class="card-label">M2 (최신)</div><div class="card-value" id="c-m2">—</div><div class="card-sub" id="c-m2-d">—</div></div>
-        <div class="card"><div class="card-label">M2 YoY</div><div class="card-value" id="c-m2yoy">—</div><div class="card-sub">전년 동월 대비</div></div>
+        <div class="card"><div class="cl">SOFR <button class="ib" onclick="tip(this,'익일물 담보금리. LIBOR 대체. 단기자금 기준.')">i</button></div><div class="cv" id="c-sofr">—</div><div class="cs">Secured Overnight</div></div>
+        <div class="card"><div class="cl">IORB <button class="ib" onclick="tip(this,'지급준비금 이자율. Fed 기준금리 하단.')">i</button></div><div class="cv" id="c-iorb">—</div><div class="cs">Interest on Reserves</div></div>
+        <div class="card"><div class="cl">T-Bill 3M <button class="ib" onclick="tip(this,'3개월 국채금리. RRP 대비 스프레드가 MMF 자금 방향 결정.')">i</button></div><div class="cv" id="c-tbill">—</div><div class="cs">DTB3</div></div>
+        <div class="card"><div class="cl">EFFR <button class="ib" onclick="tip(this,'실효 연방기금금리. FOMC 목표범위 유지 여부.')">i</button></div><div class="cv" id="c-effr">—</div><div class="cs">Fed Funds Rate</div></div>
+        <div class="card"><div class="cl">SOFR − IORB <button class="ib" onclick="tip(this,'음수 확대 → 담보 자금 수요 감소 → 유동성 완화 신호.')">i</button></div><div class="cv" id="c-spread">—</div><div class="cs">bp</div></div>
       </div>
     </div>
-    <div class="chart-card"><div class="chart-title">M2 추이 (24개월)</div><div class="legend"><span><span class="ld" style="background:#a371f7"></span>M2</span></div><div style="position:relative;height:240px"><canvas id="m2Chart"></canvas></div></div>
-    <div class="chart-card"><div class="chart-title">M2 YoY 증감률</div><div class="legend"><span><span class="ld" style="background:#a371f7"></span>YoY %</span></div><div style="position:relative;height:200px"><canvas id="m2yoyChart"></canvas></div></div>
+    <div class="cc">
+      <div class="ct">SOFR · IORB · T-Bill · EFFR 추이</div>
+      <div class="leg">
+        <span><span class="ld" style="background:#58a6ff"></span>SOFR</span>
+        <span><span class="ld" style="background:#3fb950"></span>IORB</span>
+        <span><span class="ld" style="background:#d29922"></span>T-Bill 3M</span>
+        <span><span class="ld" style="background:#f85149"></span>EFFR</span>
+      </div>
+      <div style="position:relative;height:280px"><canvas id="ratesChart"></canvas></div>
+    </div>
+    <div class="cc">
+      <div class="ct">10Y − 2Y 장단기 금리차 <button class="ib" onclick="tip(this,'음수(역전) → 경기침체 선행지표. 재역전 후 실업률 상승 패턴.')">i</button></div>
+      <div class="leg"><span><span class="ld" style="background:#58a6ff"></span>10Y−2Y (%)</span></div>
+      <div style="position:relative;height:200px"><canvas id="yieldChart"></canvas></div>
+    </div>
   </div>
-  <div id="tab-dts" style="display:none">
-    <div class="section"><div class="section-title">DTS — 일별 세수 · 지출</div>
+
+  <!-- ── H41 ── -->
+  <div id="t-h41" style="display:none">
+    <div class="sec">
+      <div class="stitle">H.4.1 — 연준 대차대조표</div>
       <div class="cards">
-        <div class="card"><div class="card-label">최근일 세수</div><div class="card-value" id="c-dts-dep">—</div><div class="card-sub" id="c-dts-dep-d">—</div></div>
-        <div class="card"><div class="card-label">최근일 지출</div><div class="card-value" id="c-dts-wdl">—</div><div class="card-sub" id="c-dts-wdl-d">—</div></div>
-        <div class="card"><div class="card-label">순수지 (D-W)</div><div class="card-value" id="c-dts-net">—</div><div class="card-sub">당일 기준</div></div>
+        <div class="card"><div class="cl">UST 보유 <button class="ib" onclick="tip(this,'연준 보유 미국채. QT로 감축 진행 중.')">i</button></div><div class="cv" id="c-ust">—</div><div class="cs" id="c-ust-d">TREAST</div></div>
+        <div class="card"><div class="cl">MBS 보유 <button class="ib" onclick="tip(this,'주택저당증권. 만기 도래분 재투자 중단.')">i</button></div><div class="cv" id="c-mbs">—</div><div class="cs" id="c-mbs-d">MBST</div></div>
+        <div class="card"><div class="cl">BTFP <button class="ib" onclick="tip(this,'Bank Term Funding Program. 2023년 은행위기 대응. 만료.')">i</button></div><div class="cv" id="c-btfp">—</div><div class="cs" id="c-btfp-d">BTFP</div></div>
+        <div class="card"><div class="cl">Discount Window <button class="ib" onclick="tip(this,'재할인창구 대출. 급증 시 은행 유동성 스트레스 신호.')">i</button></div><div class="cv" id="c-dw">—</div><div class="cs" id="c-dw-d">DISCBORR</div></div>
       </div>
     </div>
-    <div class="chart-card">
-      <div class="chart-title">세수 · 지출 추이 (30일)</div>
-      <div class="legend"><span><span class="ld" style="background:#3fb950"></span>세수(Deposits)</span><span><span class="ld" style="background:#f85149"></span>지출(Withdrawals)</span></div>
+    <div class="two">
+      <div class="cc">
+        <div class="ct">UST · MBS 보유 추이</div>
+        <div class="leg"><span><span class="ld" style="background:#58a6ff"></span>UST</span><span><span class="ld" style="background:#3fb950"></span>MBS</span></div>
+        <div style="position:relative;height:240px"><canvas id="ustChart"></canvas></div>
+      </div>
+      <div class="cc">
+        <div class="ct">BTFP · Discount Window</div>
+        <div class="leg"><span><span class="ld" style="background:#f85149"></span>BTFP</span><span><span class="ld" style="background:#d29922"></span>DW</span></div>
+        <div style="position:relative;height:240px"><canvas id="btfpChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── M2 ── -->
+  <div id="t-m2" style="display:none">
+    <div class="sec">
+      <div class="stitle">M2 통화량</div>
+      <div class="cards">
+        <div class="card"><div class="cl">M2 최신 <button class="ib" onclick="tip(this,'M2 = 현금+요구불+저축성예금+MMF. YoY가 인플레 선행.')">i</button></div><div class="cv" id="c-m2">—</div><div class="cs" id="c-m2-d">—</div></div>
+        <div class="card"><div class="cl">M2 YoY</div><div class="cv" id="c-m2yoy">—</div><div class="cs">전년 동월 대비</div></div>
+      </div>
+    </div>
+    <div class="cc">
+      <div class="ct">M2 통화량 추이 (24개월)</div>
+      <div class="leg"><span><span class="ld" style="background:#a371f7"></span>M2 (B$)</span></div>
+      <div style="position:relative;height:240px"><canvas id="m2Chart"></canvas></div>
+    </div>
+    <div class="cc">
+      <div class="ct">M2 YoY 증감률</div>
+      <div class="leg"><span><span class="ld" style="background:#a371f7"></span>YoY (%)</span></div>
+      <div style="position:relative;height:200px"><canvas id="m2yoyChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- ── DTS ── -->
+  <div id="t-dts" style="display:none">
+    <div class="sec">
+      <div class="stitle">DTS — 일별 세수 · 지출</div>
+      <div class="cards">
+        <div class="card"><div class="cl">최근일 세수 <button class="ib" onclick="tip(this,'Deposits: 세금+국채발행 등 TGA 유입.')">i</button></div><div class="cv up" id="c-dts-dep">—</div><div class="cs" id="c-dts-dep-d">—</div></div>
+        <div class="card"><div class="cl">최근일 지출 <button class="ib" onclick="tip(this,'Withdrawals: 지출+이자 등 TGA 유출.')">i</button></div><div class="cv dn" id="c-dts-wdl">—</div><div class="cs" id="c-dts-wdl-d">—</div></div>
+        <div class="card"><div class="cl">순수지 (D−W) <button class="ib" onclick="tip(this,'양수 → TGA 증가 → NL 감소 압력. 음수 → NL 증가 우호.')">i</button></div><div class="cv" id="c-dts-net">—</div><div class="cs">당일</div></div>
+      </div>
+    </div>
+    <div class="cc">
+      <div class="ct">세수 · 지출 추이 (30일)</div>
+      <div class="leg">
+        <span><span class="ld" style="background:#3fb950"></span>세수(Deposits, B$)</span>
+        <span><span class="ld" style="background:#f85149"></span>지출(Withdrawals, B$)</span>
+      </div>
       <div style="position:relative;height:280px"><canvas id="dtsChart"></canvas></div>
     </div>
-    <div class="chart-card">
-      <div class="chart-title">순수지 (Deposits − Withdrawals)</div>
-      <div class="legend"><span><span class="ld" style="background:#58a6ff"></span>순수지 (B$)</span></div>
+    <div class="cc">
+      <div class="ct">순수지 추이 <button class="ib" onclick="tip(this,'양수 = 세수 > 지출 → TGA 증가 압력.')">i</button></div>
+      <div class="leg"><span><span class="ld" style="background:#58a6ff"></span>순수지 (B$)</span></div>
       <div style="position:relative;height:200px"><canvas id="dtsNetChart"></canvas></div>
     </div>
-    <div class="section"><div class="section-title">30일 상세 테이블</div>
-      <div class="table-wrap"><table>
-        <thead><tr><th>날짜</th><th>세수(M$)</th><th>지출(M$)</th><th>순수지(M$)</th></tr></thead>
+    <div class="sec">
+      <div class="stitle">30일 상세</div>
+      <div class="tw"><table>
+        <thead><tr><th>날짜</th><th>세수 (M$)</th><th>지출 (M$)</th><th>순수지 (M$)</th></tr></thead>
         <tbody id="dtsTbody"><tr><td colspan="4" class="loading">로딩 중...</td></tr></tbody>
       </table></div>
     </div>
   </div>
-  <div id="tab-qra" style="display:none">
-    <div class="section"><div class="section-title">QRA — 국채 발행 현황</div>
+
+  <!-- ── QRA ── -->
+  <div id="t-qra" style="display:none">
+    <div class="sec">
+      <div class="stitle">QRA — 국채 발행 현황 (90일)</div>
       <div class="cards">
-        <div class="card"><div class="card-label">T-Bill 발행 (90일)</div><div class="card-value" id="c-qra-bill">—</div><div class="card-sub">유동성 흡수↓</div></div>
-        <div class="card"><div class="card-label">Notes 발행 (90일)</div><div class="card-value" id="c-qra-note">—</div><div class="card-sub">2~10Y</div></div>
-        <div class="card"><div class="card-label">Bonds 발행 (90일)</div><div class="card-value" id="c-qra-bond">—</div><div class="card-sub">20~30Y</div></div>
-        <div class="card"><div class="card-label">총 발행 (90일)</div><div class="card-value" id="c-qra-total">—</div><div class="card-sub">시장 흡수↓</div></div>
+        <div class="card"><div class="cl">T-Bill <button class="ib" onclick="tip(this,'단기채(1년 미만). T-Bill 위주 → RRP↓ 상쇄, NL 중립.')">i</button></div><div class="cv" id="c-qra-bill">—</div><div class="cs">유동성 중립↔</div></div>
+        <div class="card"><div class="cl">Notes (2~10Y) <button class="ib" onclick="tip(this,'중기채. 은행 준비금 흡수 → NL 압박.')">i</button></div><div class="cv" id="c-qra-note">—</div><div class="cs">NL 압박↓</div></div>
+        <div class="card"><div class="cl">Bonds (20~30Y) <button class="ib" onclick="tip(this,'장기채. 시장 흡수력 필요. 금리 상방 압력.')">i</button></div><div class="cv" id="c-qra-bond">—</div><div class="cs">NL 압박↓</div></div>
+        <div class="card"><div class="cl">총 발행</div><div class="cv" id="c-qra-total">—</div><div class="cs">시장 흡수 규모</div></div>
       </div>
     </div>
-    <div class="chart-card">
-      <div class="chart-title">국채 발행 구성 (90일)</div>
-      <div class="legend"><span><span class="ld" style="background:#58a6ff"></span>T-Bill</span><span><span class="ld" style="background:#3fb950"></span>Notes</span><span><span class="ld" style="background:#d29922"></span>Bonds</span></div>
-      <div style="position:relative;height:260px"><canvas id="qraChart"></canvas></div>
+    <div class="two">
+      <div class="cc full">
+        <div class="ct">국채 발행 구성 (90일)</div>
+        <div class="leg">
+          <span><span class="ld" style="background:#58a6ff"></span>T-Bill</span>
+          <span><span class="ld" style="background:#3fb950"></span>Notes</span>
+          <span><span class="ld" style="background:#d29922"></span>Bonds</span>
+        </div>
+        <div style="position:relative;height:240px"><canvas id="qraChart"></canvas></div>
+      </div>
     </div>
-    <div class="section"><div class="section-title">발행 상세</div>
-      <div class="table-wrap"><table>
-        <thead><tr><th>날짜</th><th>종류</th><th>만기</th><th>발행액(B$)</th></tr></thead>
+    <div class="sec">
+      <div class="stitle">발행 상세</div>
+      <div class="tw"><table>
+        <thead><tr><th>날짜</th><th>종류</th><th>만기</th><th>발행액</th></tr></thead>
         <tbody id="qraTbody"><tr><td colspan="4" class="loading">로딩 중...</td></tr></tbody>
       </table></div>
     </div>
   </div>
-  <div id="tab-tic" style="display:none">
-    <div class="section"><div class="section-title">TIC — 국가별 미국채 보유</div><div class="cards" id="ticCards"><div class="loading">로딩 중...</div></div></div>
-    <div class="chart-card"><div class="chart-title">상위 10개국 (B$)</div><div style="position:relative;height:340px"><canvas id="ticChart"></canvas></div></div>
-    <div class="chart-card"><div class="chart-title">일본 · 중국 추이</div><div class="legend"><span><span class="ld" style="background:#58a6ff"></span>일본</span><span><span class="ld" style="background:#f85149"></span>중국</span></div><div style="position:relative;height:220px"><canvas id="ticLineChart"></canvas></div></div>
+
+  <!-- ── TIC ── -->
+  <div id="t-tic" style="display:none">
+    <div class="sec">
+      <div class="stitle">TIC — 국가별 미국채 보유 (최신)</div>
+      <div class="cards" id="ticCards"><div class="loading">로딩 중...</div></div>
+    </div>
+    <div class="cc">
+      <div class="ct">상위 10개국 미국채 보유 (B$)</div>
+      <div style="position:relative;height:360px"><canvas id="ticChart"></canvas></div>
+    </div>
+    <div class="cc">
+      <div class="ct">일본 · 중국 비교</div>
+      <div class="leg">
+        <span><span class="ld" style="background:#58a6ff"></span>일본</span>
+        <span><span class="ld" style="background:#f85149"></span>중국</span>
+      </div>
+      <div style="position:relative;height:200px"><canvas id="ticBarChart"></canvas></div>
+    </div>
   </div>
 </div>
+
 <div class="tip" id="tipEl"></div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-const charts={};
-const fmt=(v,d=0)=>v==null||isNaN(v)?'—':new Intl.NumberFormat('ko-KR',{maximumFractionDigits:d}).format(v);
-const fmtB=v=>{if(!v||isNaN(v))return'—';const b=v/1e9;if(b>=1000)return(b/1000).toFixed(2)+'T$';if(b>=1)return Math.round(b)+'B$';return Math.round(v/1e6)+'M$';};
+const C={};
+const N=(v,d=0)=>v==null||isNaN(v)?'—':new Intl.NumberFormat('ko-KR',{maximumFractionDigits:d}).format(v);
+const B=v=>{if(!v||isNaN(v))return'—';const b=v/1e9;if(b>=1000)return(b/1000).toFixed(2)+'T$';if(b>=1)return Math.round(b)+'B$';return Math.round(v/1e6)+'M$';};
+const gc='rgba(48,54,61,0.6)',tc='#8b949e';
+const sb={ticks:{maxTicksLimit:6,color:tc,font:{size:11}},grid:{color:gc}};
 
-async function fred(series,count=90,freq=''){
-  let url=`/api/fred?series=${series}&count=${count}`;
-  if(freq)url+=`&freq=${freq}`;
-  const r=await fetch(url);
-  const d=await r.json();
-  if(!d.observations)return[];
-  return d.observations.filter(o=>o.value!=='.').map(o=>({date:o.date,value:parseFloat(o.value)})).reverse();
-}
-
-const last=arr=>arr&&arr.length?arr[arr.length-1]:null;
-function mkChart(id,type,labels,datasets,extra={}){
-  if(charts[id])charts[id].destroy();
+function mk(id,type,labels,datasets,ex={}){
+  if(C[id])C[id].destroy();
   const ctx=document.getElementById(id);if(!ctx)return;
-  const gc='rgba(48,54,61,0.8)',tc='#8b949e';
-  const sb={ticks:{maxTicksLimit:6,color:tc,font:{size:11}},grid:{color:gc}};
-  charts[id]=new Chart(ctx,{type,data:{labels,datasets},options:{
+  C[id]=new Chart(ctx,{type,data:{labels,datasets},options:{
     responsive:true,maintainAspectRatio:false,
-    plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,backgroundColor:'#21262d',borderColor:'#30363d',borderWidth:1,titleColor:'#e6edf3',bodyColor:'#8b949e'}},
+    plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,backgroundColor:'#21262d',borderColor:'#444c56',borderWidth:1,titleColor:'#e6edf3',bodyColor:'#8b949e',padding:10,cornerRadius:8}},
     scales:{x:{...sb,ticks:{...sb.ticks,maxTicksLimit:8,maxRotation:0}},y:{...sb},
-      ...(extra.y2?{y2:{type:'linear',position:'right',ticks:{maxTicksLimit:6,color:tc,font:{size:11}},grid:{display:false}}}:{})},
-    ...extra.opts}});
+      ...(ex.y2?{y2:{type:'linear',position:'right',ticks:{maxTicksLimit:6,color:tc,font:{size:11}},grid:{display:false}}}:{})},
+    ...ex.opts}});
 }
+
+async function fred(s,n=90,f=''){
+  let u=`/api/fred?series=${s}&count=${n}`;if(f)u+=`&freq=${f}`;
+  const r=await fetch(u);const d=await r.json();
+  if(!d.observations)return[];
+  return d.observations.filter(o=>o.value!=='.').map(o=>({date:o.date,v:parseFloat(o.value)})).reverse();
+}
+const last=a=>a&&a.length?a[a.length-1]:null;
 
 async function loadNL(){
   try{
     const[w,t,r,s,res]=await Promise.all([fred('WALCL',90),fred('WDTGAL',90),fred('RRPONTSYD',90),fred('SP500',90),fred('WRESBAL',90)]);
     const lw=last(w),lt=last(t),lr=last(r);if(!lw||!lt||!lr)return;
-    const tM={},rM={};t.forEach(x=>tM[x.date]=x.value);r.forEach(x=>rM[x.date]=x.value);
-    const getNL=ww=>ww.value-(tM[ww.date]||lt.value)-(rM[ww.date]||lr.value);
-    const nl=getNL(lw),prev=w.length>1?w[w.length-2]:null,dod=prev?nl-getNL(prev):0;
-    document.getElementById('c-nl').textContent=fmtB(nl*1e6);
-    const de=document.getElementById('c-nl-dod');de.textContent=(dod>=0?'▲':'▼')+fmtB(Math.abs(dod)*1e6)+' DoD';de.className='card-sub '+(dod>=0?'up':'down');
-    document.getElementById('c-walcl').textContent=fmtB(lw.value*1e6);document.getElementById('c-walcl-d').textContent=lw.date;
-    document.getElementById('c-tga').textContent=fmtB(lt.value*1e6);document.getElementById('c-tga-d').textContent=lt.date;
-    document.getElementById('c-rrp').textContent=fmtB(lr.value*1e6);document.getElementById('c-rrp-d').textContent=lr.date;
-    const lres=last(res);if(lres){document.getElementById('c-res').textContent=fmtB(lres.value*1e6);const rd=document.getElementById('c-res-d');rd.textContent=lres.value<3000?'⚠ LCLoR 근접':lres.date;if(lres.value<3000)rd.className='card-sub down';}
-    const spM={};s.forEach(x=>spM[x.date]=x.value);
+    const tM={},rM={};t.forEach(x=>tM[x.date]=x.v);r.forEach(x=>rM[x.date]=x.v);
+    const nl=ww=>ww.v-(tM[ww.date]||lt.v)-(rM[ww.date]||lr.v);
+    const nlV=nl(lw),dod=w.length>1?nlV-nl(w[w.length-2]):0;
+    document.getElementById('c-nl').textContent=B(nlV*1e6);
+    const de=document.getElementById('c-nl-dod');
+    de.textContent=(dod>=0?'▲':'▼')+B(Math.abs(dod)*1e6)+' DoD';
+    de.className='cs '+(dod>=0?'up':'dn');
+    document.getElementById('c-walcl').textContent=B(lw.v*1e6);document.getElementById('c-walcl-d').textContent=lw.date;
+    document.getElementById('c-tga').textContent=B(lt.v*1e6);document.getElementById('c-tga-d').textContent=lt.date;
+    document.getElementById('c-rrp').textContent=B(lr.v*1e6);document.getElementById('c-rrp-d').textContent=lr.date;
+    const lr2=last(res);
+    if(lr2){document.getElementById('c-res').textContent=B(lr2.v*1e6);const rd=document.getElementById('c-res-d');rd.textContent=lr2.v<3000?'⚠ LCLoR 근접':lr2.date;if(lr2.v<3000)rd.className='cs dn';}
+    const spM={};s.forEach(x=>spM[x.date]=x.v);
     const dates=w.map(x=>x.date.slice(5));
-    mkChart('nlChart','line',dates,[
-      {label:'NL',data:w.map(x=>getNL(x)),borderColor:'#58a6ff',backgroundColor:'rgba(88,166,255,0.07)',borderWidth:1.5,pointRadius:0,fill:true,tension:0.3},
+    mk('nlChart','line',dates,[
+      {label:'NL',data:w.map(x=>nl(x)),borderColor:'#58a6ff',backgroundColor:'rgba(88,166,255,0.06)',borderWidth:2,pointRadius:0,fill:true,tension:0.3},
       {label:'SPX',data:w.map(x=>spM[x.date]||null),borderColor:'#f85149',borderWidth:1.5,pointRadius:0,tension:0.3,yAxisID:'y2'}
     ],{y2:true});
-    mkChart('compChart','line',dates,[
-      {label:'WALCL',data:w.map(x=>x.value),borderColor:'#58a6ff',borderWidth:1.5,pointRadius:0,tension:0.3},
+    mk('compChart','line',dates,[
+      {label:'WALCL',data:w.map(x=>x.v),borderColor:'#58a6ff',borderWidth:1.5,pointRadius:0,tension:0.3},
       {label:'TGA',data:w.map(x=>tM[x.date]||null),borderColor:'#f85149',borderWidth:1.5,pointRadius:0,tension:0.3},
       {label:'RRP',data:w.map(x=>rM[x.date]||null),borderColor:'#d29922',borderWidth:1.5,pointRadius:0,tension:0.3}
     ]);
-    if(res.length)mkChart('resChart','line',res.map(x=>x.date.slice(5)),[
-      {label:'준비금',data:res.map(x=>x.value),borderColor:'#3fb950',backgroundColor:'rgba(63,185,80,0.07)',borderWidth:1.5,pointRadius:0,fill:true,tension:0.3},
-      {label:'LCLoR',data:res.map(()=>3000),borderColor:'#f85149',borderWidth:1,borderDash:[4,4],pointRadius:0}
+    if(res.length)mk('resChart','line',res.map(x=>x.date.slice(5)),[
+      {label:'준비금',data:res.map(x=>x.v),borderColor:'#3fb950',backgroundColor:'rgba(63,185,80,0.06)',borderWidth:2,pointRadius:0,fill:true,tension:0.3},
+      {label:'LCLoR',data:res.map(()=>3000),borderColor:'#f85149',borderWidth:1,borderDash:[5,4],pointRadius:0}
     ]);
     const sl=w.slice(-30).reverse();
     document.getElementById('nlTbody').innerHTML=sl.map((x,i)=>{
-      const nl2=getNL(x),px=sl[i+1],d2=px?nl2-getNL(px):0;
-      return`<tr><td>${x.date}</td><td>${fmt(Math.round(x.value/1000))}</td><td>${fmt(Math.round((tM[x.date]||lt.value)/1000))}</td><td>${fmt(Math.round((rM[x.date]||lr.value)/1000))}</td><td><b>${fmt(Math.round(nl2/1000))}</b></td><td class="${d2>=0?'up':'down'}">${d2>=0?'▲':'▼'}${fmt(Math.abs(Math.round(d2/1000)))}</td></tr>`;
+      const n2=nl(x),px=sl[i+1],d2=px?n2-nl(px):0;
+      return`<tr><td>${x.date}</td><td>${N(Math.round(x.v/1000))}</td><td>${N(Math.round((tM[x.date]||lt.v)/1000))}</td><td>${N(Math.round((rM[x.date]||lr.v)/1000))}</td><td><b>${N(Math.round(n2/1000))}</b></td><td class="${d2>=0?'up':'dn'}">${d2>=0?'▲':'▼'}${N(Math.abs(Math.round(d2/1000)))}</td></tr>`;
     }).join('');
   }catch(e){console.error('NL:',e);}
 }
@@ -243,20 +413,20 @@ async function loadRates(){
   try{
     const[sofr,iorb,tbill,effr,t10y2y]=await Promise.all([fred('SOFR',90),fred('IORB',90),fred('DTB3',90),fred('EFFR',90),fred('T10Y2Y',90)]);
     const ls=last(sofr),li=last(iorb),lt=last(tbill),le=last(effr);
-    if(ls)document.getElementById('c-sofr').textContent=ls.value.toFixed(2)+'%';
-    if(li)document.getElementById('c-iorb').textContent=li.value.toFixed(2)+'%';
-    if(lt)document.getElementById('c-tbill').textContent=lt.value.toFixed(2)+'%';
-    if(le)document.getElementById('c-effr').textContent=le.value.toFixed(2)+'%';
-    if(ls&&li){const sp=(ls.value-li.value)*100;const se=document.getElementById('c-spread');se.textContent=sp.toFixed(1)+'bp';se.className='card-value '+(sp<0?'down':'up');}
-    const iM={},tM={},eM={};iorb.forEach(x=>iM[x.date]=x.value);tbill.forEach(x=>tM[x.date]=x.value);effr.forEach(x=>eM[x.date]=x.value);
-    mkChart('ratesChart','line',sofr.map(x=>x.date.slice(5)),[
-      {label:'SOFR',data:sofr.map(x=>x.value),borderColor:'#58a6ff',borderWidth:1.5,pointRadius:0,tension:0.2},
-      {label:'IORB',data:sofr.map(x=>iM[x.date]||null),borderColor:'#3fb950',borderWidth:1.5,pointRadius:0,tension:0.2,borderDash:[4,4]},
+    if(ls)document.getElementById('c-sofr').textContent=ls.v.toFixed(2)+'%';
+    if(li)document.getElementById('c-iorb').textContent=li.v.toFixed(2)+'%';
+    if(lt)document.getElementById('c-tbill').textContent=lt.v.toFixed(2)+'%';
+    if(le)document.getElementById('c-effr').textContent=le.v.toFixed(2)+'%';
+    if(ls&&li){const sp=(ls.v-li.v)*100;const se=document.getElementById('c-spread');se.textContent=sp.toFixed(1)+'bp';se.className='cv '+(sp<0?'dn':'up');}
+    const iM={},tM={},eM={};iorb.forEach(x=>iM[x.date]=x.v);tbill.forEach(x=>tM[x.date]=x.v);effr.forEach(x=>eM[x.date]=x.v);
+    mk('ratesChart','line',sofr.map(x=>x.date.slice(5)),[
+      {label:'SOFR',data:sofr.map(x=>x.v),borderColor:'#58a6ff',borderWidth:1.5,pointRadius:0,tension:0.2},
+      {label:'IORB',data:sofr.map(x=>iM[x.date]||null),borderColor:'#3fb950',borderWidth:1.5,pointRadius:0,tension:0.2,borderDash:[5,4]},
       {label:'T-Bill',data:sofr.map(x=>tM[x.date]||null),borderColor:'#d29922',borderWidth:1.5,pointRadius:0,tension:0.2},
       {label:'EFFR',data:sofr.map(x=>eM[x.date]||null),borderColor:'#f85149',borderWidth:1.5,pointRadius:0,tension:0.2,borderDash:[2,4]}
     ]);
-    if(t10y2y.length)mkChart('yieldChart','line',t10y2y.map(x=>x.date.slice(5)),[
-      {label:'10Y-2Y',data:t10y2y.map(x=>x.value),borderColor:'#58a6ff',backgroundColor:t10y2y.map(x=>x.value<0?'rgba(248,81,73,0.15)':'rgba(88,166,255,0.08)'),borderWidth:1.5,pointRadius:0,fill:true,tension:0.2}
+    if(t10y2y.length)mk('yieldChart','line',t10y2y.map(x=>x.date.slice(5)),[
+      {label:'10Y-2Y',data:t10y2y.map(x=>x.v),borderColor:'#58a6ff',backgroundColor:t10y2y.map(x=>x.v<0?'rgba(248,81,73,0.12)':'rgba(88,166,255,0.06)'),borderWidth:1.5,pointRadius:0,fill:true,tension:0.2}
     ]);
   }catch(e){console.error('rates:',e);}
 }
@@ -265,18 +435,18 @@ async function loadH41(){
   try{
     const[ust,mbs,btfp,dw]=await Promise.all([fred('TREAST',60),fred('MBST',60),fred('BTFP',60),fred('DISCBORR',60)]);
     const lu=last(ust),lm=last(mbs),lb=last(btfp),ld=last(dw);
-    if(lu){document.getElementById('c-ust').textContent=fmtB(lu.value*1e6);document.getElementById('c-ust-d').textContent=lu.date;}
-    if(lm){document.getElementById('c-mbs').textContent=fmtB(lm.value*1e6);document.getElementById('c-mbs-d').textContent=lm.date;}
-    if(lb){document.getElementById('c-btfp').textContent=fmtB(lb.value*1e6);document.getElementById('c-btfp-d').textContent=lb.date;}
-    if(ld){document.getElementById('c-dw').textContent=fmtB(ld.value*1e6);document.getElementById('c-dw-d').textContent=ld.date;}
-    const mbsM={};mbs.forEach(x=>mbsM[x.date]=x.value);
-    mkChart('ustChart','line',ust.map(x=>x.date.slice(5)),[
-      {label:'UST',data:ust.map(x=>x.value),borderColor:'#58a6ff',backgroundColor:'rgba(88,166,255,0.07)',borderWidth:1.5,pointRadius:0,fill:true,tension:0.3},
-      {label:'MBS',data:ust.map(x=>mbsM[x.date]||null),borderColor:'#3fb950',backgroundColor:'rgba(63,185,80,0.07)',borderWidth:1.5,pointRadius:0,fill:true,tension:0.3}
+    if(lu){document.getElementById('c-ust').textContent=B(lu.v*1e6);document.getElementById('c-ust-d').textContent=lu.date;}
+    if(lm){document.getElementById('c-mbs').textContent=B(lm.v*1e6);document.getElementById('c-mbs-d').textContent=lm.date;}
+    if(lb){document.getElementById('c-btfp').textContent=B(lb.v*1e6);document.getElementById('c-btfp-d').textContent=lb.date;}
+    if(ld){document.getElementById('c-dw').textContent=B(ld.v*1e6);document.getElementById('c-dw-d').textContent=ld.date;}
+    const mbsM={};mbs.forEach(x=>mbsM[x.date]=x.v);
+    mk('ustChart','line',ust.map(x=>x.date.slice(5)),[
+      {label:'UST',data:ust.map(x=>x.v),borderColor:'#58a6ff',backgroundColor:'rgba(88,166,255,0.06)',borderWidth:2,pointRadius:0,fill:true,tension:0.3},
+      {label:'MBS',data:ust.map(x=>mbsM[x.date]||null),borderColor:'#3fb950',backgroundColor:'rgba(63,185,80,0.06)',borderWidth:2,pointRadius:0,fill:true,tension:0.3}
     ]);
-    const dwM={};dw.forEach(x=>dwM[x.date]=x.value);
-    mkChart('btfpChart','line',btfp.map(x=>x.date.slice(5)),[
-      {label:'BTFP',data:btfp.map(x=>x.value),borderColor:'#f85149',backgroundColor:'rgba(248,81,73,0.07)',borderWidth:1.5,pointRadius:0,fill:true,tension:0.3},
+    const dwM={};dw.forEach(x=>dwM[x.date]=x.v);
+    mk('btfpChart','line',btfp.map(x=>x.date.slice(5)),[
+      {label:'BTFP',data:btfp.map(x=>x.v),borderColor:'#f85149',backgroundColor:'rgba(248,81,73,0.06)',borderWidth:2,pointRadius:0,fill:true,tension:0.3},
       {label:'DW',data:btfp.map(x=>dwM[x.date]||null),borderColor:'#d29922',borderWidth:1.5,pointRadius:0,tension:0.3}
     ]);
   }catch(e){console.error('h41:',e);}
@@ -286,112 +456,111 @@ async function loadM2(){
   try{
     const m2=await fred('M2SL',36,'m');const lm=last(m2);
     if(lm){
-      document.getElementById('c-m2').textContent=fmtB(lm.value*1e9);
+      document.getElementById('c-m2').textContent=B(lm.v*1e9);
       document.getElementById('c-m2-d').textContent=lm.date;
-      if(m2.length>12){const p=m2[m2.length-13],yoy=(lm.value-p.value)/p.value*100;const el=document.getElementById('c-m2yoy');el.textContent=yoy.toFixed(1)+'%';el.className='card-value '+(yoy>=0?'up':'down');}
+      if(m2.length>12){const p=m2[m2.length-13],yoy=(lm.v-p.v)/p.v*100;const el=document.getElementById('c-m2yoy');el.textContent=yoy.toFixed(1)+'%';el.className='cv '+(yoy>=0?'up':'dn');}
     }
-    mkChart('m2Chart','line',m2.map(x=>x.date.slice(0,7)),[{label:'M2',data:m2.map(x=>x.value),borderColor:'#a371f7',backgroundColor:'rgba(163,113,247,0.07)',borderWidth:1.5,pointRadius:0,fill:true,tension:0.3}]);
+    mk('m2Chart','line',m2.map(x=>x.date.slice(0,7)),[{label:'M2',data:m2.map(x=>x.v),borderColor:'#a371f7',backgroundColor:'rgba(163,113,247,0.06)',borderWidth:2,pointRadius:0,fill:true,tension:0.3}]);
     if(m2.length>13){
-      const yd=m2.slice(12).map((x,i)=>({date:x.date.slice(0,7),v:(x.value-m2[i].value)/m2[i].value*100}));
-      mkChart('m2yoyChart','bar',yd.map(x=>x.date),[{label:'YoY%',data:yd.map(x=>parseFloat(x.v.toFixed(2))),backgroundColor:yd.map(x=>x.v>=0?'rgba(163,113,247,0.7)':'rgba(248,81,73,0.7)'),borderWidth:0,borderRadius:2}]);
+      const yd=m2.slice(12).map((x,i)=>({date:x.date.slice(0,7),v:(x.v-m2[i].v)/m2[i].v*100}));
+      mk('m2yoyChart','bar',yd.map(x=>x.date),[{label:'YoY%',data:yd.map(x=>parseFloat(x.v.toFixed(2))),backgroundColor:yd.map(x=>x.v>=0?'rgba(163,113,247,0.7)':'rgba(248,81,73,0.7)'),borderWidth:0,borderRadius:3}]);
     }
   }catch(e){console.error('m2:',e);}
 }
 
-async function loadTIC(){
-  try{
-    const r=await fetch('/api/tic');
-    const raw=await r.json();
-    const SKIP=['Country','All Other','Grand Total','Of Which: Foreign Official','Of Which: Foreign Official Treasury Bills','Of Which: Foreign Official T-Bonds & Notes'];
-    const NAME={'Japan':'일본','China, Mainland':'중국','United Kingdom':'영국','Belgium':'벨기에','Canada':'캐나다','Luxembourg':'룩셈부르크','Cayman Islands':'케이맨제도','France':'프랑스','Ireland':'아일랜드','Taiwan':'대만','Switzerland':'스위스','Singapore':'싱가포르','Hong Kong':'홍콩','Brazil':'브라질','India':'인도','Norway':'노르웨이','Saudi Arabia':'사우디','Korea, South':'한국'};
-    const data=Object.entries(raw)
-      .filter(([k])=>!SKIP.includes(k))
-      .map(([k,v])=>({name:NAME[k]||k,val:v.value}))
-      .filter(x=>x.val>0)
-      .sort((a,b)=>b.val-a.val)
-      .slice(0,10);
-    document.getElementById('ticCards').innerHTML=data.slice(0,5).map(x=>`<div class="card"><div class="card-label">${x.name}</div><div class="card-value">${x.val.toLocaleString()}B$</div></div>`).join('');
-    mkChart('ticChart','bar',data.map(x=>x.name),[{label:'보유(B$)',data:data.map(x=>x.val),backgroundColor:'rgba(88,166,255,0.7)',borderWidth:0,borderRadius:4}],{opts:{indexAxis:'y'}});
-    // 일본·중국 단일 포인트만 있으므로 라인차트 숨김
-    const ticLine=document.getElementById('ticLineChart');
-    if(ticLine){
-      const jpnVal=raw['Japan']?.value||0, chnVal=raw['China, Mainland']?.value||0;
-      mkChart('ticLineChart','bar',['일본','중국'],[{label:'보유(B$)',data:[jpnVal,chnVal],backgroundColor:['rgba(88,166,255,0.7)','rgba(248,81,73,0.7)'],borderWidth:0,borderRadius:4}]);
-    }
-  }catch(e){console.error('tic:',e);}
-}
-
-function tip(btn,txt){const el=document.getElementById('tipEl');if(el.style.display==='block'&&el._src===btn){el.style.display='none';return;}el.textContent=txt;el._src=btn;el.style.display='block';const r=btn.getBoundingClientRect();el.style.top=(r.bottom+6)+'px';el.style.left=Math.min(r.left,window.innerWidth-270)+'px';}
-document.addEventListener('click',e=>{const el=document.getElementById('tipEl');if(el&&!e.target.classList.contains('info-btn'))el.style.display='none';});
-
 async function loadDTS(){
   try{
-    const r=await fetch('/api/dts');const d=await r.json();
-    if(!d.data)return;
-    const rows=d.data;
-    const depMap={},wdlMap={};
-    rows.forEach(x=>{
-      if(x.transaction_type==='Deposits')depMap[x.record_date]=parseFloat(x.transaction_today_amt);
-      if(x.transaction_type==='Withdrawals')wdlMap[x.record_date]=parseFloat(x.transaction_today_amt);
+    const r=await fetch('/api/dts');const d=await r.json();if(!d.data)return;
+    const dM={},wM={};
+    d.data.forEach(x=>{
+      if(x.transaction_type==='Deposits')dM[x.record_date]=parseFloat(x.transaction_today_amt);
+      if(x.transaction_type==='Withdrawals')wM[x.record_date]=parseFloat(x.transaction_today_amt);
     });
-    const dates=[...new Set(rows.map(x=>x.record_date))].sort().reverse();
-    const latest=dates[0];
-    const dep=depMap[latest]||0,wdl=wdlMap[latest]||0,net=dep-wdl;
-    document.getElementById('c-dts-dep').textContent=Math.round(dep/1000).toLocaleString()+'B$';
-    document.getElementById('c-dts-dep-d').textContent=latest;
-    document.getElementById('c-dts-wdl').textContent=Math.round(wdl/1000).toLocaleString()+'B$';
-    document.getElementById('c-dts-wdl-d').textContent=latest;
-    const netEl=document.getElementById('c-dts-net');
-    netEl.textContent=(net>=0?'+':'')+Math.round(net/1000).toLocaleString()+'B$';
-    netEl.className='card-value '+(net>=0?'up':'down');
-    const chartDates=dates.slice(0,30).reverse();
-    mkChart('dtsChart','bar',chartDates,[
-      {label:'세수',data:chartDates.map(d=>Math.round((depMap[d]||0)/1000)),backgroundColor:'rgba(63,185,80,0.7)',borderWidth:0,borderRadius:2},
-      {label:'지출',data:chartDates.map(d=>Math.round((wdlMap[d]||0)/1000)),backgroundColor:'rgba(248,81,73,0.7)',borderWidth:0,borderRadius:2}
+    const dates=[...new Set(d.data.map(x=>x.record_date))].sort().reverse();
+    const lat=dates[0],dep=dM[lat]||0,wdl=wM[lat]||0,net=dep-wdl;
+    document.getElementById('c-dts-dep').textContent=N(Math.round(dep/1000))+'B$';
+    document.getElementById('c-dts-dep-d').textContent=lat;
+    document.getElementById('c-dts-wdl').textContent=N(Math.round(wdl/1000))+'B$';
+    document.getElementById('c-dts-wdl-d').textContent=lat;
+    const ne=document.getElementById('c-dts-net');
+    ne.textContent=(net>=0?'+':'')+N(Math.round(net/1000))+'B$';
+    ne.className='cv '+(net>=0?'up':'dn');
+    const cd=dates.slice(0,30).reverse();
+    mk('dtsChart','bar',cd,[
+      {label:'세수',data:cd.map(x=>Math.round((dM[x]||0)/1000)),backgroundColor:'rgba(63,185,80,0.65)',borderWidth:0,borderRadius:3},
+      {label:'지출',data:cd.map(x=>Math.round((wM[x]||0)/1000)),backgroundColor:'rgba(248,81,73,0.65)',borderWidth:0,borderRadius:3}
     ]);
-    const netData=chartDates.map(d=>(depMap[d]||0)-(wdlMap[d]||0));
-    mkChart('dtsNetChart','bar',chartDates,[
-      {label:'순수지',data:netData.map(v=>Math.round(v/1000)),backgroundColor:netData.map(v=>v>=0?'rgba(88,166,255,0.7)':'rgba(248,81,73,0.7)'),borderWidth:0,borderRadius:2}
-    ]);
-    const tbody=document.getElementById('dtsTbody');
-    tbody.innerHTML=dates.slice(0,30).map(d=>{
-      const dp=depMap[d]||0,wd=wdlMap[d]||0,nt=dp-wd;
-      return`<tr><td>${d}</td><td>${Math.round(dp).toLocaleString()}</td><td>${Math.round(wd).toLocaleString()}</td><td class="${nt>=0?'up':'down'}">${nt>=0?'+':''}${Math.round(nt).toLocaleString()}</td></tr>`;
+    const nd=cd.map(x=>(dM[x]||0)-(wM[x]||0));
+    mk('dtsNetChart','bar',cd,[{label:'순수지',data:nd.map(v=>Math.round(v/1000)),backgroundColor:nd.map(v=>v>=0?'rgba(88,166,255,0.7)':'rgba(248,81,73,0.7)'),borderWidth:0,borderRadius:3}]);
+    document.getElementById('dtsTbody').innerHTML=dates.slice(0,30).map(x=>{
+      const dp=dM[x]||0,wd=wM[x]||0,nt=dp-wd;
+      return`<tr><td>${x}</td><td>${N(Math.round(dp))}</td><td>${N(Math.round(wd))}</td><td class="${nt>=0?'up':'dn'}">${nt>=0?'+':''}${N(Math.round(nt))}</td></tr>`;
     }).join('');
   }catch(e){console.error('dts:',e);}
 }
 
 async function loadQRA(){
   try{
-    const r=await fetch('/api/qra');const d=await r.json();
-    if(!d.data)return;
+    const r=await fetch('/api/qra');const d=await r.json();if(!d.data)return;
     let bill=0,note=0,bond=0;
     const rows=d.data.filter(x=>x.offering_amt&&x.offering_amt!=='null');
     rows.forEach(x=>{
-      const amt=parseFloat(x.offering_amt)/1e9;
-      if(x.security_type==='Bill')bill+=amt;
-      else if(x.security_type==='Note')note+=amt;
-      else if(x.security_type==='Bond')bond+=amt;
+      const a=parseFloat(x.offering_amt)/1e9;
+      if(x.security_type==='Bill')bill+=a;
+      else if(x.security_type==='Note')note+=a;
+      else if(x.security_type==='Bond')bond+=a;
     });
-    const total=bill+note+bond;
-    document.getElementById('c-qra-bill').textContent=Math.round(bill).toLocaleString()+'B$';
-    document.getElementById('c-qra-note').textContent=Math.round(note).toLocaleString()+'B$';
-    document.getElementById('c-qra-bond').textContent=Math.round(bond).toLocaleString()+'B$';
-    document.getElementById('c-qra-total').textContent=Math.round(total).toLocaleString()+'B$';
-    mkChart('qraChart','bar',['T-Bill','Notes','Bonds'],[
+    const tot=bill+note+bond;
+    document.getElementById('c-qra-bill').textContent=N(Math.round(bill))+'B$';
+    document.getElementById('c-qra-note').textContent=N(Math.round(note))+'B$';
+    document.getElementById('c-qra-bond').textContent=N(Math.round(bond))+'B$';
+    document.getElementById('c-qra-total').textContent=N(Math.round(tot))+'B$';
+    mk('qraChart','bar',['T-Bill','Notes','Bonds'],[
       {label:'발행액(B$)',data:[Math.round(bill),Math.round(note),Math.round(bond)],
-       backgroundColor:['rgba(88,166,255,0.7)','rgba(63,185,80,0.7)','rgba(210,153,34,0.7)'],borderWidth:0,borderRadius:4}
+       backgroundColor:['rgba(88,166,255,0.7)','rgba(63,185,80,0.7)','rgba(210,153,34,0.7)'],borderWidth:0,borderRadius:5}
     ]);
-    const tbody=document.getElementById('qraTbody');
-    tbody.innerHTML=rows.slice(0,30).map(x=>{
-      const amt=x.offering_amt&&x.offering_amt!=='null'?Math.round(parseFloat(x.offering_amt)/1e9).toLocaleString()+'B$':'—';
-      return`<tr><td>${x.auction_date}</td><td>${x.security_type}</td><td>${x.security_term}</td><td>${amt}</td></tr>`;
+    document.getElementById('qraTbody').innerHTML=rows.slice(0,30).map(x=>{
+      const a=x.offering_amt&&x.offering_amt!=='null'?N(Math.round(parseFloat(x.offering_amt)/1e9))+'B$':'—';
+      const tc=x.security_type==='Bill'?'badge badge-blue':x.security_type==='Note'?'badge badge-green':'badge badge-red';
+      return`<tr><td>${x.auction_date}</td><td><span class="${tc}">${x.security_type}</span></td><td>${x.security_term}</td><td>${a}</td></tr>`;
     }).join('');
   }catch(e){console.error('qra:',e);}
 }
 
+async function loadTIC(){
+  try{
+    const r=await fetch('/api/tic');const raw=await r.json();
+    const SKIP=['Country','All Other','Grand Total','Of Which: Foreign Official','Of Which: Foreign Official Treasury Bills','Of Which: Foreign Official T-Bonds & Notes'];
+    const NM={'Japan':'일본','China, Mainland':'중국','United Kingdom':'영국','Belgium':'벨기에','Canada':'캐나다','Luxembourg':'룩셈부르크','Cayman Islands':'케이맨제도','France':'프랑스','Ireland':'아일랜드','Taiwan':'대만','Switzerland':'스위스','Singapore':'싱가포르','Hong Kong':'홍콩','Brazil':'브라질','India':'인도','Norway':'노르웨이','Saudi Arabia':'사우디','Korea, South':'한국'};
+    const data=Object.entries(raw).filter(([k])=>!SKIP.includes(k)).map(([k,v])=>({name:NM[k]||k,val:v.value})).filter(x=>x.val>0).sort((a,b)=>b.val-a.val).slice(0,10);
+    document.getElementById('ticCards').innerHTML=data.slice(0,5).map(x=>`<div class="card"><div class="cl">${x.name}</div><div class="cv">${x.val.toLocaleString()}B$</div></div>`).join('');
+    mk('ticChart','bar',data.map(x=>x.name),[
+      {label:'보유(B$)',data:data.map(x=>x.val),backgroundColor:data.map((_,i)=>i===0?'rgba(88,166,255,0.8)':i===1?'rgba(248,81,73,0.7)':'rgba(88,166,255,0.45)'),borderWidth:0,borderRadius:4}
+    ],{opts:{indexAxis:'y'}});
+    const jpn=raw['Japan']?.value||0,chn=raw['China, Mainland']?.value||0;
+    mk('ticBarChart','bar',['일본','중국'],[
+      {label:'보유(B$)',data:[jpn,chn],backgroundColor:['rgba(88,166,255,0.75)','rgba(248,81,73,0.75)'],borderWidth:0,borderRadius:6}
+    ]);
+  }catch(e){console.error('tic:',e);}
+}
+
+function tip(btn,txt){
+  const el=document.getElementById('tipEl');
+  if(el.style.display==='block'&&el._s===btn){el.style.display='none';return;}
+  el.textContent=txt;el._s=btn;el.style.display='block';
+  const rc=btn.getBoundingClientRect();
+  el.style.top=(rc.bottom+6)+'px';
+  el.style.left=Math.min(rc.left,window.innerWidth-270)+'px';
+}
+document.addEventListener('click',e=>{const el=document.getElementById('tipEl');if(el&&!e.target.classList.contains('ib'))el.style.display='none';});
+
 const TABS=['nl','rates','h41','m2','dts','qra','tic'];
-function switchTab(name,btn){TABS.forEach(t=>{const el=document.getElementById('tab-'+t);if(el)el.style.display=t===name?'':'none';});document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');}
+function sw(name,btn){
+  TABS.forEach(t=>{const el=document.getElementById('t-'+t);if(el)el.style.display=t===name?'':'none';});
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
+  if(btn)btn.classList.add('on');
+}
+
 async function loadAll(){
   document.getElementById('ts').textContent='업데이트 중...';
   await Promise.all([loadNL(),loadRates(),loadH41(),loadM2(),loadDTS(),loadQRA(),loadTIC()]);
