@@ -95,9 +95,26 @@ tr:hover td{background:var(--surf2)}
   .cards{grid-template-columns:1fr 1fr}
   .wrap{padding:14px}
   .cv{font-size:18px}
+  .hdr h1{font-size:13px}
+  .tabs{gap:0}
+  .tab{padding:7px 12px;font-size:12px}
+  .tdesc-rels{gap:8px}
+  .sp-grid{grid-template-columns:1fr 1fr}
+  .sig-val{font-size:14px}
+}
+@media(max-width:480px){
+  .cards{grid-template-columns:1fr 1fr}
+  .sp-grid{grid-template-columns:1fr 1fr}
+  .tab{padding:6px 10px;font-size:11px}
+  .cc{padding:12px}
+  .card{padding:10px 12px}
+  .cv{font-size:16px}
+  .auction-explain{font-size:10px}
 }
 @media(max-width:400px){
   .cards{grid-template-columns:1fr}
+  .sp-grid{grid-template-columns:1fr}
+  .cv{font-size:15px}
 }
 
 .sp{background:var(--surf);border:1px solid var(--brd);border-radius:var(--rl);padding:14px 16px;margin-bottom:18px}
@@ -127,17 +144,18 @@ tr:hover td{background:var(--surf2)}
 .tdesc-tag.r{background:rgba(248,81,73,0.08);color:var(--red);border-color:rgba(248,81,73,0.2)}
 .tdesc-tag.a{background:rgba(210,153,34,0.08);color:var(--amber);border-color:rgba(210,153,34,0.2)}
 .tdesc-rels{display:flex;flex-wrap:wrap;gap:14px;font-size:10px;color:var(--muted);padding-top:10px;border-top:1px solid var(--brd)}
-.cal{background:var(--surf);border:1px solid var(--brd);border-radius:var(--rl);padding:14px 16px;margin-bottom:18px}
-.cal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.cal{background:var(--surf);border:1px solid var(--brd);border-radius:var(--rl);padding:12px 14px;margin-bottom:18px}
+.cal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .cal-hdr h2{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
-.cal-nav{display:flex;align-items:center;gap:8px}
-.cal-nav span{font-size:12px;font-weight:500;color:var(--tx);min-width:84px;text-align:center}
-.cal-nav button{font-size:12px;padding:3px 10px;border:1px solid var(--brd);border-radius:6px;background:transparent;color:var(--muted);cursor:pointer}
+.cal-nav{display:flex;align-items:center;gap:6px}
+.cal-nav span{font-size:12px;font-weight:500;color:var(--tx);min-width:76px;text-align:center}
+.cal-nav button{font-size:11px;padding:2px 9px;border:1px solid var(--brd);border-radius:5px;background:transparent;color:var(--muted);cursor:pointer}
 .cal-nav button:hover{background:var(--surf2);color:var(--tx)}
-.cal-dow-row{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px}
-.cal-dow{font-size:9px;color:var(--muted);text-align:center;padding:3px 0;font-weight:500}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:12px}
-.cd{aspect-ratio:1;border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;color:var(--muted);background:var(--surf2);cursor:default;position:relative}
+.cal-wrap{max-width:480px}
+.cal-dow-row{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px}
+.cal-dow{font-size:9px;color:var(--muted);text-align:center;padding:2px 0;font-weight:500}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:10px}
+.cd{height:32px;border-radius:5px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;color:var(--muted);background:var(--surf2);cursor:default;position:relative}
 .cd.empty{background:transparent}
 .cd.today{border:1px solid var(--blue);color:var(--blue);font-weight:600}
 .cd.fomc{background:rgba(163,113,247,0.2);color:#a371f7;font-weight:600}
@@ -146,22 +164,34 @@ tr:hover td{background:var(--surf2)}
 .cd.matur{background:rgba(63,185,80,0.14);color:var(--green)}
 .cd.h41{background:rgba(88,166,255,0.1);color:var(--blue)}
 .cd .ev{width:3px;height:3px;border-radius:50%;margin-top:1px}
-.cal-leg{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px}
-.cl-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)}
-.cl-dot{width:8px;height:8px;border-radius:2px}
-.ev-list{display:flex;flex-direction:column;gap:5px;padding-top:12px;border-top:1px solid var(--brd)}
-.ev-item{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--surf2);border-radius:7px}
-.ev-date{font-size:10px;color:var(--muted);width:36px;flex-shrink:0;font-weight:500}
-.ev-dot2{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.cal-leg{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.cl-item{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted)}
+.cl-dot{width:7px;height:7px;border-radius:2px}
+.ev-list{display:flex;flex-direction:column;gap:4px;padding-top:10px;border-top:1px solid var(--brd)}
+.ev-item{display:flex;align-items:center;gap:7px;padding:6px 9px;background:var(--surf2);border-radius:6px}
+.ev-date{font-size:10px;color:var(--muted);width:34px;flex-shrink:0;font-weight:500}
+.ev-dot2{width:5px;height:5px;border-radius:50%;flex-shrink:0}
 .ev-name{font-size:11px;color:var(--tx);flex:1}
-.ev-badge{font-size:9px;padding:2px 6px;border-radius:4px;font-weight:500;flex-shrink:0}
+.ev-badge{font-size:9px;padding:2px 5px;border-radius:3px;font-weight:500;flex-shrink:0}
 .eb-fomc{background:rgba(163,113,247,0.15);color:#a371f7}
 .eb-tax{background:rgba(248,81,73,0.15);color:var(--red)}
 .eb-qra{background:rgba(210,153,34,0.15);color:var(--amber)}
 .eb-matur{background:rgba(63,185,80,0.15);color:var(--green)}
 .eb-h41{background:rgba(88,166,255,0.12);color:var(--blue)}
 .ev-days{font-size:10px;color:var(--muted);flex-shrink:0}
-@media(max-width:700px){.sp-grid{grid-template-columns:1fr 1fr}}
+.auction-explain{background:var(--surf2);border-radius:var(--r);padding:12px 14px;margin-bottom:14px;font-size:11px;color:var(--muted);line-height:1.7}
+.auction-explain h3{font-size:11px;font-weight:600;color:var(--tx);margin-bottom:8px}
+.auction-step{display:flex;gap:10px;margin-bottom:6px}
+.auction-step-num{width:18px;height:18px;border-radius:50%;background:rgba(88,166,255,0.15);color:var(--blue);font-size:9px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+@media(max-width:700px){
+  .sp-grid{grid-template-columns:1fr 1fr}
+  .cal-wrap{max-width:100%}
+  .cd{height:28px;font-size:9px}
+}
+@media(max-width:400px){
+  .sp-grid{grid-template-columns:1fr}
+  .cd{height:24px;font-size:8px}
+}
 </style>
 </head>
 <body>
@@ -439,18 +469,47 @@ tr:hover td{background:var(--surf2)}
   <!-- ── CALENDAR ── -->
   <div id="t-cal" style="display:none">
   <div class="tdesc"><div class="tdesc-hdr"><div class="tdesc-icon">CAL</div><div><div class="tdesc-title">재정 캘린더 — 유동성 이벤트 일정</div><div class="tdesc-src">FOMC · H.4.1 · QRA · Tax Day · 국채 만기</div></div></div><div class="tdesc-body">유동성에 영향을 미치는 주요 재정·통화 이벤트를 한눈에. FOMC → 금리 방향, H.4.1(매주 수요일) → QT 진행 확인, QRA → 발행 구성, Tax Day → TGA 급증.</div><div class="tdesc-tags"><span class="tdesc-tag b">FOMC</span><span class="tdesc-tag b">H.4.1 수요일</span><span class="tdesc-tag r">Tax Day</span><span class="tdesc-tag a">QRA 발표</span><span class="tdesc-tag g">국채 만기</span></div></div>
-  <div class="cal">
-    <div class="cal-hdr"><h2>재정 캘린더</h2><div class="cal-nav"><button onclick="calMove(-1)">‹</button><span id="cal-month-label"></span><button onclick="calMove(1)">›</button></div></div>
-    <div class="cal-dow-row"><div class="cal-dow">일</div><div class="cal-dow">월</div><div class="cal-dow">화</div><div class="cal-dow">수</div><div class="cal-dow">목</div><div class="cal-dow">금</div><div class="cal-dow">토</div></div>
-    <div class="cal-grid" id="cal-grid"></div>
-    <div class="cal-leg">
-      <div class="cl-item"><span class="cl-dot" style="background:rgba(163,113,247,0.5)"></span>FOMC</div>
-      <div class="cl-item"><span class="cl-dot" style="background:rgba(248,81,73,0.5)"></span>Tax Day</div>
-      <div class="cl-item"><span class="cl-dot" style="background:rgba(210,153,34,0.5)"></span>QRA 발표</div>
-      <div class="cl-item"><span class="cl-dot" style="background:rgba(63,185,80,0.4)"></span>국채 만기</div>
-      <div class="cl-item"><span class="cl-dot" style="background:rgba(88,166,255,0.4)"></span>H.4.1</div>
+  <div class="two">
+    <div class="cal full" style="max-width:100%">
+      <div class="cal-hdr"><h2>재정 캘린더</h2><div class="cal-nav"><button onclick="calMove(-1)">‹</button><span id="cal-month-label"></span><button onclick="calMove(1)">›</button></div></div>
+      <div class="cal-wrap">
+        <div class="cal-dow-row"><div class="cal-dow">일</div><div class="cal-dow">월</div><div class="cal-dow">화</div><div class="cal-dow">수</div><div class="cal-dow">목</div><div class="cal-dow">금</div><div class="cal-dow">토</div></div>
+        <div class="cal-grid" id="cal-grid"></div>
+      </div>
+      <div class="cal-leg">
+        <div class="cl-item"><span class="cl-dot" style="background:rgba(163,113,247,0.5)"></span>FOMC</div>
+        <div class="cl-item"><span class="cl-dot" style="background:rgba(248,81,73,0.5)"></span>Tax Day</div>
+        <div class="cl-item"><span class="cl-dot" style="background:rgba(210,153,34,0.5)"></span>QRA 발표</div>
+        <div class="cl-item"><span class="cl-dot" style="background:rgba(63,185,80,0.4)"></span>국채 만기</div>
+        <div class="cl-item"><span class="cl-dot" style="background:rgba(88,166,255,0.4)"></span>H.4.1</div>
+      </div>
+      <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">다가오는 이벤트</div>
+      <div class="ev-list" id="ev-list"></div>
     </div>
-    <div class="ev-list" id="ev-list"></div>
+  </div>
+  <div class="two" style="margin-top:14px">
+    <div class="cc full">
+      <div class="ct">최근 국채 경매 결과 (10일)</div>
+      <div class="tw"><table id="auction-table">
+        <thead><tr><th>날짜</th><th>종류</th><th>만기</th><th>발행액</th><th>응찰률</th></tr></thead>
+        <tbody id="auction-tbody"><tr><td colspan="5" class="loading">로딩 중...</td></tr></tbody>
+      </table></div>
+    </div>
+    <div class="cc full">
+      <div class="ct">미국 국채 경매 방식 — 더치옥션</div>
+      <div class="auction-explain">
+        <h3>더치옥션 (Dutch Auction) 방식</h3>
+        <div class="auction-step"><div class="auction-step-num">1</div><div>재무부가 발행 규모·만기를 공고. 딜러·기관·개인이 수익률(금리) 제시 입찰.</div></div>
+        <div class="auction-step"><div class="auction-step-num">2</div><div>낮은 수익률(높은 가격) 입찰부터 순서대로 낙찰. 총 발행액 소진 시점의 수익률이 <b style="color:var(--tx)">낙찰 금리(Stop-out Rate)</b>.</div></div>
+        <div class="auction-step"><div class="auction-step-num">3</div><div>모든 낙찰자는 낙찰 금리로 동일하게 발행 — 입찰 금리와 무관. 이것이 더치옥션의 핵심.</div></div>
+        <div class="auction-step"><div class="auction-step-num">4</div><div><b style="color:var(--tx)">응찰률(BTC, Bid-to-Cover)</b> = 총 입찰액 ÷ 발행액. 2.0 이상 = 수요 양호. 1.5 이하 = 수요 부족 신호.</div></div>
+        <div class="auction-step"><div class="auction-step-num">5</div><div><b style="color:var(--tx)">간접 입찰자(Indirect)</b> = 외국 중앙은행 포함 해외 수요. 비중 높을수록 글로벌 달러 수요 건재.</div></div>
+        <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--brd)">
+          <span style="color:var(--green);font-weight:500">우호적 신호</span>: 높은 BTC + 낙찰금리 < 발행 전 WI(When-Issued) 금리 → 수요 > 공급<br>
+          <span style="color:var(--red);font-weight:500">경고 신호</span>: 낮은 BTC + 낙찰금리 > WI 금리 → 테일(Tail) 발생 → 시장 소화 불량
+        </div>
+      </div>
+    </div>
   </div>
   </div>
 </div>
@@ -642,6 +701,16 @@ async function loadQRA(){
       const tc=x.security_type==='Bill'?'badge badge-blue':x.security_type==='Note'?'badge badge-green':'badge badge-red';
       return`<tr><td>${x.auction_date}</td><td><span class="${tc}">${x.security_type}</span></td><td>${x.security_term}</td><td>${a}</td></tr>`;
     }).join('');
+    // 캘린더 경매 결과 테이블도 업데이트
+    const aBody=document.getElementById('auction-tbody');
+    if(aBody){
+      const recent=d.data.filter(x=>x.offering_amt&&x.offering_amt!=='null').slice(0,10);
+      aBody.innerHTML=recent.map(x=>{
+        const a=N(Math.round(parseFloat(x.offering_amt)/1e9))+'B$';
+        const tc=x.security_type==='Bill'?'badge badge-blue':x.security_type==='Note'?'badge badge-green':'badge badge-red';
+        return`<tr><td>${x.auction_date}</td><td><span class="${tc}">${x.security_type}</span></td><td>${x.security_term}</td><td>${a}</td><td>—</td></tr>`;
+      }).join('');
+    }
   }catch(e){console.error('qra:',e);}
 }
 
