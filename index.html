@@ -63,6 +63,8 @@ tr:hover td{background:var(--color-surface2)}
     <button class="tab" onclick="switchTab('rates',this)">단기금리</button>
     <button class="tab" onclick="switchTab('h41',this)">H.4.1 상세</button>
     <button class="tab" onclick="switchTab('m2',this)">M2 · 준비금</button>
+    <button class="tab" onclick="switchTab('dts',this)">DTS</button>
+    <button class="tab" onclick="switchTab('qra',this)">QRA</button>
     <button class="tab" onclick="switchTab('tic',this)">TIC</button>
   </div>
   <div id="tab-nl">
@@ -118,6 +120,52 @@ tr:hover td{background:var(--color-surface2)}
     </div>
     <div class="chart-card"><div class="chart-title">M2 추이 (24개월)</div><div class="legend"><span><span class="ld" style="background:#a371f7"></span>M2</span></div><div style="position:relative;height:240px"><canvas id="m2Chart"></canvas></div></div>
     <div class="chart-card"><div class="chart-title">M2 YoY 증감률</div><div class="legend"><span><span class="ld" style="background:#a371f7"></span>YoY %</span></div><div style="position:relative;height:200px"><canvas id="m2yoyChart"></canvas></div></div>
+  </div>
+  <div id="tab-dts" style="display:none">
+    <div class="section"><div class="section-title">DTS — 일별 세수 · 지출</div>
+      <div class="cards">
+        <div class="card"><div class="card-label">최근일 세수</div><div class="card-value" id="c-dts-dep">—</div><div class="card-sub" id="c-dts-dep-d">—</div></div>
+        <div class="card"><div class="card-label">최근일 지출</div><div class="card-value" id="c-dts-wdl">—</div><div class="card-sub" id="c-dts-wdl-d">—</div></div>
+        <div class="card"><div class="card-label">순수지 (D-W)</div><div class="card-value" id="c-dts-net">—</div><div class="card-sub">당일 기준</div></div>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">세수 · 지출 추이 (30일)</div>
+      <div class="legend"><span><span class="ld" style="background:#3fb950"></span>세수(Deposits)</span><span><span class="ld" style="background:#f85149"></span>지출(Withdrawals)</span></div>
+      <div style="position:relative;height:280px"><canvas id="dtsChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">순수지 (Deposits − Withdrawals)</div>
+      <div class="legend"><span><span class="ld" style="background:#58a6ff"></span>순수지 (B$)</span></div>
+      <div style="position:relative;height:200px"><canvas id="dtsNetChart"></canvas></div>
+    </div>
+    <div class="section"><div class="section-title">30일 상세 테이블</div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>날짜</th><th>세수(M$)</th><th>지출(M$)</th><th>순수지(M$)</th></tr></thead>
+        <tbody id="dtsTbody"><tr><td colspan="4" class="loading">로딩 중...</td></tr></tbody>
+      </table></div>
+    </div>
+  </div>
+  <div id="tab-qra" style="display:none">
+    <div class="section"><div class="section-title">QRA — 국채 발행 현황</div>
+      <div class="cards">
+        <div class="card"><div class="card-label">T-Bill 발행 (90일)</div><div class="card-value" id="c-qra-bill">—</div><div class="card-sub">유동성 흡수↓</div></div>
+        <div class="card"><div class="card-label">Notes 발행 (90일)</div><div class="card-value" id="c-qra-note">—</div><div class="card-sub">2~10Y</div></div>
+        <div class="card"><div class="card-label">Bonds 발행 (90일)</div><div class="card-value" id="c-qra-bond">—</div><div class="card-sub">20~30Y</div></div>
+        <div class="card"><div class="card-label">총 발행 (90일)</div><div class="card-value" id="c-qra-total">—</div><div class="card-sub">시장 흡수↓</div></div>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">국채 발행 구성 (90일)</div>
+      <div class="legend"><span><span class="ld" style="background:#58a6ff"></span>T-Bill</span><span><span class="ld" style="background:#3fb950"></span>Notes</span><span><span class="ld" style="background:#d29922"></span>Bonds</span></div>
+      <div style="position:relative;height:260px"><canvas id="qraChart"></canvas></div>
+    </div>
+    <div class="section"><div class="section-title">발행 상세</div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>날짜</th><th>종류</th><th>만기</th><th>발행액(B$)</th></tr></thead>
+        <tbody id="qraTbody"><tr><td colspan="4" class="loading">로딩 중...</td></tr></tbody>
+      </table></div>
+    </div>
   </div>
   <div id="tab-tic" style="display:none">
     <div class="section"><div class="section-title">TIC — 국가별 미국채 보유</div><div class="cards" id="ticCards"><div class="loading">로딩 중...</div></div></div>
@@ -275,11 +323,78 @@ async function loadTIC(){
 
 function tip(btn,txt){const el=document.getElementById('tipEl');if(el.style.display==='block'&&el._src===btn){el.style.display='none';return;}el.textContent=txt;el._src=btn;el.style.display='block';const r=btn.getBoundingClientRect();el.style.top=(r.bottom+6)+'px';el.style.left=Math.min(r.left,window.innerWidth-270)+'px';}
 document.addEventListener('click',e=>{const el=document.getElementById('tipEl');if(el&&!e.target.classList.contains('info-btn'))el.style.display='none';});
-const TABS=['nl','rates','h41','m2','tic'];
+
+async function loadDTS(){
+  try{
+    const r=await fetch('/api/dts');const d=await r.json();
+    if(!d.data)return;
+    const rows=d.data;
+    const depMap={},wdlMap={};
+    rows.forEach(x=>{
+      if(x.transaction_type==='Deposits')depMap[x.record_date]=parseFloat(x.transaction_today_amt);
+      if(x.transaction_type==='Withdrawals')wdlMap[x.record_date]=parseFloat(x.transaction_today_amt);
+    });
+    const dates=[...new Set(rows.map(x=>x.record_date))].sort().reverse();
+    const latest=dates[0];
+    const dep=depMap[latest]||0,wdl=wdlMap[latest]||0,net=dep-wdl;
+    document.getElementById('c-dts-dep').textContent=Math.round(dep/1000).toLocaleString()+'B$';
+    document.getElementById('c-dts-dep-d').textContent=latest;
+    document.getElementById('c-dts-wdl').textContent=Math.round(wdl/1000).toLocaleString()+'B$';
+    document.getElementById('c-dts-wdl-d').textContent=latest;
+    const netEl=document.getElementById('c-dts-net');
+    netEl.textContent=(net>=0?'+':'')+Math.round(net/1000).toLocaleString()+'B$';
+    netEl.className='card-value '+(net>=0?'up':'down');
+    const chartDates=dates.slice(0,30).reverse();
+    mkChart('dtsChart','bar',chartDates,[
+      {label:'세수',data:chartDates.map(d=>Math.round((depMap[d]||0)/1000)),backgroundColor:'rgba(63,185,80,0.7)',borderWidth:0,borderRadius:2},
+      {label:'지출',data:chartDates.map(d=>Math.round((wdlMap[d]||0)/1000)),backgroundColor:'rgba(248,81,73,0.7)',borderWidth:0,borderRadius:2}
+    ]);
+    const netData=chartDates.map(d=>(depMap[d]||0)-(wdlMap[d]||0));
+    mkChart('dtsNetChart','bar',chartDates,[
+      {label:'순수지',data:netData.map(v=>Math.round(v/1000)),backgroundColor:netData.map(v=>v>=0?'rgba(88,166,255,0.7)':'rgba(248,81,73,0.7)'),borderWidth:0,borderRadius:2}
+    ]);
+    const tbody=document.getElementById('dtsTbody');
+    tbody.innerHTML=dates.slice(0,30).map(d=>{
+      const dp=depMap[d]||0,wd=wdlMap[d]||0,nt=dp-wd;
+      return`<tr><td>${d}</td><td>${Math.round(dp).toLocaleString()}</td><td>${Math.round(wd).toLocaleString()}</td><td class="${nt>=0?'up':'down'}">${nt>=0?'+':''}${Math.round(nt).toLocaleString()}</td></tr>`;
+    }).join('');
+  }catch(e){console.error('dts:',e);}
+}
+
+async function loadQRA(){
+  try{
+    const r=await fetch('/api/qra');const d=await r.json();
+    if(!d.data)return;
+    let bill=0,note=0,bond=0;
+    const rows=d.data.filter(x=>x.offering_amt&&x.offering_amt!=='null');
+    rows.forEach(x=>{
+      const amt=parseFloat(x.offering_amt)/1e9;
+      if(x.security_type==='Bill')bill+=amt;
+      else if(x.security_type==='Note')note+=amt;
+      else if(x.security_type==='Bond')bond+=amt;
+    });
+    const total=bill+note+bond;
+    document.getElementById('c-qra-bill').textContent=Math.round(bill).toLocaleString()+'B$';
+    document.getElementById('c-qra-note').textContent=Math.round(note).toLocaleString()+'B$';
+    document.getElementById('c-qra-bond').textContent=Math.round(bond).toLocaleString()+'B$';
+    document.getElementById('c-qra-total').textContent=Math.round(total).toLocaleString()+'B$';
+    mkChart('qraChart','bar',['T-Bill','Notes','Bonds'],[
+      {label:'발행액(B$)',data:[Math.round(bill),Math.round(note),Math.round(bond)],
+       backgroundColor:['rgba(88,166,255,0.7)','rgba(63,185,80,0.7)','rgba(210,153,34,0.7)'],borderWidth:0,borderRadius:4}
+    ]);
+    const tbody=document.getElementById('qraTbody');
+    tbody.innerHTML=rows.slice(0,30).map(x=>{
+      const amt=x.offering_amt&&x.offering_amt!=='null'?Math.round(parseFloat(x.offering_amt)/1e9).toLocaleString()+'B$':'—';
+      return`<tr><td>${x.auction_date}</td><td>${x.security_type}</td><td>${x.security_term}</td><td>${amt}</td></tr>`;
+    }).join('');
+  }catch(e){console.error('qra:',e);}
+}
+
+const TABS=['nl','rates','h41','m2','dts','qra','tic'];
 function switchTab(name,btn){TABS.forEach(t=>{const el=document.getElementById('tab-'+t);if(el)el.style.display=t===name?'':'none';});document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');}
 async function loadAll(){
   document.getElementById('ts').textContent='업데이트 중...';
-  await Promise.all([loadNL(),loadRates(),loadH41(),loadM2(),loadTIC()]);
+  await Promise.all([loadNL(),loadRates(),loadH41(),loadM2(),loadDTS(),loadQRA(),loadTIC()]);
   const kst=new Date(Date.now()+9*3600*1000);
   document.getElementById('ts').textContent='업데이트: '+kst.toISOString().slice(0,16).replace('T',' ')+' KST';
 }
