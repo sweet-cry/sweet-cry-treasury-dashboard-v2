@@ -252,18 +252,23 @@ async function loadM2(){
 
 async function loadTIC(){
   try{
-    const TIC=[['일본','JTDUSNO'],['중국','CHDUSNO'],['영국','GBDUSNO'],['벨기에','BDDUSNO'],['룩셈부르크','LUDUSNO'],['케이맨제도','KYDUSNO'],['아일랜드','IEDUSNO'],['캐나다','CADUSNO'],['프랑스','FRDUSNO'],['브라질','BRDUSNO']];
-    const results=await Promise.all(TIC.map(([,s])=>fred(s,15,'m')));
-    const data=TIC.map(([name],i)=>({name,val:last(results[i])?.value||0,hist:results[i]})).sort((a,b)=>b.val-a.val);
-    document.getElementById('ticCards').innerHTML=data.slice(0,5).map(x=>`<div class="card"><div class="card-label">${x.name}</div><div class="card-value">${fmtB(x.val*1e9)}</div><div class="card-sub">${last(x.hist)?.date||''}</div></div>`).join('');
-    mkChart('ticChart','bar',data.map(x=>x.name),[{label:'보유',data:data.map(x=>Math.round(x.val/1e3)),backgroundColor:'rgba(88,166,255,0.7)',borderWidth:0,borderRadius:4}],{opts:{indexAxis:'y'}});
-    const jpn=results[0],chn=results[1];
-    if(jpn.length&&chn.length){
-      const cm={};chn.forEach(x=>cm[x.date]=x.value);
-      mkChart('ticLineChart','line',jpn.map(x=>x.date.slice(0,7)),[
-        {label:'일본',data:jpn.map(x=>Math.round(x.value/1e3)),borderColor:'#58a6ff',borderWidth:1.5,pointRadius:3,tension:0.3},
-        {label:'중국',data:jpn.map(x=>cm[x.date]?Math.round(cm[x.date]/1e3):null),borderColor:'#f85149',borderWidth:1.5,pointRadius:3,tension:0.3}
-      ]);
+    const r=await fetch('/api/tic');
+    const raw=await r.json();
+    const SKIP=['Country','All Other','Grand Total','Of Which: Foreign Official','Of Which: Foreign Official Treasury Bills','Of Which: Foreign Official T-Bonds & Notes'];
+    const NAME={'Japan':'일본','China, Mainland':'중국','United Kingdom':'영국','Belgium':'벨기에','Canada':'캐나다','Luxembourg':'룩셈부르크','Cayman Islands':'케이맨제도','France':'프랑스','Ireland':'아일랜드','Taiwan':'대만','Switzerland':'스위스','Singapore':'싱가포르','Hong Kong':'홍콩','Brazil':'브라질','India':'인도','Norway':'노르웨이','Saudi Arabia':'사우디','Korea, South':'한국'};
+    const data=Object.entries(raw)
+      .filter(([k])=>!SKIP.includes(k))
+      .map(([k,v])=>({name:NAME[k]||k,val:v.value}))
+      .filter(x=>x.val>0)
+      .sort((a,b)=>b.val-a.val)
+      .slice(0,10);
+    document.getElementById('ticCards').innerHTML=data.slice(0,5).map(x=>`<div class="card"><div class="card-label">${x.name}</div><div class="card-value">${x.val.toLocaleString()}B$</div></div>`).join('');
+    mkChart('ticChart','bar',data.map(x=>x.name),[{label:'보유(B$)',data:data.map(x=>x.val),backgroundColor:'rgba(88,166,255,0.7)',borderWidth:0,borderRadius:4}],{opts:{indexAxis:'y'}});
+    // 일본·중국 단일 포인트만 있으므로 라인차트 숨김
+    const ticLine=document.getElementById('ticLineChart');
+    if(ticLine){
+      const jpnVal=raw['Japan']?.value||0, chnVal=raw['China, Mainland']?.value||0;
+      mkChart('ticLineChart','bar',['일본','중국'],[{label:'보유(B$)',data:[jpnVal,chnVal],backgroundColor:['rgba(88,166,255,0.7)','rgba(248,81,73,0.7)'],borderWidth:0,borderRadius:4}]);
     }
   }catch(e){console.error('tic:',e);}
 }
