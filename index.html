@@ -433,36 +433,11 @@ tr:hover td{background:var(--surf2)}
         <path d="M 288.2 78.6 A 150 150 0 0 1 333.7 131.9" fill="none" stroke="#e3793a" stroke-width="32"/>
         <!-- 85~100%: red -->
         <path d="M 333.7 131.9 A 150 150 0 0 1 350 200" fill="none" stroke="#f85149" stroke-width="32" stroke-linecap="butt"/>
-        <!-- 눈금 tick marks -->
-        <g stroke="#8b949e" stroke-width="2" stroke-linecap="round">
-          <line x1="35.0" y1="200.0" x2="65.0" y2="200.0"/>
-          <line x1="149.0" y1="43.1" x2="158.3" y2="71.6"/>
-          <line x1="297.0" y1="66.5" x2="279.4" y2="90.8"/>
-          <line x1="347.0" y1="125.1" x2="320.3" y2="138.7"/>
-          <line x1="365.0" y1="200.0" x2="335.0" y2="200.0"/>
-        </g>
-        <!-- 눈금 숫자 -->
-        <g fill="#8b949e" font-size="12" font-family="-apple-system,sans-serif" text-anchor="middle">
-          <text x="20.0" y="204.0">0</text>
-          <text x="144.4" y="32.8">40</text>
-          <text x="305.8" y="58.4">70</text>
-          <text x="360.4" y="122.3">85</text>
-          <text x="380.0" y="204.0">100</text>
-        </g>
-        <!-- 구간 라벨 -->
-        <g fill="#6e7681" font-size="9" font-family="-apple-system,sans-serif" text-anchor="middle">
-          <text x="115.1" y="141.3">ABUNDANT</text>
-          <text x="216.4" y="99.3">AMPLE</text>
-          <text x="279.8" y="134.8">APPROACH</text>
-          <text x="302.1" y="178.5">SCARCE</text>
-        </g>
-        <!-- 바늘 + 허브 -->
-        <line id="lclor-needle" x1="200" y1="200" x2="200" y2="60" stroke="#e6edf3" stroke-width="4" stroke-linecap="round"/>
-        <circle cx="200" cy="200" r="12" fill="#0d1117" stroke="#e6edf3" stroke-width="2"/>
-        <circle cx="200" cy="200" r="4" fill="#e6edf3"/>
+        <line id="lclor-needle" x1="100" y1="100" x2="100" y2="28" stroke="var(--tx)" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="100" cy="100" r="5" fill="var(--tx)"/>
       </svg>
       <div style="min-width:180px">
-        <div style="font-size:56px;font-weight:500;color:var(--tx);line-height:1" id="lclor-prox">—</div>
+        <div style="font-size:36px;font-weight:500;color:var(--tx)" id="lclor-prox">—</div>
         <div style="font-size:14px;color:var(--tx);margin-top:8px;letter-spacing:0.5px;font-weight:500" id="lclor-zone">로딩 중</div>
         <div style="font-size:12px;color:var(--muted);margin-top:6px;line-height:1.5" id="lclor-detail">—</div>
       </div>
@@ -1142,9 +1117,9 @@ async function loadLCLoR(mode){
     document.getElementById('lclor-prox').textContent=p+'%';
     document.getElementById('lclor-zone').textContent=z.toUpperCase()+' · '+label;
     document.getElementById('lclor-detail').textContent=`Reserves $${res_b.toFixed(1)}B / Upper $${upper_b.toFixed(0)}B`;
-    const ang=-180+(p/100)*180;
+    const ang=-90+(p/100)*180;
     const rad=ang*Math.PI/180;
-    const x2=200+140*Math.cos(rad),y2=200+140*Math.sin(rad);
+    const x2=100+72*Math.cos(rad),y2=100+72*Math.sin(rad);
     const needle=document.getElementById('lclor-needle');
     if(needle){needle.setAttribute('x2',x2.toFixed(1));needle.setAttribute('y2',y2.toFixed(1));}
     // Reserves/GDP 시계열
