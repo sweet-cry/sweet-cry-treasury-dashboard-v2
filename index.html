@@ -377,7 +377,7 @@ tr:hover td{background:var(--surf2)}
   <!-- ── H41 ── -->
   <div id="t-h41" style="display:none">
 
-  <div class="tdesc"><div class="tdesc-hdr"><div class="tdesc-icon">H41</div><div><div class="tdesc-title">H.4.1 — 연준 대차대조표 상세</div><div class="tdesc-src">TREAST · MBST · BTFP · DISCBORR · FRED 주간</div></div></div><div class="tdesc-body">매주 수요일 발표되는 Fed 공식 대차대조표. UST·MBS 감소 추세로 QT 진행 속도 확인. BTFP는 2023년 SVB 사태 대응 긴급 창구로 현재 잔액 소멸 진행 중. Discount Window 잔액 급등 시 특정 은행의 유동성 압박 또는 광범위한 시장 스트레스 신호.</div><div class="tdesc-tags"><span class="tdesc-tag b">QT 속도 주시</span><span class="tdesc-tag g">BTFP 만료 확인</span><span class="tdesc-tag r">DW 급증 = 위기</span><span class="tdesc-tag ">MBS 감소 완만</span><span class="tdesc-tag a">주간 발표</span></div><div class="tdesc-rels"><span><span style="color:#58a6ff">→</span> UST 감소 둔화 = QT 종료 신호</span><span><span style="color:#f85149">→</span> DW 급등 = 은행 스트레스</span><span><span style="color:#3fb950">→</span> BTFP 0 = 은행권 안정</span></div><div class="tdesc-links"><a class="tdesc-link" href="https://fred.stlouisfed.org/series/TREAST" target="_blank">TREAST ↗</a><a class="tdesc-link" href="https://fred.stlouisfed.org/series/MBST" target="_blank">MBST ↗</a><a class="tdesc-link" href="https://fred.stlouisfed.org/series/BTFP" target="_blank">BTFP ↗</a><a class="tdesc-link" href="https://fred.stlouisfed.org/series/DISCBORR" target="_blank">DISCBORR ↗</a><a class="tdesc-link" href="https://www.federalreserve.gov/releases/h41/" target="_blank">H.4.1 원문 ↗</a></div></div>
+  <div class="tdesc"><div class="tdesc-hdr"><div class="tdesc-icon">H41</div><div><div class="tdesc-title">H.4.1 — 연준 대차대조표 상세</div><div class="tdesc-src">TREAST · MBST · BTFP · DISCBORR · FRED 주간</div></div></div><div class="tdesc-body">매주 수요일 기준 대차대조표, 목요일 16:30 ET 발표 (FRED 반영은 통상 목 저녁~금 오전). UST·MBS 감소 추세로 QT 진행 속도 확인. BTFP는 2023년 SVB 사태 대응 긴급 창구로 현재 잔액 소멸 진행 중. Discount Window 잔액 급등 시 특정 은행의 유동성 압박 또는 광범위한 시장 스트레스 신호.</div><div class="tdesc-tags"><span class="tdesc-tag b">QT 속도 주시</span><span class="tdesc-tag g">BTFP 만료 확인</span><span class="tdesc-tag r">DW 급증 = 위기</span><span class="tdesc-tag ">MBS 감소 완만</span><span class="tdesc-tag a">주간 발표</span></div><div class="tdesc-rels"><span><span style="color:#58a6ff">→</span> UST 감소 둔화 = QT 종료 신호</span><span><span style="color:#f85149">→</span> DW 급등 = 은행 스트레스</span><span><span style="color:#3fb950">→</span> BTFP 0 = 은행권 안정</span></div><div class="tdesc-links"><a class="tdesc-link" href="https://fred.stlouisfed.org/series/TREAST" target="_blank">TREAST ↗</a><a class="tdesc-link" href="https://fred.stlouisfed.org/series/MBST" target="_blank">MBST ↗</a><a class="tdesc-link" href="https://fred.stlouisfed.org/series/BTFP" target="_blank">BTFP ↗</a><a class="tdesc-link" href="https://fred.stlouisfed.org/series/DISCBORR" target="_blank">DISCBORR ↗</a><a class="tdesc-link" href="https://www.federalreserve.gov/releases/h41/" target="_blank">H.4.1 원문 ↗</a></div></div>
     <div class="sec">
       <div class="stitle">H.4.1 — 연준 대차대조표</div>
       <div class="cards">
@@ -713,14 +713,30 @@ async function loadRates(){
   }catch(e){console.error('rates:',e);}
 }
 
+// H.4.1 데이터 기준일 + 지연 시간 계산 (기준일이 최근 수요일이어야 정상)
+function h41Status(isoDate){
+  if(!isoDate) return '—';
+  const d=new Date(isoDate+'T00:00:00Z');
+  const now=new Date();
+  const daysOld=Math.floor((now-d)/86400000);
+  // H.4.1: 매주 수요일 기준, 목요일 4:30PM ET 발표
+  // daysOld 0~2 = 신선, 3~7 = 이번 주 정상, 8+ = 지연
+  let status='';
+  if(daysOld<=2) status=' · 최신';
+  else if(daysOld<=7) status=' · 이번 주';
+  else if(daysOld<=14) status=' · 1주 지연';
+  else status=' · '+Math.floor(daysOld/7)+'주 지연';
+  return isoDate+status;
+}
+
 async function loadH41(){
   try{
     const[ust,mbs,btfp,dw]=await Promise.all([fred('TREAST',60),fred('MBST',60),fred('BTFP',60),fred('DISCBORR',60)]);
     const lu=last(ust),lm=last(mbs),lb=last(btfp),ld=last(dw);
-    if(lu){document.getElementById('c-ust').textContent=B(lu.v*1e6);document.getElementById('c-ust-d').textContent=lu.date;}
-    if(lm){document.getElementById('c-mbs').textContent=B(lm.v*1e6);document.getElementById('c-mbs-d').textContent=lm.date;}
-    if(lb){document.getElementById('c-btfp').textContent=B(lb.v*1e6);document.getElementById('c-btfp-d').textContent=lb.date;}
-    if(ld){document.getElementById('c-dw').textContent=B(ld.v*1e6);document.getElementById('c-dw-d').textContent=ld.date;}
+    if(lu){document.getElementById('c-ust').textContent=B(lu.v*1e6);document.getElementById('c-ust-d').textContent=h41Status(lu.date);}
+    if(lm){document.getElementById('c-mbs').textContent=B(lm.v*1e6);document.getElementById('c-mbs-d').textContent=h41Status(lm.date);}
+    if(lb){document.getElementById('c-btfp').textContent=B(lb.v*1e6);document.getElementById('c-btfp-d').textContent=h41Status(lb.date);}
+    if(ld){document.getElementById('c-dw').textContent=B(ld.v*1e6);document.getElementById('c-dw-d').textContent=h41Status(ld.date);}
     const mbsM={};mbs.forEach(x=>mbsM[x.date]=x.v);
     mk('ustChart','line',ust.map(x=>x.date.slice(5)),[
       {label:'UST',data:ust.map(x=>x.v),borderColor:'#58a6ff',backgroundColor:'rgba(88,166,255,0.06)',borderWidth:2,pointRadius:0,fill:true,tension:0.3},
