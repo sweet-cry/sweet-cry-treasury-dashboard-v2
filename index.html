@@ -1085,14 +1085,14 @@ function renderCal(){
   const evList=document.getElementById('ev-list');
   if(!evList)return;
   const now=new Date();
-  const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  const today2=new Date(now.getFullYear(),now.getMonth(),now.getDate());
   const upcoming=FISCAL_EVENTS
-    .filter(e=>new Date(e.y,e.m-1,e.d)>=today)
+    .filter(e=>new Date(e.y,e.m-1,e.d)>=today2)
     .sort((a,b)=>new Date(a.y,a.m-1,a.d)-new Date(b.y,b.m-1,b.d))
     .slice(0,15);
   evList.innerHTML=upcoming.map(e=>{
     const d=new Date(e.y,e.m-1,e.d);
-    const diff=Math.round((d-today)/(86400000));
+    const diff=Math.round((d-today2)/(86400000));
     const diffStr=diff===0?'오늘':diff===1?'내일':diff+'일 후';
     const col=e.type==='fomc'?'#a371f7':e.type==='tax'?'#f85149':e.type==='qra'?'#d29922':e.type==='h41'?'#58a6ff':'#3fb950';
     const label=e.type==='fomc'?'FOMC':e.type==='tax'?'Tax':e.type==='qra'?'QRA':e.type==='h41'?'H.4.1':'만기';
