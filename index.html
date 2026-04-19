@@ -595,21 +595,24 @@ tr:hover td{background:var(--surf2)}
 
 <div class="tip" id="tipEl"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
 /* ═══════════════════════ SRF ═══════════════════════ */
 let _srfData=null, _shockData=null;
 let srfSpreadChartObj=null, srfUtilChartObj=null, srfShockChartObj=null;
 
 async function loadRatesSRF(){
   if(_srfData)return;
-  const FRED_KEY=window.FRED_KEY||'';
+  const days=120;
   const end=new Date(),start=new Date();
   start.setDate(end.getDate()-120);
   const s=start.toISOString().slice(0,10),e=end.toISOString().slice(0,10);
   async function f(id){
-    const u=`https://api.stlouisfed.org/fred/series/observations?series_id=${id}&api_key=${FRED_KEY}&file_type=json&observation_start=${s}&observation_end=${e}`;
-    try{const r=await fetch(u);const d=await r.json();
-      return (d.observations||[]).filter(x=>x.value!=='.').map(x=>({date:x.date,v:parseFloat(x.value)}));
+    try{
+      const r=await fetch(`/api/fred?series=${id}&count=${days}`);
+      const d=await r.json();
+      if(!d.observations)return [];
+      return d.observations.filter(x=>x.value!=='.').map(x=>({date:x.date,v:parseFloat(x.value)})).reverse();
     }catch{return [];}
   }
   const [srf,sofr,iorb,sofr99,dw]=await Promise.all([
@@ -664,12 +667,11 @@ async function loadRatesSRF(){
 
 async function loadShockData(){
   if(_shockData)return;
-  const FRED_KEY=window.FRED_KEY||'';
   const SHOCKS={'2019-09':{'date':'2019-09-17','label':'Repo rate spike'},'2020-03':{'date':'2020-03-15','label':'COVID crisis'},'2023-03':{'date':'2023-03-13','label':'SVB stress'}};
-  async function fetchRange(id,s,e){
-    const u=`https://api.stlouisfed.org/fred/series/observations?series_id=${id}&api_key=${FRED_KEY}&file_type=json&observation_start=${s}&observation_end=${e}`;
-    try{const r=await fetch(u);const d=await r.json();return (d.observations||[]).filter(x=>x.value!=='.').map(x=>({date:x.date,v:parseFloat(x.value)}));}catch{return [];}
-  }
+  // /api/fred는 최근 N일만 반환하므로 과거 쇼크(2019/2020/2023)는 조회 불가 — 프록시 한계
+  // 대안: 해당 범위 데이터를 미리 하드코딩하거나 서버 프록시에 range 파라미터 추가 필요
+  // 현재는 스킵
+  async function fetchRange(id,s,e){ return []; }
   const out={};
   for(const[key,meta] of Object.entries(SHOCKS)){
     const d0=new Date(meta.date);
@@ -711,13 +713,16 @@ let _lclorMode='fed_comm', lclorChartObj=null;
 
 async function loadLCLoR(mode){
   _lclorMode=mode||_lclorMode;
-  const FRED_KEY=window.FRED_KEY||'';
-  const end=new Date(),start=new Date();
+    const end=new Date(),start=new Date();
   start.setDate(end.getDate()-730);
   const s=start.toISOString().slice(0,10),e=end.toISOString().slice(0,10);
-  async function f(id,freq){
-    const u=`https://api.stlouisfed.org/fred/series/observations?series_id=${id}&api_key=${FRED_KEY}&file_type=json&observation_start=${s}&observation_end=${e}`;
-    try{const r=await fetch(u);const d=await r.json();return (d.observations||[]).filter(x=>x.value!=='.').map(x=>({date:x.date,v:parseFloat(x.value)}));}catch{return [];}
+  async function f(id){
+    try{
+      const r=await fetch(`/api/fred?series=${id}&count=120`);
+      const d=await r.json();
+      if(!d.observations)return [];
+      return d.observations.filter(x=>x.value!=='.').map(x=>({date:x.date,v:parseFloat(x.value)})).reverse();
+    }catch{return [];}
   }
   const [wresbal,gdp]=await Promise.all([f('WRESBAL'),f('GDP')]);
   if(!wresbal.length)return;
