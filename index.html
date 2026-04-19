@@ -336,14 +336,19 @@ tr:hover td{background:var(--surf2)}
     </div>
   <!-- ── SRF (금리·자금시장 하단) ── -->
   <div class="sec" style="margin-top:20px;padding-top:20px;border-top:1px solid var(--brd)">
-    <div class="stitle">Repo 경색 조기감지 (SRF)</div>
-    <div style="font-size:12px;color:var(--muted);margin-bottom:14px">SRF 이용 발생 또는 SOFR이 IORB를 상향 돌파 시 준비금 희소성 신호. 2021년 7월 상설화 이후 평시 $0 유지.</div>
+    <div class="stitle">Repo 경색 조기감지 (SRF) <button class="ib" onclick="tip('srf-signal',this)">i</button></div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.6">SRF(Standing Repo Facility) = Fed가 재무부 증권을 담보로 레포 금리 상한을 제공하는 상설 창구. 2021.7 상설화 이후 평시 $0 유지가 정상. SOFR이 IORB를 상향 돌파하거나 SRF 이용액이 발생하면 시스템 내 담보 자금 공급 부족 신호 — 2019.9 repo 대란 재연 가능성 경고.</div>
     <!-- 신호등 -->
     <div id="srf-signal" style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg2);border-radius:8px;margin-bottom:14px">
       <div id="srf-light" style="width:28px;height:28px;border-radius:50%;background:var(--muted);flex-shrink:0"></div>
-      <div>
+      <div style="flex:1">
         <div id="srf-level" style="font-size:13px;font-weight:500;color:var(--tx)">—</div>
         <div id="srf-reason" style="font-size:11px;color:var(--muted)">로딩 중...</div>
+      </div>
+      <div style="font-size:10px;color:var(--muted);line-height:1.5;max-width:240px;border-left:1px solid var(--brd);padding-left:10px">
+        GREEN: SRF=0 + SOFR≤IORB · 여유<br>
+        YELLOW: 잔액 발생 또는 스프레드 축소 · 주의<br>
+        RED: SRF&gt;$10B 또는 스프레드&gt;+5bp · 경고
       </div>
     </div>
     <!-- 카드 -->
@@ -353,11 +358,13 @@ tr:hover td{background:var(--surf2)}
       <div class="card"><div class="cl">SOFR − IORB <button class="ib" onclick="tip('sofr-iorb-bp',this)">i</button></div><div class="cv" id="c-sofr-iorb-bp">—</div><div class="cs">bp · 음수=건강</div></div>
       <div class="card"><div class="cl">SOFR99 갭</div><div class="cv" id="c-sofr99-gap">—</div><div class="cs">bp · 꼬리압력</div></div>
     </div>
-    <div class="ct" style="margin-top:18px">SOFR − IORB 스프레드 (90일)</div>
+    <div class="ct" style="margin-top:18px">SOFR − IORB 스프레드 (90일) <button class="ib" onclick="tip('sofr-iorb-bp',this)">i</button></div>
     <div class="leg"><span><span class="ld" style="background:#58a6ff"></span>SOFR-IORB (bp)</span></div>
     <div style="position:relative;height:180px"><canvas id="srfSpreadChart"></canvas></div>
+    <div style="font-size:10px;color:var(--muted);margin-top:4px;line-height:1.5">0bp 기준선 돌파가 반복되면 레포 시장 경직 신호. 2019.9 스파이크 이전에도 8월부터 스프레드가 +2~5bp로 부풀어 있었음.</div>
     <div class="ct" style="margin-top:14px">SRF 일일 이용액 (90일)</div>
     <div style="position:relative;height:140px"><canvas id="srfUtilChart"></canvas></div>
+    <div style="font-size:10px;color:var(--muted);margin-top:4px;line-height:1.5">초록 = 평시 $0 / 노랑 = $0 초과 / 빨강 = $10B 초과. 분기말(quarter-end) $5~30B 일시 발생은 정상 범위.</div>
   </div>
 
   </div>
@@ -412,27 +419,23 @@ tr:hover td{background:var(--surf2)}
     </div>
   <!-- ── LCLoR (통화·준비금 하단) ── -->
   <div class="sec" style="margin-top:20px;padding-top:20px;border-top:1px solid var(--brd)">
-    <div class="stitle">LCLoR — 준비금 희소성 근접도</div>
-    <div style="font-size:12px;color:var(--muted);margin-bottom:14px">준비금이 '최저 편안한 수준(LCLoR)'에 근접할수록 QT 종료 압박 증가. NY Fed Afonso et al. 프레임워크.</div>
+    <div class="stitle">LCLoR — 준비금 희소성 근접도 <button class="ib" onclick="tip('lclor-gauge',this)">i</button></div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.6">LCLoR(Lowest Comfortable Level of Reserves) = 은행 시스템이 단기금리 안정성을 유지하며 운영 가능한 최저 준비금 수준. 이 선 아래로 QT 진행 시 SRF 이용·SOFR 스파이크 발생. NY Fed Afonso, Cipriani, La Spada 정립. Fed 공식 목표 = 'ample reserves' 유지.</div>
     <!-- 모드 토글 -->
-    <div style="display:flex;gap:6px;margin-bottom:18px">
+    <div style="display:flex;gap:6px;margin-bottom:10px;align-items:center;flex-wrap:wrap">
       <button class="shock-btn on" id="lclor-mode-fed" onclick="switchLCLoR('fed_comm',this)">Fed 기준 ($2.8~3.2T)</button>
       <button class="shock-btn" id="lclor-mode-gdp" onclick="switchLCLoR('reserves_gdp',this)">Reserves/GDP 8%</button>
+      <button class="ib" onclick="tip('lclor-mode',this)" style="margin-left:4px">i</button>
     </div>
+    <div style="font-size:10px;color:var(--muted);margin-bottom:14px;line-height:1.5">두 기준은 상반된 결과 가능: Fed 기준(절대 금액 $2.8~3.2T)은 파월이 명시한 밴드. Reserves/GDP 기준은 경제 규모 연동 동적 — 명목 GDP 성장 시 LCLoR도 비례 증가. 교차 검증 권장.</div>
     <!-- 게이지 (크게, 눈금 포함) -->
     <div style="display:flex;align-items:center;gap:28px;margin-bottom:20px;flex-wrap:wrap;padding:10px 0">
-      <svg id="lclor-gauge" viewBox="0 0 400 240" style="width:min(400px,100%);max-width:400px;height:auto;flex-shrink:0">
-        <!-- 배경 트랙 -->
-        <path d="M 50 200 A 150 150 0 0 1 350 200" fill="none" stroke="#21262d" stroke-width="32" stroke-linecap="round"/>
-        <!-- 4구간 색상 호 (각 구간 정확 각도 계산) -->
-        <!-- 0~40%: green -->
-        <path d="M 50 200 A 150 150 0 0 1 153.6 57.3" fill="none" stroke="#3fb950" stroke-width="32" stroke-linecap="butt"/>
-        <!-- 40~70%: amber -->
-        <path d="M 153.6 57.3 A 150 150 0 0 1 288.2 78.6" fill="none" stroke="#d29922" stroke-width="32"/>
-        <!-- 70~85%: orange -->
-        <path d="M 288.2 78.6 A 150 150 0 0 1 333.7 131.9" fill="none" stroke="#e3793a" stroke-width="32"/>
-        <!-- 85~100%: red -->
-        <path d="M 333.7 131.9 A 150 150 0 0 1 350 200" fill="none" stroke="#f85149" stroke-width="32" stroke-linecap="butt"/>
+      <svg id="lclor-gauge" viewBox="0 0 200 120" style="width:200px;height:120px;flex-shrink:0">
+        <path d="M 20.0 100.0 A 80 80 0 0 1 180.0 100.0" fill="none" stroke="#21262d" stroke-width="18" stroke-linecap="round"/>
+        <path d="M 20.0 100.0 A 80 80 0 0 1 75.3 23.9" fill="none" stroke="#3fb950" stroke-width="18" stroke-linecap="butt"/>
+        <path d="M 75.3 23.9 A 80 80 0 0 1 147.0 35.3" fill="none" stroke="#d29922" stroke-width="18"/>
+        <path d="M 147.0 35.3 A 80 80 0 0 1 171.3 63.7" fill="none" stroke="#e3793a" stroke-width="18"/>
+        <path d="M 171.3 63.7 A 80 80 0 0 1 180.0 100.0" fill="none" stroke="#f85149" stroke-width="18" stroke-linecap="butt"/>
         <line id="lclor-needle" x1="100" y1="100" x2="100" y2="28" stroke="var(--tx)" stroke-width="3" stroke-linecap="round"/>
         <circle cx="100" cy="100" r="5" fill="var(--tx)"/>
       </svg>
@@ -442,9 +445,10 @@ tr:hover td{background:var(--surf2)}
         <div style="font-size:12px;color:var(--muted);margin-top:6px;line-height:1.5" id="lclor-detail">—</div>
       </div>
     </div>
-    <div class="ct">Reserves/GDP 추이 (24개월)</div>
+    <div class="ct">Reserves/GDP 추이 (24개월) <button class="ib" onclick="tip('lclor-calc',this)">i</button></div>
     <div class="leg"><span><span class="ld" style="background:#58a6ff"></span>Reserves/GDP %</span></div>
     <div style="position:relative;height:180px"><canvas id="lclorChart"></canvas></div>
+    <div style="font-size:10px;color:var(--muted);margin-top:4px;line-height:1.5">파란 실선이 8% scarce 기준선에 접근 시 QT 종료 압력 본격화. 2025 하반기부터 8% 근접 추세 → 2026 초 Fed QT taper 가능성 상승.</div>
   </div>
 
   </div>
@@ -854,7 +858,16 @@ const TIPS={
 'qra-note':['Notes 발행 (2~10Y)','fiscaldata','2·3·5·7·10년 중기채. 은행·연기금이 주 매수자 → 준비금 직접 흡수 → NL 감소 압박.','Notes 비중 증가 = NL 직접 압박. 금리 상승 시 발행 비용 증가 → 재정 이자 부담 확대.'],
 'qra-bond':['Bonds 발행 (20~30Y)','fiscaldata','20·30년 장기채. 보험·연기금·해외 중앙은행이 주 매수자. 발행 증가 시 장기금리 상방 압력.','30Y 금리 6% 접근 시 시장 흡수 한계 우려. 수급 불균형 → 장기금리 변동성 확대 → 밸류에이션 압박.'],
 'qra-total':['총 국채 발행','fiscaldata','T-Bill+Notes+Bonds 합계. 재정적자 + 만기 차환 수요 반영. 연간 $20T 이상 규모.','총 발행 증가 = 시장 자금 흡수 → 민간 투자 구축. 발행 구성(T-Bill vs 쿠폰채)의 NL 영향 차이 중요.'],
-'tic':['TIC — 국가별 미국채 보유','미 재무부 월간','Treasury International Capital. 외국 정부·기관 미국채 보유 현황. 약 6주 후행 발표.','일본·중국 보유 감소 = 달러 약세 + 미국채 금리 상승 압력. 지정학 위기 시 보유국 매도(무기화) 우려.']
+'tic':['TIC — 국가별 미국채 보유','미 재무부 월간','Treasury International Capital. 외국 정부·기관 미국채 보유 현황. 약 6주 후행 발표.','일본·중국 보유 감소 = 달러 약세 + 미국채 금리 상승 압력. 지정학 위기 시 보유국 매도(무기화) 우려.'],
+'srf-daily':['SRF 일간 이용액','FRED RPONTSYD','Fed Standing Repo Facility 일일 이용액($B). 딜러가 재무부 증권을 담보로 Fed에서 레포 금리 상한가로 오버나잇 자금 조달. 2021.7 상설화.','$0 = 정상 / $0 초과 = 시장 레포 금리가 SRF 상한(통상 IORB+2~5bp)을 건드렸다는 증거. $10B 초과 시 2019.9 재현 경고.'],
+'srf-7d':['SRF 7일 누적','계산값','최근 7영업일 SRF 이용 총액. 일회성 vs 구조적 압박 구분 용도.','단일일 $5B는 세금·경매일 영향일 수 있으나 7일 누적 $20B↑은 지속적 담보 희소성 신호.'],
+'sofr-iorb-bp':['SOFR − IORB 스프레드','FRED 계산','(SOFR - IORB) × 100 bp. IORB는 은행 예치금 하한, SOFR은 실거래 담보 금리.','정상 상태 = SOFR < IORB (담보 이점). 음수 -3~-5bp 건강 / 0 근접 경계 / 양수 레포 경직. 2019.9 직전 8월부터 +2~5bp 부풀림 패턴 주의.'],
+'sofr99-gap':['SOFR 99퍼센타일 갭','FRED SOFR99','SOFR 99퍼센타일 - 중앙값 (bp). SOFR 분포의 꼬리 압력 측정.','평균이 잠잠해도 상위 1% 거래 금리가 튀면 특정 딜러 대상 자금 경색. 5bp 이하 정상 / 10bp↑ 특정 참여자 제약 / 20bp↑ 시스템 위기 전조.'],
+'srf-signal':['SRF 신호등','종합 판정','SRF 이용액 + SOFR-IORB 스프레드 종합 판정.','GREEN: SRF=0 + SOFR≤IORB (여유). YELLOW: 잔액 발생 또는 스프레드 축소 (주의). RED: SRF>$10B 또는 스프레드>+5bp (2019.9 재현 경고).'],
+'srf-shock':['과거 repo 쇼크 비교','FRED 과거 데이터','쇼크일 day 0 기준 ±30일 SOFR-IORB 오버레이. 세 사건 모두 쇼크 전 스프레드 점진 상승 공통.','2019-09-17: 법인세+경매 정산 중복, +282bp 스파이크 → SRF 상설화 계기. 2020-03-15: COVID dash for cash, +60bp. 2023-03-13: SVB, +24bp (SRF 첫 실전, 제한적).'],
+'lclor-gauge':['LCLoR 근접도 게이지','계산값','준비금이 Lowest Comfortable Level of Reserves에 얼마나 근접했는지 0~100% 측정. Abundant<40 / Ample<70 / Approaching<85 / Scarce.','Scarce 접근 시 SRF 이용·SOFR 스파이크 발생 → Fed QT 종료 트리거. 2024.6 Fed가 70% 근처에서 QT taper 50% 감속 전례.'],
+'lclor-calc':['근접도 계산식','수식','reserves ≥ upper×1.3 → 0% / reserves=upper → 40% / reserves=lower → 85% / reserves ≤ lower×0.9 → 100%. 구간별 선형 보간.','Fed 기준: lower=$2,800B, upper=$3,200B (파월 커뮤니케이션). GDP 기준: lower=GDP×8%, upper=lower×1.15 (NY Fed Afonso et al. 프레임).'],
+'lclor-mode':['두 기준 차이','Fed vs NY Fed','Fed 커뮤니케이션: 절대 금액 $2.8~3.2T 고정. Reserves/GDP 8%: 경제 규모 연동 동적.','두 기준이 상반된 결과 가능 — 현재 Fed 48% AMPLE이지만 GDP 기준은 8% ABUNDANT. 교차 검증으로 QT 종료 타이밍 정확도 향상.']
 };
 function tip(key,btn){
   const el=document.getElementById('tipEl');
