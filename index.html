@@ -194,6 +194,7 @@ tr:hover td{background:var(--surf2)}
 }
 
 /* SRF 신호등 */
+#srf-light{background:#30363d;transition:background .2s}
 #srf-light.green{background:#3fb950;box-shadow:0 0 12px rgba(63,185,80,0.4)}
 #srf-light.yellow{background:#d29922;box-shadow:0 0 12px rgba(210,153,34,0.4)}
 #srf-light.red{background:#f85149;box-shadow:0 0 12px rgba(248,81,73,0.4)}
@@ -340,7 +341,7 @@ tr:hover td{background:var(--surf2)}
     <div style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.6">SRF(Standing Repo Facility) = Fed가 재무부 증권을 담보로 레포 금리 상한을 제공하는 상설 창구. 2021.7 상설화 이후 평시 $0 유지가 정상. SOFR이 IORB를 상향 돌파하거나 SRF 이용액이 발생하면 시스템 내 담보 자금 공급 부족 신호 — 2019.9 repo 대란 재연 가능성 경고.</div>
     <!-- 신호등 -->
     <div id="srf-signal" style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg2);border-radius:8px;margin-bottom:14px">
-      <div id="srf-light" style="width:28px;height:28px;border-radius:50%;background:var(--muted);flex-shrink:0"></div>
+      <div id="srf-light" style="width:28px;height:28px;border-radius:50%;flex-shrink:0"></div>
       <div style="flex:1">
         <div id="srf-level" style="font-size:13px;font-weight:500;color:var(--tx)">—</div>
         <div id="srf-reason" style="font-size:11px;color:var(--muted)">로딩 중...</div>
