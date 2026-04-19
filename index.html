@@ -955,65 +955,94 @@ function updateSignalPanel(data){
   }
 }
 
-const FISCAL_EVENTS = [
+const FIXED_EVENTS = [
+  // ===== FOMC 2026 (Fed 공식, 발표일 기준) =====
   {y:2026,m:1,d:28,type:'fomc',name:'FOMC 회의 (1/27~28)',badge:'eb-fomc'},
   {y:2026,m:3,d:18,type:'fomc',name:'FOMC 회의 (3/17~18)',badge:'eb-fomc'},
-  {y:2026,m:4,d:9,type:'tax',name:'법인세 분납 (1분기)',badge:'eb-tax'},
-  {y:2026,m:4,d:15,type:'tax',name:'Tax Day — 개인소득세 마감',badge:'eb-tax'},
   {y:2026,m:4,d:29,type:'fomc',name:'FOMC 회의 (4/28~29)',badge:'eb-fomc'},
-  {y:2026,m:4,d:27,type:'qra',name:'QRA 분기 차입 수요 발표',badge:'eb-qra'},
-  {y:2026,m:4,d:28,type:'qra',name:'QRA 리펀딩 상세 발표',badge:'eb-qra'},
-  {y:2026,m:4,d:29,type:'h41',name:'H.4.1 발표 (주간)',badge:'eb-h41'},
-  {y:2026,m:4,d:30,type:'matur',name:'국채 만기 집중 (~$420B)',badge:'eb-matur'},
-  {y:2026,m:5,d:6,type:'h41',name:'H.4.1 발표 (주간)',badge:'eb-h41'},
-  {y:2026,m:5,d:13,type:'h41',name:'H.4.1 발표 (주간)',badge:'eb-h41'},
-  {y:2026,m:5,d:15,type:'tax',name:'법인세 분납 (Q1 추가)',badge:'eb-tax'},
-  {y:2026,m:5,d:20,type:'h41',name:'H.4.1 발표 (주간)',badge:'eb-h41'},
-  {y:2026,m:5,d:27,type:'h41',name:'H.4.1 발표 (주간)',badge:'eb-h41'},
-  {y:2026,m:6,d:3,type:'h41',name:'H.4.1 발표 (주간)',badge:'eb-h41'},
   {y:2026,m:6,d:17,type:'fomc',name:'FOMC 회의 (6/16~17)',badge:'eb-fomc'},
-  {y:2026,m:6,d:10,type:'h41',name:'H.4.1 발표 (주간)',badge:'eb-h41'},
-  {y:2026,m:6,d:15,type:'tax',name:'법인세 분납 (2분기)',badge:'eb-tax'},
-  {y:2026,m:6,d:17,type:'h41',name:'H.4.1 발표 (주간)',badge:'eb-h41'},
-  {y:2026,m:6,d:24,type:'h41',name:'H.4.1 발표 (주간)',badge:'eb-h41'},
-  {y:2026,m:6,d:30,type:'matur',name:'국채 만기 집중',badge:'eb-matur'},
-  {y:2026,m:7,d:1,type:'h41',name:'H.4.1 발표 (주간)',badge:'eb-h41'},
-  {y:2026,m:7,d:8,type:'h41',name:'H.4.1 발표 (주간)',badge:'eb-h41'},
-  {y:2026,m:7,d:15,type:'h41',name:'H.4.1 발표 (주간)',badge:'eb-h41'},
-  {y:2026,m:7,d:22,type:'h41',name:'H.4.1 발표 (주간)',badge:'eb-h41'},
-  {y:2026,m:7,d:27,type:'qra',name:'QRA 분기 차입 수요 발표 (Q3)',badge:'eb-qra'},
-  {y:2026,m:7,d:28,type:'qra',name:'QRA 리펀딩 상세 발표 (Q3)',badge:'eb-qra'},
   {y:2026,m:7,d:29,type:'fomc',name:'FOMC 회의 (7/28~29)',badge:'eb-fomc'},
-  {y:2026,m:7,d:29,type:'h41',name:'H.4.1 발표 (주간)',badge:'eb-h41'},
-  {y:2026,m:8,d:5,type:'h41',name:'H.4.1 발표 (주간)',badge:'eb-h41'},
-  {y:2026,m:8,d:12,type:'h41',name:'H.4.1 발표 (주간)',badge:'eb-h41'},
-  {y:2026,m:8,d:19,type:'h41',name:'H.4.1 발표 (주간)',badge:'eb-h41'},
-  {y:2026,m:8,d:26,type:'h41',name:'H.4.1 발표 (주간)',badge:'eb-h41'},
-  {y:2026,m:9,d:2,type:'h41',name:'H.4.1 발표 (주간)',badge:'eb-h41'},
-  {y:2026,m:9,d:9,type:'h41',name:'H.4.1 발표 (주간)',badge:'eb-h41'},
-  {y:2026,m:9,d:15,type:'tax',name:'법인세 분납 (3분기)',badge:'eb-tax'},
   {y:2026,m:9,d:16,type:'fomc',name:'FOMC 회의 (9/15~16)',badge:'eb-fomc'},
-  {y:2026,m:9,d:16,type:'h41',name:'H.4.1 발표 (주간)',badge:'eb-h41'},
-  {y:2026,m:9,d:23,type:'h41',name:'H.4.1 발표 (주간)',badge:'eb-h41'},
-  {y:2026,m:9,d:30,type:'h41',name:'H.4.1 발표 (주간)',badge:'eb-h41'},
-  {y:2026,m:10,d:7,type:'h41',name:'H.4.1 발표 (주간)',badge:'eb-h41'},
-  {y:2026,m:10,d:14,type:'h41',name:'H.4.1 발표 (주간)',badge:'eb-h41'},
-  {y:2026,m:10,d:21,type:'h41',name:'H.4.1 발표 (주간)',badge:'eb-h41'},
-  {y:2026,m:10,d:26,type:'qra',name:'QRA 분기 차입 수요 발표 (Q4)',badge:'eb-qra'},
-  {y:2026,m:10,d:27,type:'qra',name:'QRA 리펀딩 상세 발표 (Q4)',badge:'eb-qra'},
-  {y:2026,m:10,d:28,type:'h41',name:'H.4.1 발표 (주간)',badge:'eb-h41'},
   {y:2026,m:10,d:28,type:'fomc',name:'FOMC 회의 (10/27~28)',badge:'eb-fomc'},
-  {y:2026,m:11,d:4,type:'h41',name:'H.4.1 발표 (주간)',badge:'eb-h41'},
-  {y:2026,m:11,d:11,type:'h41',name:'H.4.1 발표 (주간)',badge:'eb-h41'},
-  {y:2026,m:11,d:18,type:'h41',name:'H.4.1 발표 (주간)',badge:'eb-h41'},
-  {y:2026,m:11,d:25,type:'h41',name:'H.4.1 발표 (주간)',badge:'eb-h41'},
-  {y:2026,m:12,d:2,type:'h41',name:'H.4.1 발표 (주간)',badge:'eb-h41'},
-  {y:2026,m:12,d:9,type:'h41',name:'H.4.1 발표 (주간)',badge:'eb-h41'},
-  {y:2026,m:12,d:15,type:'tax',name:'법인세 분납 (4분기)',badge:'eb-tax'},
   {y:2026,m:12,d:9,type:'fomc',name:'FOMC 회의 (12/8~9)',badge:'eb-fomc'},
-  {y:2026,m:12,d:16,type:'h41',name:'H.4.1 발표 (주간)',badge:'eb-h41'},
-  {y:2026,m:12,d:23,type:'h41',name:'H.4.1 발표 (주간)',badge:'eb-h41'},
-  {y:2026,m:12,d:30,type:'h41',name:'H.4.1 발표 (주간)',badge:'eb-h41'},
+  // ===== FOMC 2027 (Fed 공식) =====
+  {y:2027,m:1,d:27,type:'fomc',name:'FOMC 회의 (1/26~27)',badge:'eb-fomc'},
+  {y:2027,m:3,d:17,type:'fomc',name:'FOMC 회의 (3/16~17)',badge:'eb-fomc'},
+  {y:2027,m:4,d:28,type:'fomc',name:'FOMC 회의 (4/27~28)',badge:'eb-fomc'},
+  {y:2027,m:6,d:9,type:'fomc',name:'FOMC 회의 (6/8~9)',badge:'eb-fomc'},
+  {y:2027,m:7,d:28,type:'fomc',name:'FOMC 회의 (7/27~28)',badge:'eb-fomc'},
+  {y:2027,m:9,d:15,type:'fomc',name:'FOMC 회의 (9/14~15)',badge:'eb-fomc'},
+  {y:2027,m:10,d:27,type:'fomc',name:'FOMC 회의 (10/26~27)',badge:'eb-fomc'},
+  {y:2027,m:12,d:8,type:'fomc',name:'FOMC 회의 (12/7~8)',badge:'eb-fomc'},
+  // ===== Tax 2026 (IRS 공식: 개인 추정세 4/15, 6/15, 9/15, 다음해 1/15) =====
+  {y:2026,m:4,d:15,type:'tax',name:'Tax Day — 개인소득세 + Q1 추정세',badge:'eb-tax'},
+  {y:2026,m:6,d:15,type:'tax',name:'Q2 추정세 납부 (6/15)',badge:'eb-tax'},
+  {y:2026,m:9,d:15,type:'tax',name:'Q3 추정세 납부 (9/15)',badge:'eb-tax'},
+  {y:2027,m:1,d:15,type:'tax',name:'Q4 추정세 납부 (2026 final)',badge:'eb-tax'},
+  {y:2027,m:4,d:15,type:'tax',name:'Tax Day — 개인소득세 + Q1 추정세',badge:'eb-tax'},
+  {y:2027,m:6,d:15,type:'tax',name:'Q2 추정세 납부 (6/15)',badge:'eb-tax'},
+  {y:2027,m:9,d:15,type:'tax',name:'Q3 추정세 납부 (9/15)',badge:'eb-tax'},
+  // ===== QRA 2026 (분기별 발표: 통상 2월·5월·8월·11월 첫째 주) =====
+  {y:2026,m:4,d:27,type:'qra',name:'QRA 분기 차입 수요 발표',badge:'eb-qra'},
+  {y:2026,m:4,d:29,type:'qra',name:'QRA 리펀딩 상세 발표',badge:'eb-qra'},
+  {y:2026,m:7,d:27,type:'qra',name:'QRA 분기 차입 수요 발표 (Q3)',badge:'eb-qra'},
+  {y:2026,m:7,d:29,type:'qra',name:'QRA 리펀딩 상세 발표 (Q3)',badge:'eb-qra'},
+  {y:2026,m:11,d:2,type:'qra',name:'QRA 분기 차입 수요 발표 (Q4)',badge:'eb-qra'},
+  {y:2026,m:11,d:4,type:'qra',name:'QRA 리펀딩 상세 발표 (Q4)',badge:'eb-qra'},
+  {y:2027,m:2,d:1,type:'qra',name:'QRA 분기 차입 수요 발표 (Q1)',badge:'eb-qra'},
+  {y:2027,m:2,d:3,type:'qra',name:'QRA 리펀딩 상세 발표 (Q1)',badge:'eb-qra'}
+];
+
+// 국채 만기는 매월 15일, 말일에 집중 (Treasury 정기 만기 패턴)
+function genMaturityEvents(startY, endY) {
+  const out = [];
+  for (let y = startY; y <= endY; y++) {
+    for (let m = 1; m <= 12; m++) {
+      out.push({y, m, d:15, type:'matur', name:'국채 만기 (월 중순)', badge:'eb-matur'});
+      const lastDay = new Date(y, m, 0).getDate();
+      out.push({y, m, d:lastDay, type:'matur', name:'국채 만기 (월말)', badge:'eb-matur'});
+    }
+  }
+  return out;
+}
+
+// H.4.1은 매주 목요일 4:30pm ET 발표 (공휴일엔 금요일로 이월)
+// 2026년 공휴일 목요일: 1/1 (신정), 7/3(대체휴일 없음), 11/26(추수감사절), 11/27(공휴일 다음날 금요일 발표)
+function genH41Events(startY, endY) {
+  const out = [];
+  const usHolidays = {
+    // yyyy-mm-dd 형식으로 연방공휴일 등록 (목요일과 겹치는 경우)
+    '2026-11-26': true, // Thanksgiving
+    '2027-11-25': true,
+    '2028-11-23': true,
+    '2029-11-22': true,
+    '2030-11-28': true
+  };
+  for (let y = startY; y <= endY; y++) {
+    let d = new Date(y, 0, 1);
+    while (d.getFullYear() === y) {
+      if (d.getDay() === 4) { // Thursday
+        const key = y + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+        if (usHolidays[key]) {
+          // 다음 금요일로 이월
+          const nd = new Date(d.getTime() + 86400000);
+          out.push({y:nd.getFullYear(), m:nd.getMonth()+1, d:nd.getDate(), type:'h41', name:'H.4.1 발표 (공휴일 이월, 금요일)', badge:'eb-h41'});
+        } else {
+          out.push({y, m:d.getMonth()+1, d:d.getDate(), type:'h41', name:'H.4.1 발표 (주간)', badge:'eb-h41'});
+        }
+      }
+      d.setDate(d.getDate() + 1);
+    }
+  }
+  return out;
+}
+
+// 런타임에 현재 연도 기준 ±2년치 생성 (H.4.1·국채만기)
+const _curY = new Date().getFullYear();
+const FISCAL_EVENTS = [
+  ...FIXED_EVENTS,
+  ...genH41Events(_curY - 1, _curY + 3),
+  ...genMaturityEvents(_curY - 1, _curY + 3)
 ];
 
 let calYear=2026, calMonth=4;
