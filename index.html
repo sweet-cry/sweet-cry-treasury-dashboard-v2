@@ -521,7 +521,7 @@ tr:hover td{background:var(--surf2)}
     <div class="cc full">
       <div class="ct">최근 국채 경매 결과 (10일)</div>
       <div class="tw"><table id="auction-table">
-        <thead><tr><th>날짜</th><th>종류</th><th>만기</th><th>발행액</th><th>응찰률</th></tr></thead>
+        <thead><tr><th>날짜 <button class="ib" onclick="tip('auc-date',this)">i</button></th><th>종류 <button class="ib" onclick="tip('auc-type',this)">i</button></th><th>만기 <button class="ib" onclick="tip('auc-term',this)">i</button></th><th>발행액 <button class="ib" onclick="tip('auc-offer',this)">i</button></th><th>응찰률 <button class="ib" onclick="tip('auc-btc',this)">i</button></th></tr></thead>
         <tbody id="auction-tbody"><tr><td colspan="5" class="loading">로딩 중...</td></tr></tbody>
       </table></div>
     </div>
@@ -869,7 +869,12 @@ const TIPS={
 'srf-shock':['과거 repo 쇼크 비교','FRED 과거 데이터','쇼크일 day 0 기준 ±30일 SOFR-IORB 오버레이. 세 사건 모두 쇼크 전 스프레드 점진 상승 공통.','2019-09-17: 법인세+경매 정산 중복, +282bp 스파이크 → SRF 상설화 계기. 2020-03-15: COVID dash for cash, +60bp. 2023-03-13: SVB, +24bp (SRF 첫 실전, 제한적).'],
 'lclor-gauge':['LCLoR 근접도 게이지','계산값','준비금이 Lowest Comfortable Level of Reserves에 얼마나 근접했는지 0~100% 측정. Abundant<40 / Ample<70 / Approaching<85 / Scarce.','Scarce 접근 시 SRF 이용·SOFR 스파이크 발생 → Fed QT 종료 트리거. 2024.6 Fed가 70% 근처에서 QT taper 50% 감속 전례.'],
 'lclor-calc':['근접도 계산식','수식','reserves ≥ upper×1.3 → 0% / reserves=upper → 40% / reserves=lower → 85% / reserves ≤ lower×0.9 → 100%. 구간별 선형 보간.','Fed 기준: lower=$2,800B, upper=$3,200B (파월 커뮤니케이션). GDP 기준: lower=GDP×8%, upper=lower×1.15 (NY Fed Afonso et al. 프레임).'],
-'lclor-mode':['두 기준 차이','Fed vs NY Fed','Fed 커뮤니케이션: 절대 금액 $2.8~3.2T 고정. Reserves/GDP 8%: 경제 규모 연동 동적.','두 기준이 상반된 결과 가능 — 현재 Fed 48% AMPLE이지만 GDP 기준은 8% ABUNDANT. 교차 검증으로 QT 종료 타이밍 정확도 향상.']
+'lclor-mode':['두 기준 차이','Fed vs NY Fed','Fed 커뮤니케이션: 절대 금액 $2.8~3.2T 고정. Reserves/GDP 8%: 경제 규모 연동 동적.','두 기준이 상반된 결과 가능 — 현재 Fed 48% AMPLE이지만 GDP 기준은 8% ABUNDANT. 교차 검증으로 QT 종료 타이밍 정확도 향상.'],
+'auc-date':['경매일 (Auction Date)','fiscaldata.treasury.gov','재무부가 국채를 경쟁 입찰에 부친 날짜. 미국 동부시간 오후 1시에 대부분 진행. 정산(결제)은 통상 2~5영업일 후.','경매일 직전·직후 시장금리 변동이 큼. 경매 결과가 예상보다 약하면 장기금리 상방 압력·주식 조정 촉발 가능.'],
+'auc-type':['경매 종류 (Security Type)','fiscaldata','Bill = 1년 이하 단기채 (할인 발행). Note = 2·3·5·7·10년 중기채 (쿠폰 지급). Bond = 20·30년 장기채 (쿠폰 지급).','T-Bill은 MMF 수요 기반 — NL 영향 중립. Notes·Bonds는 은행·보험·연기금이 주 매수자 → 준비금 흡수 → NL 감소 압박.'],
+'auc-term':['만기 (Security Term)','fiscaldata','발행 증권의 만기. 4주~52주 = Bill, 2Y~10Y = Note, 20Y~30Y = Bond. 정기 경매 주기: 4·8·17·52주 Bill 매주, 2·3·5·7·10Y Note 월 중순, 20·30Y Bond 분기 신규+리오프닝.','만기별 수요자 분리: 4주 = MMF, 10Y = 해외·연기금, 30Y = 보험·장기투자자. 만기별 수요 강도 차이가 수익률 커브 형성.'],
+'auc-offer':['발행액 (Offering Amount)','fiscaldata','해당 경매에서 재무부가 발행하는 증권의 액면 총액. 분기 QRA 발표로 사전 공지되며 실제 경매일에 확정.','발행액 증가 = 시장 자금 흡수 확대. 예상보다 증가 시 장기금리 상방·위험자산 약세 신호. 쿠폰채 발행 증가 = NL 직접 압박.'],
+'auc-btc':['응찰률 (Bid-to-Cover Ratio)','fiscaldata 계산','BTC = 총 입찰액 ÷ 발행액. 수요 강도 지표. 계산식: 모든 입찰 금액 합계 / 실제 발행 금액.','2.0↑ = 수요 양호 (정상). 1.8~2.0 = 평균. 1.5↓ = 수요 부진 경고. 낮은 BTC + 낙찰금리 > WI 금리 = 테일(Tail) 발생 → 장기금리 급등 촉매.']
 };
 function tip(key,btn){
   const el=document.getElementById('tipEl');
