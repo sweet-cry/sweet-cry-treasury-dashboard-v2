@@ -731,7 +731,7 @@ function h41Status(isoDate){
 
 async function loadH41(){
   try{
-    const[ust,mbs,btfp,dw]=await Promise.all([fred('TREAST',60),fred('MBST',60),fred('BTFP',60),fred('DISCBORR',60)]);
+    const[ust,mbs,btfp,dw]=await Promise.all([fred('TREAST',60),fred('WSHOMCB',60),fred('H41RESPPALDKNWW',60),fred('WLCFLL',60)]);
     const lu=last(ust),lm=last(mbs),lb=last(btfp),ld=last(dw);
     if(lu){document.getElementById('c-ust').textContent=B(lu.v*1e6);document.getElementById('c-ust-d').textContent=h41Status(lu.date);}
     if(lm){document.getElementById('c-mbs').textContent=B(lm.v*1e6);document.getElementById('c-mbs-d').textContent=h41Status(lm.date);}
@@ -846,7 +846,7 @@ async function loadTIC(){
     document.getElementById('ticCards').innerHTML=data.slice(0,5).map(x=>`<div class="card"><div class="cl">${x.name}</div><div class="cv">${x.val.toLocaleString()}B$</div></div>`).join('');
     mk('ticChart','bar',data.map(x=>x.name),[
       {label:'보유(B$)',data:data.map(x=>x.val),backgroundColor:data.map((_,i)=>i===0?'rgba(88,166,255,0.8)':i===1?'rgba(248,81,73,0.7)':'rgba(88,166,255,0.45)'),borderWidth:0,borderRadius:4}
-    ],{opts:{indexAxis:'y'}});
+    ],{opts:{indexAxis:'y',scales:{y:{ticks:{autoSkip:false,color:tc,font:{size:11}},grid:{color:gc}},x:{ticks:{maxTicksLimit:6,color:tc,font:{size:11}},grid:{color:gc}}}}});
     const jpn=raw['Japan']?.value||0,chn=raw['China, Mainland']?.value||0;
     mk('ticBarChart','bar',['일본','중국'],[
       {label:'보유(B$)',data:[jpn,chn],backgroundColor:['rgba(88,166,255,0.75)','rgba(248,81,73,0.75)'],borderWidth:0,borderRadius:6}
@@ -1061,7 +1061,7 @@ const FISCAL_EVENTS = [
   ...genMaturityEvents(_curY - 1, _curY + 3)
 ];
 
-let calYear=2026, calMonth=4;
+const _calNow=new Date(); let calYear=_calNow.getFullYear(), calMonth=_calNow.getMonth()+1;
 
 function calMove(dir){
   calMonth+=dir;

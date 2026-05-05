@@ -10,7 +10,7 @@ function getCacheMaxAge(series) {
   const hourET = (now.getUTCHours() - 4 + 24) % 24;  // ET = UTC-4 (DST 기준 근사)
   
   // H.4.1 주간 지표
-  const weeklyH41 = ['WALCL','TREAST','MBST','BTFP','DISCBORR','WRESBAL','WDTGAL'];
+  const weeklyH41 = ['WALCL','TREAST','WSHOMCB','H41RESPPALDKNWW','WLCFLL','WRESBAL','WDTGAL'];
   if (weeklyH41.includes(series)) {
     // 목요일 16:00 ET ~ 금요일 12:00 ET: 짧은 캐시 (5분)
     if ((day === 4 && hourET >= 16) || (day === 5 && hourET < 12)) return 300;
