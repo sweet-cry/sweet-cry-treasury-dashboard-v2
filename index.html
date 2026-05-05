@@ -303,7 +303,7 @@ tr:hover td{background:var(--surf2)}
     <div class="sec">
       <div class="stitle">최근 30일 데이터</div>
       <div class="tw"><table>
-        <thead><tr><th>날짜</th><th>WALCL (B) *<br><span id="th-walcl" style="font-size:9px;font-weight:400;color:var(--muted)">—</span></th><th>TGA (B)<br><span id="th-tga" style="font-size:9px;font-weight:400;color:var(--muted)">—</span></th><th>RRP (B)<br><span id="th-rrp" style="font-size:9px;font-weight:400;color:var(--muted)">—</span></th><th>NL (B)</th><th>DoD</th></tr></thead>
+        <thead><tr><th>날짜</th><th>WALCL (B)<span style="font-size:9px;color:var(--muted)"> *주간</span><br><span id="th-walcl" style="font-size:9px;font-weight:400;color:var(--muted)">—</span></th><th>TGA (B)<span style="font-size:9px;color:var(--muted)"> 일간</span><br><span id="th-tga" style="font-size:9px;font-weight:400;color:var(--muted)">—</span></th><th>RRP (B)<span style="font-size:9px;color:var(--muted)"> 일간</span><br><span id="th-rrp" style="font-size:9px;font-weight:400;color:var(--muted)">—</span></th><th>NL (B)</th><th>DoD</th></tr></thead>
         <tbody id="nlTbody"><tr><td colspan="6" class="loading">로딩 중...</td></tr></tbody>
       </table></div>
       <div style="font-size:10px;color:var(--muted);margin-top:6px;padding:0 4px">* WALCL은 주간 발표(매주 수요일). 발표일 사이 행은 직전 주간값 유지.</div>
@@ -629,12 +629,49 @@ const last=a=>a&&a.length?a[a.length-1]:null;
 
 async function loadNL(){
   try{
-    const[w,t,r,s,res]=await Promise.all([fred('WALCL',90),fred('WDTGAL',90),fred('RRPONTSYD',90),fred('SP500',90),fred('WRESBAL',90)]);
-    const lw=last(w),lt=last(t),lr=last(r);if(!lw||!lt||!lr)return;
-    const tM={},rM={};t.forEach(x=>tM[x.date]=x.v);r.forEach(x=>rM[x.date]=x.v);
-    const nl=ww=>ww.v-(tM[ww.date]||lt.v)-(rM[ww.date]||lr.v);
-    const nlV=nl(lw),dod=w.length>1?nlV-nl(w[w.length-2]):0;
-_sigData.nl={val:B(nlV*1e6),dod:dod*1e6};
+    const[w, dtsRes, r, s, res]=await Promise.all([
+      fred('WALCL',90),
+      fetch('/api/dts').then(x=>x.json()),
+      fred('RRPONTSYD',90),
+      fred('SP500',90),
+      fred('WRESBAL',90)
+    ]);
+
+    // 일간 TGA 잔액 (DTS operating_cash_balance)
+    const tDaily=(dtsRes.tga||[])
+      .map(x=>({date:x.record_date,v:parseFloat(x.open_today_bal)}))
+      .filter(x=>!isNaN(x.v))
+      .sort((a,b)=>a.date.localeCompare(b.date));
+
+    // 주간 TGA (차트용 fallback)
+    const tWeekly=await fred('WDTGAL',90);
+    const tWeeklyArr=tWeekly.sort((a,b)=>a.date.localeCompare(b.date));
+
+    const lw=last(w),lr=last(r);
+    const lt=tDaily.length?tDaily[tDaily.length-1]:last(tWeeklyArr);
+    if(!lw||!lt||!lr)return;
+
+    // 일간 TGA map
+    const tDailyMap={};tDaily.forEach(x=>tDailyMap[x.date]=x.v);
+    // 주간 TGA forward-fill
+    const getTga=date=>{
+      if(tDailyMap[date]!==undefined)return tDailyMap[date];
+      const arr=tWeeklyArr.filter(x=>x.date<=date);
+      return arr.length?arr[arr.length-1].v:lt.v;
+    };
+
+    const rM={};r.forEach(x=>rM[x.date]=x.v);
+    // 주간 TGA map (차트용)
+    const tM={};tWeeklyArr.forEach(x=>tM[x.date]=x.v);
+
+    // 최신 NL (WALCL 기준)
+    const latestTga=getTga(lw.date);
+    const latestRrp=rM[lw.date]||lr.v;
+    const nlV=lw.v-latestTga-latestRrp;
+    const prevW=w.length>1?w[w.length-2]:null;
+    const dod=prevW?(nlV-(prevW.v-getTga(prevW.date)-(rM[prevW.date]||lr.v))):0;
+    _sigData.nl={val:B(nlV*1e6),dod:dod*1e6};
+
     document.getElementById('c-nl').textContent=B(nlV*1e6);
     const de=document.getElementById('c-nl-dod');
     de.textContent=(dod>=0?'▲':'▼')+B(Math.abs(dod)*1e6)+' DoD';
@@ -648,13 +685,14 @@ _sigData.nl={val:B(nlV*1e6),dod:dod*1e6};
     document.getElementById('c-rrp').textContent=B(lr.v*1e6);document.getElementById('c-rrp-d').textContent=lr.date;
     const lr2=last(res);
     if(lr2){document.getElementById('c-res').textContent=B(lr2.v*1e6);const rd=document.getElementById('c-res-d');rd.textContent=lr2.v<3000?'⚠ LCLoR 근접':lr2.date;if(lr2.v<3000)rd.className='cs dn';}
+
     const spM={};s.forEach(x=>spM[x.date]=x.v);
-    const dates=w.map(x=>x.date.slice(5));
-    mk('nlChart','line',dates,[
-      {label:'NL',data:w.map(x=>nl(x)),borderColor:'#58a6ff',backgroundColor:'rgba(88,166,255,0.06)',borderWidth:2,pointRadius:0,fill:true,tension:0.3},
+    const wDates=w.map(x=>x.date.slice(5));
+    mk('nlChart','line',wDates,[
+      {label:'NL',data:w.map(x=>x.v-getTga(x.date)-(rM[x.date]||lr.v)),borderColor:'#58a6ff',backgroundColor:'rgba(88,166,255,0.06)',borderWidth:2,pointRadius:0,fill:true,tension:0.3},
       {label:'SPX',data:w.map(x=>spM[x.date]||null),borderColor:'#f85149',borderWidth:1.5,pointRadius:0,tension:0.3,yAxisID:'y2'}
     ],{y2:true});
-    mk('compChart','line',dates,[
+    mk('compChart','line',wDates,[
       {label:'WALCL',data:w.map(x=>x.v),borderColor:'#58a6ff',borderWidth:1.5,pointRadius:0,tension:0.3},
       {label:'TGA',data:w.map(x=>tM[x.date]||null),borderColor:'#f85149',borderWidth:1.5,pointRadius:0,tension:0.3},
       {label:'RRP',data:w.map(x=>rM[x.date]||null),borderColor:'#d29922',borderWidth:1.5,pointRadius:0,tension:0.3}
@@ -663,29 +701,34 @@ _sigData.nl={val:B(nlV*1e6),dod:dod*1e6};
       {label:'준비금',data:res.map(x=>x.v),borderColor:'#3fb950',backgroundColor:'rgba(63,185,80,0.06)',borderWidth:2,pointRadius:0,fill:true,tension:0.3},
       {label:'LCLoR',data:res.map(()=>3000),borderColor:'#f85149',borderWidth:1,borderDash:[5,4],pointRadius:0}
     ]);
-    // TGA 일간 기준으로 테이블 생성 (WALCL은 가장 가까운 주간값 사용)
-    const tDates=t.slice(-30).reverse();
+
+    // 테이블: 일간 TGA 기준 (주말·공휴일 제외 영업일)
     const wMap={};w.forEach(x=>wMap[x.date]=x.v);
-    // WALCL: 날짜 이전 가장 최근 주간값 찾기
     const getWalcl=date=>{
-      const sorted=w.filter(x=>x.date<=date).sort((a,b)=>b.date.localeCompare(a.date));
-      return sorted.length?sorted[0].v:lw.v;
+      const arr=w.filter(x=>x.date<=date);
+      return arr.length?arr[arr.length-1].v:lw.v;
     };
+    // 일간 TGA가 있으면 일간, 없으면 주간 기준
+    const tDates=tDaily.length
+      ? tDaily.slice(-30).reverse()
+      : tWeeklyArr.slice(-30).reverse();
     const nlFromDate=date=>{
       const wv=getWalcl(date);
-      const tv=tM[date]||lt.v;
+      const tv=getTga(date);
       const rv=rM[date]||lr.v;
       return wv-tv-rv;
     };
     document.getElementById('nlTbody').innerHTML=tDates.map((x,i)=>{
       const wv=getWalcl(x.date);
-      const tv=tM[x.date]||lt.v;
+      const tv=getTga(x.date);
       const rv=rM[x.date]||lr.v;
       const n2=wv-tv-rv;
       const px=tDates[i+1];
       const d2=px?n2-nlFromDate(px.date):0;
       const walclMark=wMap[x.date]?'':'<span style="font-size:9px;color:var(--muted)">*</span>';
-      return`<tr><td>${x.date}</td><td>${N(Math.round(wv/1000))}${walclMark}</td><td>${N(Math.round(tv/1000))}</td><td>${N(Math.round(rv/1000))}</td><td><b>${N(Math.round(n2/1000))}</b></td><td class="${d2>=0?'up':'dn'}">${d2>=0?'▲':'▼'}${N(Math.abs(Math.round(d2/1000)))}</td></tr>`;
+      const isDailyTga=tDailyMap[x.date]!==undefined;
+      const tgaMark=isDailyTga?'':'<span style="font-size:9px;color:var(--muted)">*</span>';
+      return`<tr><td>${x.date}</td><td>${N(Math.round(wv/1000))}${walclMark}</td><td>${N(Math.round(tv/1000))}${tgaMark}</td><td>${N(Math.round(rv/1000))}</td><td><b>${N(Math.round(n2/1000))}</b></td><td class="${d2>=0?'up':'dn'}">${d2>=0?'▲':'▼'}${N(Math.abs(Math.round(d2/1000)))}</td></tr>`;
     }).join('');
   }catch(e){console.error('NL:',e);}
 }
