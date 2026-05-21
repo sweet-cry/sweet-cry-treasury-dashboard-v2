@@ -548,6 +548,38 @@ tr:hover td{background:var(--surf2)}
           <div style="font-size:10px;color:var(--muted);padding-top:6px;border-top:1px solid var(--brd)">
             T-Bill <span id="c-qra-bill">—</span> · 쿠폰채 <span id="c-qra-note">—</span>
           </div>
+          <!-- 진행도 -->
+          <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--brd);display:flex;flex-direction:column;gap:10px">
+            <!-- ① 분기 경과 -->
+            <div style="display:flex;flex-direction:column;gap:3px">
+              <div style="display:flex;justify-content:space-between;align-items:baseline">
+                <span style="font-size:11px;color:#8b949e">① 분기 경과</span>
+                <span style="font-size:12px;font-weight:600;color:#c9d1d9" id="c-qra-qprog-label">—</span>
+              </div>
+              <div style="height:6px;background:#21262d;border-radius:3px;overflow:hidden;position:relative">
+                <div id="qra-prog-q" style="height:100%;background:linear-gradient(90deg,#30363d,#484f58);border-radius:3px;width:0%;transition:width .6s ease"></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:10px;color:#484f58" id="c-qra-qprog-foot">
+                <span id="c-qra-qstart">—</span><span id="c-qra-qend">—</span>
+              </div>
+            </div>
+            <!-- ② 발행 진행도 -->
+            <div style="display:flex;flex-direction:column;gap:3px">
+              <div style="display:flex;justify-content:space-between;align-items:baseline">
+                <span style="font-size:11px;color:#8b949e">② 발행 진행도 <span style="color:#484f58">vs 전분기 평균</span></span>
+                <span style="font-size:12px;font-weight:600;color:#58a6ff" id="c-qra-iprog-label">—</span>
+              </div>
+              <div style="height:6px;background:#21262d;border-radius:3px;overflow:hidden;position:relative">
+                <div id="qra-prog-i" style="height:100%;background:#58a6ff;opacity:0.85;border-radius:3px;width:0%;transition:width .6s ease"></div>
+                <div id="qra-prog-marker" style="position:absolute;top:0;bottom:0;width:2px;background:#d29922;opacity:0.9;border-radius:1px;left:0%;transition:left .6s ease"></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:10px;color:#484f58">
+                <span>0B$</span><span style="color:#d29922">┆ 경과 기준</span><span id="c-qra-avg-label">평균 —B$</span>
+              </div>
+            </div>
+            <!-- 해석 -->
+            <div style="font-size:10px;color:#8b949e;background:var(--bg);border-radius:6px;padding:5px 8px;line-height:1.6" id="c-qra-prog-interp">—</div>
+          </div>
         </div>
       </div>
     </div>
@@ -954,6 +986,32 @@ async function loadQRA(){
         if(sl){sl.textContent=sigLabel;sl.style.color=sigColor;}
         const sd=document.getElementById('c-qra-signal-desc');
         if(sd)sd.textContent=sigDesc;
+        // ① 분기 경과도
+        const [qy,qq]=cur.q.split('-Q').map(Number);
+        const qStart=new Date(qy,(qq-1)*3,1);
+        const qEnd=new Date(qy,qq*3,1);
+        const now=new Date();
+        const qTotal=qEnd-qStart, qElapsed=Math.min(now-qStart,qTotal);
+        const qPct=Math.round(qElapsed/qTotal*100);
+        const fmtD=d=>d.toISOString().slice(0,7);
+        document.getElementById('qra-prog-q').style.width=qPct+'%';
+        document.getElementById('c-qra-qprog-label').textContent=`${qPct}%  (${now.toISOString().slice(5,10).replace('-','/')}까지)`;
+        document.getElementById('c-qra-qstart').textContent=fmtD(qStart);
+        document.getElementById('c-qra-qend').textContent=fmtD(new Date(qEnd-1));
+        // ② 발행 진행도
+        const prevQtrs=d.quarters.filter(q=>q.q!==cur.q&&q.total>0);
+        const avg=prevQtrs.length?prevQtrs.reduce((s,q)=>s+q.total,0)/prevQtrs.length:cur.total;
+        const iPct=Math.min(Math.round(cur.total/avg*100),150);
+        document.getElementById('qra-prog-i').style.width=Math.min(iPct,100)+'%';
+        document.getElementById('qra-prog-marker').style.left=Math.min(qPct,98)+'%';
+        document.getElementById('c-qra-iprog-label').textContent=`${iPct}%  (${N(Math.round(cur.total))} / 평균 ${N(Math.round(avg))}B$)`;
+        document.getElementById('c-qra-avg-label').textContent=`평균 ${N(Math.round(avg))}B$`;
+        // 해석
+        const diff=iPct-qPct;
+        const interp=diff>8?`발행 ${diff}%p 앞서 — 조기 발행 가속`:diff<-8?`발행 ${Math.abs(diff)}%p 뒤처짐 — 발행 지연 신호`:`정상 속도 (경과 기준 ±${Math.abs(diff)}%p)`;
+        const interpColor=diff>8?'#d29922':diff<-8?'#f85149':'#3fb950';
+        const interpEl=document.getElementById('c-qra-prog-interp');
+        if(interpEl){interpEl.textContent=`분기 ${qPct}% 경과 · 발행 ${iPct}% 완료 → ${interp}`;interpEl.style.color=interpColor;}
         _sigData.qra={billPct};
       }
     }
