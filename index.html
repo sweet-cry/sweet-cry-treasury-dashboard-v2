@@ -508,14 +508,46 @@ tr:hover td{background:var(--surf2)}
       </div>
       <div style="position:relative;height:260px"><canvas id="qraQtrChart"></canvas></div>
     </div>
-    <!-- 이번 분기 요약 카드 -->
+    <!-- 이번 분기 요약 — 직선 게이지 -->
     <div class="sec" style="margin-top:14px">
       <div class="stitle">이번 분기 계획 <span id="qraQtrLabel" style="font-size:12px;color:var(--muted);font-weight:400"></span></div>
-      <div class="cards">
-        <div class="card"><div class="cl">총 발행 계획</div><div class="cv" id="c-qra-total">—</div><div class="cs" id="c-qra-total-cs">시장 흡수 규모</div></div>
-        <div class="card"><div class="cl">T-Bill <button class="ib" onclick="tip('qra-bill',this)">i</button></div><div class="cv" id="c-qra-bill">—</div><div class="cs" id="c-qra-bill-cs">유동성 중립↔</div></div>
-        <div class="card"><div class="cl">쿠폰채 (Notes+Bonds) <button class="ib" onclick="tip('qra-note',this)">i</button></div><div class="cv" id="c-qra-note">—</div><div class="cs" id="c-qra-note-cs">NL 압박↓</div></div>
-        <div class="card"><div class="cl">T-Bill 비중</div><div class="cv" id="c-qra-billpct">—</div><div class="cs" id="c-qra-billpct-cs">발행 구성</div></div>
+      <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;margin-top:12px">
+        <!-- 좌: 총액 + NL 시그널 -->
+        <div style="min-width:150px">
+          <div style="font-size:11px;color:var(--muted)">총 발행</div>
+          <div style="font-size:28px;font-weight:600;color:var(--tx);margin:2px 0" id="c-qra-total">—</div>
+          <div style="font-size:11px;color:var(--muted)" id="c-qra-total-cs">시장 흡수 규모</div>
+          <div style="margin-top:12px;padding:8px 10px;background:var(--surf);border-radius:8px;border-left:3px solid #484f58" id="c-qra-signal-box">
+            <div style="font-size:12px;font-weight:600" id="c-qra-signal-label">—</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:2px" id="c-qra-signal-desc">—</div>
+          </div>
+        </div>
+        <!-- 우: 직선 바 게이지 -->
+        <div style="flex:1;min-width:220px;display:flex;flex-direction:column;gap:10px;padding-top:2px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:68px;font-size:12px;color:#58a6ff">T-Bill</div>
+            <div style="flex:1;height:10px;background:#21262d;border-radius:5px;overflow:hidden"><div id="qra-bar-bill" style="height:100%;background:#58a6ff;border-radius:5px;width:0%;transition:width .5s ease"></div></div>
+            <div style="width:38px;text-align:right;font-size:12px;font-weight:600;color:#58a6ff" id="c-qra-billpct">—</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:68px;font-size:12px;color:#3fb950">Notes</div>
+            <div style="flex:1;height:10px;background:#21262d;border-radius:5px;overflow:hidden"><div id="qra-bar-note" style="height:100%;background:#3fb950;border-radius:5px;width:0%;transition:width .5s ease"></div></div>
+            <div style="width:38px;text-align:right;font-size:12px;font-weight:600;color:#3fb950" id="c-qra-notepct">—</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:68px;font-size:12px;color:#d29922">Bonds</div>
+            <div style="flex:1;height:10px;background:#21262d;border-radius:5px;overflow:hidden"><div id="qra-bar-bond" style="height:100%;background:#d29922;border-radius:5px;width:0%;transition:width .5s ease"></div></div>
+            <div style="width:38px;text-align:right;font-size:12px;font-weight:600;color:#d29922" id="c-qra-bondpct">—</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:68px;font-size:12px;color:#79c0ff">TIPS/FRN</div>
+            <div style="flex:1;height:10px;background:#21262d;border-radius:5px;overflow:hidden"><div id="qra-bar-tips" style="height:100%;background:#79c0ff;border-radius:5px;width:0%;transition:width .5s ease"></div></div>
+            <div style="width:38px;text-align:right;font-size:12px;font-weight:600;color:#79c0ff" id="c-qra-tipspct">—</div>
+          </div>
+          <div style="font-size:10px;color:var(--muted);padding-top:6px;border-top:1px solid var(--brd)">
+            T-Bill <span id="c-qra-bill">—</span> · 쿠폰채 <span id="c-qra-note">—</span>
+          </div>
+        </div>
       </div>
     </div>
     <!-- 향후 90일 예정 경매 -->
@@ -888,22 +920,39 @@ async function loadQRA(){
             callbacks:{label:ctx=>` ${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString()}B$`}}}}}
       );}catch(e){console.error('qraChart:',e);}
 
-      // ② 이번 분기 카드
+      // ② 이번 분기 게이지
       const cur=d.quarters.find(q=>q.q===todayQ)||d.quarters[d.quarters.length-1];
       if(cur){
         const coupon=cur.note+cur.bond+cur.tips+cur.frn;
-        const billPct=cur.total>0?cur.bill/cur.total*100:50;
+        const t=cur.total||1;
+        const billPct=cur.bill/t*100, notePct=cur.note/t*100;
+        const bondPct=cur.bond/t*100, tipsPct=(cur.tips+cur.frn)/t*100;
         document.getElementById('qraQtrLabel').textContent=cur.q+(cur.planned>0?' (일부 예정)':'');
         document.getElementById('c-qra-total').textContent=N(Math.round(cur.total))+'B$';
         document.getElementById('c-qra-total-cs').textContent=cur.planned>0?`예정 ${N(Math.round(cur.planned))}B$ 포함`:'실적 기준';
-        document.getElementById('c-qra-bill').textContent=N(Math.round(cur.bill))+'B$';
-        document.getElementById('c-qra-bill-cs').textContent='T-Bill 단기채';
-        document.getElementById('c-qra-note').textContent=N(Math.round(coupon))+'B$';
-        document.getElementById('c-qra-note-cs').textContent='Notes+Bonds+TIPS+FRN';
+        // 바 너비
+        document.getElementById('qra-bar-bill').style.width=billPct.toFixed(1)+'%';
+        document.getElementById('qra-bar-note').style.width=notePct.toFixed(1)+'%';
+        document.getElementById('qra-bar-bond').style.width=bondPct.toFixed(1)+'%';
+        document.getElementById('qra-bar-tips').style.width=tipsPct.toFixed(1)+'%';
+        // 퍼센트 레이블
         document.getElementById('c-qra-billpct').textContent=Math.round(billPct)+'%';
-        const billCol=billPct>50?'up':billPct<30?'dn':'';
-        document.getElementById('c-qra-billpct').className='cv '+(billCol);
-        document.getElementById('c-qra-billpct-cs').textContent=billPct>50?'T-Bill 위주 — NL 중립':billPct<30?'쿠폰채 위주 — NL 압박':'발행 구성 균형';
+        document.getElementById('c-qra-notepct').textContent=Math.round(notePct)+'%';
+        document.getElementById('c-qra-bondpct').textContent=Math.round(bondPct)+'%';
+        document.getElementById('c-qra-tipspct').textContent=Math.round(tipsPct)+'%';
+        // 절대 금액
+        document.getElementById('c-qra-bill').textContent=N(Math.round(cur.bill))+'B$';
+        document.getElementById('c-qra-note').textContent=N(Math.round(coupon))+'B$';
+        // NL 시그널
+        const sigColor=billPct>60?'#3fb950':billPct<40?'#f85149':'#d29922';
+        const sigLabel=billPct>60?'T-Bill 위주 — NL 중립':billPct<40?'쿠폰채 위주 — NL 압박↓':'발행 구성 혼합';
+        const sigDesc=billPct>60?'MMF가 T-Bill 매입 → 준비금 흡수 없음':billPct<40?'은행이 쿠폰채 매입 → 준비금 직접 흡수':'비중 변화 방향 주시 필요';
+        const sb=document.getElementById('c-qra-signal-box');
+        if(sb)sb.style.borderLeftColor=sigColor;
+        const sl=document.getElementById('c-qra-signal-label');
+        if(sl){sl.textContent=sigLabel;sl.style.color=sigColor;}
+        const sd=document.getElementById('c-qra-signal-desc');
+        if(sd)sd.textContent=sigDesc;
         _sigData.qra={billPct};
       }
     }
