@@ -1,23 +1,22 @@
 export const config = { runtime: "nodejs" };
 
-const BASE = "https://ticdata.treasury.gov/resource-center/data-chart-center/tic/Documents/";
-const HEADERS = { "User-Agent": "Mozilla/5.0", "Accept": "text/plain" };
-// 연도별 아카이브 파일 존재 여부 확인
-const CANDIDATES = [
-  "mfh2024.txt","mfh2023.txt","mfh2020.txt","mfh2015.txt","mfh2010.txt","mfh2006.txt",
-  "mfh_2024.txt","mfh_2023.txt",
-  "slt_table5_2024.txt","tic_mfh_hist.txt","mfh_historical.txt"
-];
+const KEY = "3d022b35a44eabf7bb45dbdd9a1cfa01";
 
 export default async function handler(req, res) {
+  // Japan, China TIC 시리즈 탐색
+  const searches = [
+    "treasury securities japan foreign holders",
+    "treasury securities china foreign holders",
+  ];
   const results = {};
-  for (const f of CANDIDATES) {
+  for (const q of searches) {
+    const url = `https://api.stlouisfed.org/fred/series/search?search_text=${encodeURIComponent(q)}&api_key=${KEY}&file_type=json&limit=5&order_by=popularity`;
     try {
-      const r = await fetch(BASE + f, { headers: HEADERS, signal: AbortSignal.timeout(8000) });
-      const text = await r.text();
-      results[f] = { status: r.status, bytes: text.length };
+      const r = await fetch(url);
+      const d = await r.json();
+      results[q] = (d.seriess || []).map(s => ({ id: s.id, title: s.title, freq: s.frequency, obs_start: s.observation_start }));
     } catch (e) {
-      results[f] = { error: e.message };
+      results[q] = { error: e.message };
     }
   }
   res.setHeader("Access-Control-Allow-Origin", "*");
