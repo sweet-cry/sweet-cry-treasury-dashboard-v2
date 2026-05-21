@@ -497,31 +497,41 @@ tr:hover td{background:var(--surf2)}
   <!-- ── QRA (국채발행 하단) ── -->
   <div class="sec" style="margin-top:20px;padding-top:20px;border-top:1px solid var(--brd)">
 <div class="tdesc"><div class="tdesc-hdr"><div class="tdesc-icon">QRA</div><div><div class="tdesc-title">QRA — 분기 국채 발행 계획</div><div class="tdesc-src">fiscaldata.treasury.gov · 분기 발표</div></div></div><div class="tdesc-body">재무부 분기 차입 계획. T-Bill 위주 발행 시 MMF RRP 자금이 T-Bill로 이동 → NL 영향 중립. 쿠폰채(Notes·Bonds) 위주 시 은행 준비금 직접 흡수 → NL 감소 압박. 발행 구성 비율과 총액이 향후 NL 경로를 결정하는 핵심 변수.</div><div class="tdesc-tags"><span class="tdesc-tag g">T-Bill 위주 = NL 중립</span><span class="tdesc-tag r">쿠폰채 위주 = NL↓</span><span class="tdesc-tag a">총 발행 $20T+/년</span><span class="tdesc-tag b">분기 발표 = 시장 이벤트</span><span class="tdesc-tag ">재정적자 반영</span></div><div class="tdesc-rels"><span><span style="color:#3fb950">→</span> T-Bill 비중 확대 = 유동성 압박 완화</span><span><span style="color:#f85149">→</span> 쿠폰채 급증 = 준비금 흡수 → 금리 상승</span><span><span style="color:#d29922">→</span> QRA 발표일 = 시장 변동성 주의</span></div></div>
-    <div class="sec">
-      <div class="stitle">QRA — 국채 발행 현황 (90일)</div>
+    <!-- 분기별 발행 추이 -->
+    <div class="cc" style="margin-top:14px">
+      <div class="ct">분기별 국채 발행 추이 <span id="qraQtrNote" style="font-size:11px;color:var(--muted);font-weight:400"></span></div>
+      <div class="leg">
+        <span><span class="ld" style="background:#58a6ff"></span>T-Bill</span>
+        <span><span class="ld" style="background:#3fb950"></span>Notes</span>
+        <span><span class="ld" style="background:#d29922"></span>Bonds</span>
+        <span><span class="ld" style="background:#79c0ff"></span>TIPS/FRN</span>
+      </div>
+      <div style="position:relative;height:260px"><canvas id="qraQtrChart"></canvas></div>
+    </div>
+    <!-- 이번 분기 요약 카드 -->
+    <div class="sec" style="margin-top:14px">
+      <div class="stitle">이번 분기 계획 <span id="qraQtrLabel" style="font-size:12px;color:var(--muted);font-weight:400"></span></div>
       <div class="cards">
-        <div class="card"><div class="cl">T-Bill <button class="ib" onclick="tip('qra-bill',this)">i</button></div><div class="cv" id="c-qra-bill">—</div><div class="cs">유동성 중립↔</div></div>
-        <div class="card"><div class="cl">Notes (2~10Y) <button class="ib" onclick="tip('qra-note',this)">i</button></div><div class="cv" id="c-qra-note">—</div><div class="cs">NL 압박↓</div></div>
-        <div class="card"><div class="cl">Bonds (20~30Y) <button class="ib" onclick="tip('qra-bond',this)">i</button></div><div class="cv" id="c-qra-bond">—</div><div class="cs">NL 압박↓</div></div>
-        <div class="card"><div class="cl">총 발행</div><div class="cv" id="c-qra-total">—</div><div class="cs">시장 흡수 규모</div></div>
+        <div class="card"><div class="cl">총 발행 계획</div><div class="cv" id="c-qra-total">—</div><div class="cs" id="c-qra-total-cs">시장 흡수 규모</div></div>
+        <div class="card"><div class="cl">T-Bill <button class="ib" onclick="tip('qra-bill',this)">i</button></div><div class="cv" id="c-qra-bill">—</div><div class="cs" id="c-qra-bill-cs">유동성 중립↔</div></div>
+        <div class="card"><div class="cl">쿠폰채 (Notes+Bonds) <button class="ib" onclick="tip('qra-note',this)">i</button></div><div class="cv" id="c-qra-note">—</div><div class="cs" id="c-qra-note-cs">NL 압박↓</div></div>
+        <div class="card"><div class="cl">T-Bill 비중</div><div class="cv" id="c-qra-billpct">—</div><div class="cs" id="c-qra-billpct-cs">발행 구성</div></div>
       </div>
     </div>
-    <div class="two">
-      <div class="cc full">
-        <div class="ct">국채 발행 구성 (90일)</div>
-        <div class="leg">
-          <span><span class="ld" style="background:#58a6ff"></span>T-Bill</span>
-          <span><span class="ld" style="background:#3fb950"></span>Notes</span>
-          <span><span class="ld" style="background:#d29922"></span>Bonds</span>
-        </div>
-        <div style="position:relative;height:240px"><canvas id="qraChart"></canvas></div>
-      </div>
-    </div>
-    <div class="sec">
-      <div class="stitle">발행 상세</div>
+    <!-- 향후 90일 예정 경매 -->
+    <div class="sec" style="margin-top:14px">
+      <div class="stitle">향후 예정 경매 <span id="qraUpcomingCount" style="font-size:12px;color:var(--muted);font-weight:400"></span></div>
       <div class="tw"><table>
-        <thead><tr><th>날짜</th><th>종류</th><th>만기</th><th>발행액</th></tr></thead>
-        <tbody id="qraTbody"><tr><td colspan="4" class="loading">로딩 중...</td></tr></tbody>
+        <thead><tr><th>날짜</th><th>종류</th><th>만기</th><th>규모</th></tr></thead>
+        <tbody id="qraUpcoming"><tr><td colspan="4" class="loading">로딩 중...</td></tr></tbody>
+      </table></div>
+    </div>
+    <!-- 최근 경매 결과 -->
+    <div class="sec" style="margin-top:14px">
+      <div class="stitle">최근 경매 결과 (30일)</div>
+      <div class="tw"><table>
+        <thead><tr><th>날짜</th><th>종류</th><th>만기</th><th>발행액</th><th>낙찰금리</th><th>응찰률</th></tr></thead>
+        <tbody id="qraTbody"><tr><td colspan="6" class="loading">로딩 중...</td></tr></tbody>
       </table></div>
     </div>
   </div>
@@ -858,38 +868,71 @@ async function loadDTS(){
 
 async function loadQRA(){
   try{
-    const r=await fetch('/api/qra');const d=await r.json();if(!d.data)return;
-    let bill=0,note=0,bond=0;
-    const rows=d.data.filter(x=>x.offering_amt&&x.offering_amt!=='null');
-    rows.forEach(x=>{
-      const a=parseFloat(x.offering_amt)/1e9;
-      if(x.security_type==='Bill')bill+=a;
-      else if(x.security_type==='Note')note+=a;
-      else if(x.security_type==='Bond')bond+=a;
-    });
-    const tot=bill+note+bond;
-    _sigData.qra={billPct:tot>0?bill/tot*100:50};
-    document.getElementById('c-qra-bill').textContent=N(Math.round(bill))+'B$';
-    document.getElementById('c-qra-note').textContent=N(Math.round(note))+'B$';
-    document.getElementById('c-qra-bond').textContent=N(Math.round(bond))+'B$';
-    document.getElementById('c-qra-total').textContent=N(Math.round(tot))+'B$';
-    mk('qraChart','bar',['T-Bill','Notes','Bonds'],[
-      {label:'발행액(B$)',data:[Math.round(bill),Math.round(note),Math.round(bond)],
-       backgroundColor:['rgba(88,166,255,0.7)','rgba(63,185,80,0.7)','rgba(210,153,34,0.7)'],borderWidth:0,borderRadius:5}
-    ]);
-    document.getElementById('qraTbody').innerHTML=rows.slice(0,30).map(x=>{
-      const a=x.offering_amt&&x.offering_amt!=='null'?N(Math.round(parseFloat(x.offering_amt)/1e9))+'B$':'—';
-      const tc=x.security_type==='Bill'?'badge badge-blue':x.security_type==='Note'?'badge badge-green':'badge badge-red';
-      return`<tr><td>${x.auction_date}</td><td><span class="${tc}">${x.security_type}</span></td><td>${x.security_term}</td><td>${a}</td></tr>`;
+    const r=await fetch('/api/qra');const d=await r.json();
+    const typeBadge=t=>t==='Bill'?'badge badge-blue':t==='Note'?'badge badge-green':t==='Bond'?'badge badge-red':'badge';
+
+    // ① 분기별 추이 스택 바차트
+    if(d.quarters&&d.quarters.length){
+      const qtrs=d.quarters.slice(-7); // 최근 7분기
+      const todayQ=(()=>{const n=new Date();return`${n.getFullYear()}-Q${Math.ceil((n.getMonth()+1)/3)}`;})();
+      document.getElementById('qraQtrNote').textContent='— 음영 분기는 예정 포함';
+      mk('qraQtrChart','bar',qtrs.map(q=>q.q),[
+        {label:'T-Bill', data:qtrs.map(q=>Math.round(q.bill)), backgroundColor:'rgba(88,166,255,0.75)', stack:'s'},
+        {label:'Notes',  data:qtrs.map(q=>Math.round(q.note)), backgroundColor:'rgba(63,185,80,0.75)',  stack:'s'},
+        {label:'Bonds',  data:qtrs.map(q=>Math.round(q.bond)), backgroundColor:'rgba(210,153,34,0.75)', stack:'s'},
+        {label:'TIPS/FRN',data:qtrs.map(q=>Math.round(q.tips+q.frn)),backgroundColor:'rgba(121,192,255,0.6)',stack:'s'}
+      ],{opts:{scales:{x:{stacked:true,ticks:{color:tc,font:{size:11}},grid:{color:gc}},
+        y:{stacked:true,ticks:{maxTicksLimit:6,color:tc,font:{size:11},callback:v=>v+'B'},grid:{color:gc}}},
+        plugins:{legend:{display:true,labels:{color:'#c9d1d9',font:{size:11},boxWidth:10,padding:10}},
+          tooltip:{backgroundColor:'#21262d',titleColor:'#e6edf3',bodyColor:'#8b949e',borderColor:'#30363d',borderWidth:1,
+            callbacks:{label:ctx=>` ${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString()}B$`}}}}}
+      );
+
+      // ② 이번 분기 카드
+      const cur=d.quarters.find(q=>q.q===todayQ)||d.quarters[d.quarters.length-1];
+      if(cur){
+        const coupon=cur.note+cur.bond+cur.tips+cur.frn;
+        const billPct=cur.total>0?cur.bill/cur.total*100:50;
+        document.getElementById('qraQtrLabel').textContent=cur.q+(cur.planned>0?' (일부 예정)':'');
+        document.getElementById('c-qra-total').textContent=N(Math.round(cur.total))+'B$';
+        document.getElementById('c-qra-total-cs').textContent=cur.planned>0?`예정 ${N(Math.round(cur.planned))}B$ 포함`:'실적 기준';
+        document.getElementById('c-qra-bill').textContent=N(Math.round(cur.bill))+'B$';
+        document.getElementById('c-qra-bill-cs').textContent='T-Bill 단기채';
+        document.getElementById('c-qra-note').textContent=N(Math.round(coupon))+'B$';
+        document.getElementById('c-qra-note-cs').textContent='Notes+Bonds+TIPS+FRN';
+        document.getElementById('c-qra-billpct').textContent=Math.round(billPct)+'%';
+        const billCol=billPct>50?'up':billPct<30?'dn':'';
+        document.getElementById('c-qra-billpct').className='cv '+(billCol);
+        document.getElementById('c-qra-billpct-cs').textContent=billPct>50?'T-Bill 위주 — NL 중립':billPct<30?'쿠폰채 위주 — NL 압박':'발행 구성 균형';
+        _sigData.qra={billPct};
+      }
+    }
+
+    // ③ 향후 예정 경매 테이블
+    if(d.upcoming&&d.upcoming.length){
+      document.getElementById('qraUpcomingCount').textContent=`— ${d.upcoming.length}건`;
+      document.getElementById('qraUpcoming').innerHTML=d.upcoming.map(x=>
+        `<tr><td>${x.date}</td><td><span class="${typeBadge(x.type)}">${x.type}</span></td><td>${x.term}</td><td>${x.amount}B$</td></tr>`
+      ).join('');
+    } else {
+      document.getElementById('qraUpcoming').innerHTML='<tr><td colspan="4" style="color:var(--muted);text-align:center">예정 경매 없음</td></tr>';
+    }
+
+    // ④ 최근 30일 경매 결과
+    const recent=d.recent||[];
+    document.getElementById('qraTbody').innerHTML=recent.map(x=>{
+      const yld=x.yield&&x.yield!=='null'?parseFloat(x.yield).toFixed(3)+'%':'—';
+      const btc=x.btc&&x.btc!=='null'?parseFloat(x.btc).toFixed(2):'—';
+      return`<tr><td>${x.date}</td><td><span class="${typeBadge(x.type)}">${x.type}</span></td><td>${x.term}</td><td>${x.amount}B$</td><td>${yld}</td><td>${btc}</td></tr>`;
     }).join('');
-    // 캘린더 경매 결과 테이블도 업데이트
+
+    // ⑤ 캘린더 경매 결과 테이블
     const aBody=document.getElementById('auction-tbody');
-    if(aBody){
-      const recent=d.data.filter(x=>x.offering_amt&&x.offering_amt!=='null').slice(0,10);
-      aBody.innerHTML=recent.map(x=>{
-        const a=N(Math.round(parseFloat(x.offering_amt)/1e9))+'B$';
-        const tc=x.security_type==='Bill'?'badge badge-blue':x.security_type==='Note'?'badge badge-green':'badge badge-red';
-        return`<tr><td>${x.auction_date}</td><td><span class="${tc}">${x.security_type}</span></td><td>${x.security_term}</td><td>${a}</td><td>—</td></tr>`;
+    if(aBody&&recent.length){
+      aBody.innerHTML=recent.slice(0,10).map(x=>{
+        const yld=x.yield&&x.yield!=='null'?parseFloat(x.yield).toFixed(3)+'%':'—';
+        const btc=x.btc&&x.btc!=='null'?parseFloat(x.btc).toFixed(2):'—';
+        return`<tr><td>${x.date}</td><td><span class="${typeBadge(x.type)}">${x.type}</span></td><td>${x.term}</td><td>${x.amount}B$</td><td>${btc}</td></tr>`;
       }).join('');
     }
   }catch(e){console.error('qra:',e);}
