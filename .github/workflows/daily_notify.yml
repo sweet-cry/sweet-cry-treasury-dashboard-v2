@@ -1,0 +1,28 @@
+name: 📊 Treasury 일일 카카오톡 신호 요약
+
+on:
+  schedule:
+    # 매일 18:00 KST = 09:00 UTC
+    - cron: '0 9 * * *'
+  workflow_dispatch:   # 수동 실행 버튼 (테스트용)
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Python 설정
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 의존성 설치
+        run: pip install requests
+
+      - name: 카카오톡 신호 요약 전송
+        env:
+          KAKAO_REST_KEY:      ${{ secrets.KAKAO_REST_KEY }}
+          KAKAO_REFRESH_TOKEN: ${{ secrets.KAKAO_REFRESH_TOKEN }}
+        run: python scripts/kakao_notify.py
