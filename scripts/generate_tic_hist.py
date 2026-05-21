@@ -17,8 +17,19 @@ SKIP = {
     'Country','All Other','Grand Total',
     'Of Which: Foreign Official',
     'Of Which: Foreign Official Treasury Bills',
-    'Of Which: Foreign Official T-Bonds & Notes'
+    'Of Which: Foreign Official T-Bonds & Notes',
+    # 구버전 아카이브 파일의 약식 레이블
+    'For. Official', 'T-Bills', 'T-Bonds & Notes',
+    'All Other Countries', 'Grand Total 2/',
 }
+
+def _should_skip(name):
+    if name in SKIP:
+        return True
+    # 집계행 패턴: "Grand Total", "Total", "Of Which" 포함 시 제외
+    low = name.lower()
+    return ('total' in low or 'of which' in low or 'for. official' in low
+            or name.startswith('  '))  # 들여쓰기된 행
 
 # ── 파서: 고정폭 format (mfh.txt) ──────────────────────────────────
 def parse_fixed_width(text):
@@ -40,7 +51,7 @@ def parse_fixed_width(text):
             continue
         if months and years:
             country = line[:32].strip()
-            if not country or country in SKIP:
+            if not country or _should_skip(country):
                 continue
             val_str = line[32:].strip()
             if not val_str:
