@@ -561,19 +561,9 @@ tr:hover td{background:var(--surf2)}
       <div class="stitle" id="ticDateLbl">TIC — 국가별 미국채 보유</div>
       <div class="cards" id="ticCards"><div class="loading">로딩 중...</div></div>
     </div>
-    <div class="two">
-      <div class="cc">
-        <div class="ct">상위 10개국 미국채 보유 (B$)</div>
-        <div style="position:relative;height:320px"><canvas id="ticChart"></canvas></div>
-      </div>
-      <div class="cc">
-        <div class="ct">일본 · 중국 비교</div>
-        <div class="leg">
-          <span><span class="ld" style="background:#58a6ff"></span>일본</span>
-          <span><span class="ld" style="background:#f85149"></span>중국</span>
-        </div>
-        <div style="position:relative;height:320px"><canvas id="ticBarChart"></canvas></div>
-      </div>
+    <div class="cc">
+      <div class="ct">상위 10개국 미국채 보유 (B$)</div>
+      <div style="position:relative;height:320px"><canvas id="ticChart"></canvas></div>
     </div>
     <div class="cc" style="margin-top:14px">
       <div class="ct">국가별 보유 추이 <span id="ticRangeLbl" style="font-size:11px;color:var(--muted);font-weight:400"></span>
@@ -946,11 +936,6 @@ async function loadTIC(){
       {label:'보유(B$)',data:data.map(x=>x.val),backgroundColor:data.map((_,i)=>i===0?'rgba(88,166,255,0.8)':i===1?'rgba(248,81,73,0.7)':'rgba(88,166,255,0.45)'),borderWidth:0,borderRadius:4}
     ],{opts:{indexAxis:'y',scales:{y:{ticks:{autoSkip:false,color:tc,font:{size:11}},grid:{color:gc}},x:{ticks:{maxTicksLimit:6,color:tc,font:{size:11}},grid:{color:gc}}}}});
 
-    // 일·중 비교
-    const jpnLat=latestMap['Japan']?.value||0,chnLat=latestMap['China, Mainland']?.value||0;
-    mk('ticBarChart','bar',['일본','중국'],[
-      {label:'보유(B$)',data:[jpnLat,chnLat],backgroundColor:['rgba(88,166,255,0.75)','rgba(248,81,73,0.75)'],borderWidth:0,borderRadius:6}
-    ]);
 
     // ② 추이 차트 (10개국 토글)
     const TC=[
