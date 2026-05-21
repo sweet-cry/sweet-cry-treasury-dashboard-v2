@@ -1,7 +1,1 @@
-{
-  "functions": {
-    "api/tic.js": {
-      "includeFiles": "tic_hist.json"
-    }
-  }
-}
+{}

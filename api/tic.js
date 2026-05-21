@@ -1,8 +1,6 @@
 export const config = { runtime: "nodejs" };
 
-import { createRequire } from 'module';
-const _require = createRequire(import.meta.url);
-const HIST = _require('./tic_hist.json');
+import HIST from './tic_hist_data.js';
 
 const SKIP = new Set([
   'Country', 'All Other', 'Grand Total',
