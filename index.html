@@ -895,14 +895,15 @@ async function loadTIC(){
   try{
     const r=await fetch('/api/tic');const raw=await r.json();
     const NM={'Japan':'일본','China, Mainland':'중국','United Kingdom':'영국','Belgium':'벨기에','Canada':'캐나다','Luxembourg':'룩셈부르크','Cayman Islands':'케이맨제도','France':'프랑스','Ireland':'아일랜드','Taiwan':'대만','Switzerland':'스위스','Singapore':'싱가포르','Hong Kong':'홍콩','Brazil':'브라질','India':'인도','Norway':'노르웨이','Saudi Arabia':'사우디','Korea, South':'한국'};
-    const SKIP_SET=new Set(['Country','All Other','Grand Total','Of Which: Foreign Official','Of Which: Foreign Official Treasury Bills','Of Which: Foreign Official T-Bonds & Notes']);
+    const SKIP_SET=new Set(['Country','All Other','Grand Total','Of Which: Foreign Official','Of Which: Foreign Official Treasury Bills','Of Which: Foreign Official T-Bonds & Notes','For. Official','T-Bonds & Notes','T-Bills','Treasury Bills']);
+    const isSkip=k=>SKIP_SET.has(k)||/\d/.test(k)||k.toLowerCase().includes('total')||k.toLowerCase().includes('of which');
 
     // 신규 포맷: {country: [{date, value}]} 배열 or 구 포맷: {country: {value, date}}
     const isNew=v=>Array.isArray(v);
 
     const latestMap={}, histMap={}, dateSet=new Set();
     for(const [k,v] of Object.entries(raw)){
-      if(SKIP_SET.has(k)) continue;
+      if(isSkip(k)) continue;
       if(isNew(v)){
         if(!v.length) continue;
         const sorted=[...v].sort((a,b)=>a.date.localeCompare(b.date));
@@ -1024,7 +1025,7 @@ async function loadTIC(){
     }
     // ③ 순매수/매도 랭킹
     const chgList=Object.entries(latestMap)
-      .filter(([k])=>!SKIP_SET.has(k))
+      .filter(([k])=>!isSkip(k))
       .map(([k,v])=>({name:NM[k]||k,diff:v.prev!=null?+(v.value-v.prev).toFixed(1):null}))
       .filter(x=>x.diff!=null).sort((a,b)=>b.diff-a.diff);
     const top5up=chgList.slice(0,5), top5dn=[...chgList].reverse().slice(0,5).reverse();
