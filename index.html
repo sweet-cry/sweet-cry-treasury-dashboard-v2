@@ -206,6 +206,10 @@ tr:hover td{background:var(--surf2)}
 .tdesc-links{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--brd)}
 .tdesc-link{font-size:11px;color:var(--muted);text-decoration:none;padding:3px 8px;background:var(--bg2);border:1px solid var(--brd);border-radius:4px;transition:all .15s}
 .tdesc-link:hover{color:var(--tx);border-color:var(--blue);background:rgba(88,166,255,0.08)}
+
+/* TIC 국가 토글 버튼 */
+.tic-tog{font-size:11px;padding:4px 10px;border-radius:20px;cursor:pointer;transition:all .15s;background:transparent;font-family:inherit;}
+.tic-tog:hover{opacity:.85;}
 </style>
 </head>
 <body>
@@ -571,6 +575,23 @@ tr:hover td{background:var(--surf2)}
         <div style="position:relative;height:320px"><canvas id="ticBarChart"></canvas></div>
       </div>
     </div>
+    <div class="cc" style="margin-top:14px">
+      <div class="ct">국가별 보유 추이 <span id="ticRangeLbl" style="font-size:11px;color:var(--muted);font-weight:400"></span>
+        <span style="font-size:11px;color:var(--muted);font-weight:400;margin-left:6px">— 클릭으로 국가 선택</span>
+      </div>
+      <div id="ticToggles" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px"></div>
+      <div style="position:relative;height:320px"><canvas id="ticTrendChart"></canvas></div>
+    </div>
+    <div class="two" style="margin-top:14px">
+      <div class="cc">
+        <div class="ct">전월 대비 순매수 / 순매도 (B$)</div>
+        <div style="position:relative;height:260px"><canvas id="ticChangeChart"></canvas></div>
+      </div>
+      <div class="cc">
+        <div class="ct">외국인 보유 점유율</div>
+        <div style="position:relative;height:260px"><canvas id="ticShareChart"></canvas></div>
+      </div>
+    </div>
   </div>
 
   <!-- ── CALENDAR ── -->
@@ -883,17 +904,137 @@ async function loadQRA(){
 async function loadTIC(){
   try{
     const r=await fetch('/api/tic');const raw=await r.json();
-    const SKIP=['Country','All Other','Grand Total','Of Which: Foreign Official','Of Which: Foreign Official Treasury Bills','Of Which: Foreign Official T-Bonds & Notes'];
     const NM={'Japan':'일본','China, Mainland':'중국','United Kingdom':'영국','Belgium':'벨기에','Canada':'캐나다','Luxembourg':'룩셈부르크','Cayman Islands':'케이맨제도','France':'프랑스','Ireland':'아일랜드','Taiwan':'대만','Switzerland':'스위스','Singapore':'싱가포르','Hong Kong':'홍콩','Brazil':'브라질','India':'인도','Norway':'노르웨이','Saudi Arabia':'사우디','Korea, South':'한국'};
-    const data=Object.entries(raw).filter(([k])=>!SKIP.includes(k)).map(([k,v])=>({name:NM[k]||k,val:v.value})).filter(x=>x.val>0).sort((a,b)=>b.val-a.val).slice(0,10);
-    document.getElementById('ticCards').innerHTML=data.slice(0,5).map(x=>`<div class="card"><div class="cl">${x.name}</div><div class="cv">${x.val.toLocaleString()}B$</div></div>`).join('');
+    const SKIP_SET=new Set(['Country','All Other','Grand Total','Of Which: Foreign Official','Of Which: Foreign Official Treasury Bills','Of Which: Foreign Official T-Bonds & Notes']);
+
+    // 신규 포맷: {country: [{date, value}]} 배열 or 구 포맷: {country: {value, date}}
+    const isNew=v=>Array.isArray(v);
+
+    const latestMap={}, histMap={}, dateSet=new Set();
+    for(const [k,v] of Object.entries(raw)){
+      if(SKIP_SET.has(k)) continue;
+      if(isNew(v)){
+        if(!v.length) continue;
+        const sorted=[...v].sort((a,b)=>a.date.localeCompare(b.date));
+        const last=sorted[sorted.length-1];
+        const prev=sorted.length>1?sorted[sorted.length-2]:null;
+        latestMap[k]={value:last.value,prev:prev?.value||null,date:last.date};
+        histMap[k]=sorted;
+        sorted.forEach(x=>dateSet.add(x.date));
+      } else {
+        latestMap[k]={value:v.value,prev:null,date:v.date};
+        histMap[k]=[{date:v.date,value:v.value}];
+        if(v.date) dateSet.add(v.date);
+      }
+    }
+
+    // 상위 10개국
+    const data=Object.entries(latestMap)
+      .map(([k,v])=>({key:k,name:NM[k]||k,val:v.value,prev:v.prev}))
+      .filter(x=>x.val>0).sort((a,b)=>b.val-a.val).slice(0,10);
+
+    // 카드 (상위 5) — 전월 대비 증감
+    document.getElementById('ticCards').innerHTML=data.slice(0,5).map(x=>{
+      const diff=x.prev!=null?+(x.val-x.prev).toFixed(1):null;
+      const pct=diff!=null&&x.prev?(diff/x.prev*100).toFixed(1):null;
+      const chg=diff!=null?`<div class="cs ${diff>=0?'up':'dn'}">${diff>=0?'▲':'▼'} ${Math.abs(diff).toLocaleString()}B$ <span style="color:var(--muted)">(${pct>=0?'+':''}${pct}%)</span></div>`:'';
+      return`<div class="card"><div class="cl">${x.name}</div><div class="cv">${x.val.toLocaleString()}B$</div>${chg}</div>`;
+    }).join('');
+
+    // 기존 바 차트 (상위 10)
     mk('ticChart','bar',data.map(x=>x.name),[
       {label:'보유(B$)',data:data.map(x=>x.val),backgroundColor:data.map((_,i)=>i===0?'rgba(88,166,255,0.8)':i===1?'rgba(248,81,73,0.7)':'rgba(88,166,255,0.45)'),borderWidth:0,borderRadius:4}
     ],{opts:{indexAxis:'y',scales:{y:{ticks:{autoSkip:false,color:tc,font:{size:11}},grid:{color:gc}},x:{ticks:{maxTicksLimit:6,color:tc,font:{size:11}},grid:{color:gc}}}}});
-    const jpn=raw['Japan']?.value||0,chn=raw['China, Mainland']?.value||0;
+
+    // 일·중 비교
+    const jpnLat=latestMap['Japan']?.value||0,chnLat=latestMap['China, Mainland']?.value||0;
     mk('ticBarChart','bar',['일본','중국'],[
-      {label:'보유(B$)',data:[jpn,chn],backgroundColor:['rgba(88,166,255,0.75)','rgba(248,81,73,0.75)'],borderWidth:0,borderRadius:6}
+      {label:'보유(B$)',data:[jpnLat,chnLat],backgroundColor:['rgba(88,166,255,0.75)','rgba(248,81,73,0.75)'],borderWidth:0,borderRadius:6}
     ]);
+
+    // ② 추이 차트 (10개국 토글)
+    const TC=[
+      {key:'Japan',name:'일본',color:'#58a6ff',on:true},
+      {key:'China, Mainland',name:'중국',color:'#f85149',on:true},
+      {key:'United Kingdom',name:'영국',color:'#3fb950',on:true},
+      {key:'Cayman Islands',name:'케이맨',color:'#d29922',on:true},
+      {key:'Canada',name:'캐나다',color:'#a371f7',on:false},
+      {key:'Belgium',name:'벨기에',color:'#79c0ff',on:false},
+      {key:'Luxembourg',name:'룩셈부르크',color:'#56d364',on:false},
+      {key:'France',name:'프랑스',color:'#ffa657',on:false},
+      {key:'Ireland',name:'아일랜드',color:'#ff7b72',on:false},
+      {key:'Switzerland',name:'스위스',color:'#e3b341',on:false},
+    ];
+    const allDates=[...dateSet].sort();
+    const fmtD=d=>{
+      if(!d||d.length<6) return d;
+      if(d.includes('-')) return d.slice(2,7); // "2026-01" → "26-01"
+      return d.slice(2,4)+'-'+d.slice(4,6);    // "202601"  → "26-01"
+    };
+    const rangeLbl=document.getElementById('ticRangeLbl');
+    if(rangeLbl&&allDates.length>1){
+      const y0=allDates[0].slice(0,4),y1=allDates[allDates.length-1].slice(0,4);
+      rangeLbl.textContent=`(${y0} — ${y1} · ${allDates.length}개월)`;
+    }
+    const trendDs=TC.map(c=>{
+      const dm=new Map((histMap[c.key]||[]).map(x=>[x.date,x.value]));
+      return{label:c.name,data:allDates.map(d=>dm.get(d)||null),
+        borderColor:c.color,backgroundColor:'transparent',
+        borderWidth:c.key==='Japan'||c.key==='China, Mainland'?2:1.5,
+        pointRadius:0,tension:0.3,hidden:!c.on,spanGaps:true};
+    });
+    mk('ticTrendChart','line',allDates.map(fmtD),trendDs,{opts:{
+      scales:{
+        x:{ticks:{maxTicksLimit:20,color:tc,font:{size:11},callback(v){const l=this.getLabelForValue(v);return l&&l.endsWith('-01')?'20'+l.slice(0,2):''}},grid:{color:gc}},
+        y:{min:0,ticks:{maxTicksLimit:7,color:tc,font:{size:11},callback:v=>v+'B'},grid:{color:gc}}
+      },
+      plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,backgroundColor:'#21262d',titleColor:'#e6edf3',bodyColor:'#8b949e',borderColor:'#30363d',borderWidth:1,
+        filter:i=>!i.dataset.hidden,callbacks:{label:ctx=>ctx.parsed.y!=null?` ${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString()}B$`:null}}}
+    }});
+    const togEl=document.getElementById('ticToggles');
+    if(togEl){
+      togEl.innerHTML='';
+      TC.forEach((c,i)=>{
+        const btn=document.createElement('button');
+        btn.textContent=c.name;btn.className='tic-tog';
+        btn.style.border=`1.5px solid ${c.color}`;
+        btn.style.color=c.on?c.color:'#8b949e';
+        btn.style.background=c.on?c.color+'33':'transparent';
+        btn.onclick=()=>{
+          c.on=!c.on;
+          btn.style.color=c.on?c.color:'#8b949e';
+          btn.style.background=c.on?c.color+'33':'transparent';
+          if(C['ticTrendChart']){C['ticTrendChart'].data.datasets[i].hidden=!c.on;C['ticTrendChart'].update();}
+        };
+        togEl.appendChild(btn);
+      });
+    }
+
+    // ③ 순매수/매도 랭킹
+    const chgList=Object.entries(latestMap)
+      .filter(([k])=>!SKIP_SET.has(k))
+      .map(([k,v])=>({name:NM[k]||k,diff:v.prev!=null?+(v.value-v.prev).toFixed(1):null}))
+      .filter(x=>x.diff!=null).sort((a,b)=>b.diff-a.diff);
+    const top5up=chgList.slice(0,5), top5dn=[...chgList].reverse().slice(0,5).reverse();
+    const chgShow=[...top5up,...top5dn.filter(x=>!top5up.includes(x))].slice(0,10);
+    mk('ticChangeChart','bar',chgShow.map(x=>x.name),[
+      {label:'변화(B$)',data:chgShow.map(x=>x.diff),
+       backgroundColor:chgShow.map(x=>x.diff>=0?'rgba(63,185,80,0.7)':'rgba(248,81,73,0.7)'),
+       borderWidth:0,borderRadius:4}
+    ],{opts:{indexAxis:'y',scales:{y:{ticks:{color:tc,font:{size:11}},grid:{color:gc}},x:{ticks:{maxTicksLimit:5,color:tc,font:{size:11},callback:v=>(v>0?'+':'')+v+'B'},grid:{color:gc}}}}});
+
+    // ④ 점유율 도넛
+    const top5=data.slice(0,5);
+    const grandTotal=Object.values(latestMap).reduce((s,v)=>s+(v.value||0),0);
+    const othersVal=Math.round(grandTotal-top5.reduce((s,x)=>s+x.val,0));
+    mk('ticShareChart','doughnut',[...top5.map(x=>x.name),'기타'],[
+      {data:[...top5.map(x=>x.val),othersVal],
+       backgroundColor:['rgba(88,166,255,0.8)','rgba(248,81,73,0.75)','rgba(63,185,80,0.75)','rgba(210,153,34,0.75)','rgba(163,113,247,0.7)','rgba(139,148,158,0.4)'],
+       borderColor:'#161b22',borderWidth:2}
+    ],{opts:{cutout:'62%',plugins:{legend:{display:true,position:'right',labels:{color:tc,font:{size:11},boxWidth:10,padding:8}},
+      tooltip:{backgroundColor:'#21262d',titleColor:'#e6edf3',bodyColor:'#8b949e',borderColor:'#30363d',borderWidth:1,
+        callbacks:{label:ctx=>` ${ctx.label}: ${ctx.parsed.toLocaleString()}B$ (${(ctx.parsed/grandTotal*100).toFixed(1)}%)`}}}}});
+
   }catch(e){console.error('tic:',e);}
 }
 function _updateSignals(){updateSignalPanel(_sigData);}
