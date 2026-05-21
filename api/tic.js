@@ -1,11 +1,8 @@
 export const config = { runtime: "nodejs" };
 
-import { readFileSync } from 'fs';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const HIST = JSON.parse(readFileSync(join(__dirname, 'tic_hist.json'), 'utf8'));
+import { createRequire } from 'module';
+const _require = createRequire(import.meta.url);
+const HIST = _require('./tic_hist.json');
 
 const SKIP = new Set([
   'Country', 'All Other', 'Grand Total',
