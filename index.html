@@ -876,7 +876,7 @@ async function loadQRA(){
       const qtrs=d.quarters.slice(-7); // 최근 7분기
       const todayQ=(()=>{const n=new Date();return`${n.getFullYear()}-Q${Math.ceil((n.getMonth()+1)/3)}`;})();
       document.getElementById('qraQtrNote').textContent='— 음영 분기는 예정 포함';
-      mk('qraQtrChart','bar',qtrs.map(q=>q.q),[
+      try{mk('qraQtrChart','bar',qtrs.map(q=>q.q),[
         {label:'T-Bill', data:qtrs.map(q=>Math.round(q.bill)), backgroundColor:'rgba(88,166,255,0.75)', stack:'s'},
         {label:'Notes',  data:qtrs.map(q=>Math.round(q.note)), backgroundColor:'rgba(63,185,80,0.75)',  stack:'s'},
         {label:'Bonds',  data:qtrs.map(q=>Math.round(q.bond)), backgroundColor:'rgba(210,153,34,0.75)', stack:'s'},
@@ -886,7 +886,7 @@ async function loadQRA(){
         plugins:{legend:{display:true,labels:{color:'#c9d1d9',font:{size:11},boxWidth:10,padding:10}},
           tooltip:{backgroundColor:'#21262d',titleColor:'#e6edf3',bodyColor:'#8b949e',borderColor:'#30363d',borderWidth:1,
             callbacks:{label:ctx=>` ${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString()}B$`}}}}}
-      );
+      );}catch(e){console.error('qraChart:',e);}
 
       // ② 이번 분기 카드
       const cur=d.quarters.find(q=>q.q===todayQ)||d.quarters[d.quarters.length-1];
@@ -1176,6 +1176,7 @@ function sw(name,btn){
   if(name==='cal')renderCal();
   if(name==='rates')loadRatesSRF();
   if(name==='m2')loadLCLoR();
+  if(name==='dts')setTimeout(()=>{if(C['qraQtrChart'])C['qraQtrChart'].resize();},50);
 }
 
 function setSig(id,val,desc,pct,color){
