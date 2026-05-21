@@ -558,7 +558,7 @@ tr:hover td{background:var(--surf2)}
 
   <div class="tdesc"><div class="tdesc-hdr"><div class="tdesc-icon">TIC</div><div><div class="tdesc-title">TIC — 국가별 미국채 보유</div><div class="tdesc-src">미 재무부 월간 · 약 6주 후행</div><div class="tdesc-links"><a class="tdesc-link" href="https://home.treasury.gov/data/treasury-international-capital-tic-system-home-page" target="_blank">TIC 홈 ↗</a><a class="tdesc-link" href="https://home.treasury.gov/news/press-releases" target="_blank">Treasury 보도 ↗</a><a class="tdesc-link" href="https://ticdata.treasury.gov/" target="_blank">TIC 데이터 ↗</a></div></div></div><div class="tdesc-body">외국 정부·기관의 미국채 보유 현황. 일본이 최대 보유국($1.2T), 중국은 감소 추세. 보유 감소 = 달러 약세 + 미국채 금리 상승 압력. 최근 미·중 무역 갈등과 관세 전쟁으로 중국의 미국채 무기화(전략적 매도) 우려가 시장 리스크로 부상.</div><div class="tdesc-tags"><span class="tdesc-tag b">일본 = 최대 보유국</span><span class="tdesc-tag r">중국 감소 추세</span><span class="tdesc-tag a">케이맨 과소집계</span><span class="tdesc-tag ">지정학 리스크</span><span class="tdesc-tag ">6주 후행 발표</span></div><div class="tdesc-rels"><span><span style="color:#f85149">→</span> 보유 감소 = 미국채 금리 상방 압력</span><span><span style="color:#58a6ff">→</span> 일본 BOJ 정책 변화와 연동</span><span><span style="color:#d29922">→</span> 중국 매도 = 달러 약세 동반</span></div></div>
     <div class="sec">
-      <div class="stitle">TIC — 국가별 미국채 보유 (최신)</div>
+      <div class="stitle" id="ticDateLbl">TIC — 국가별 미국채 보유</div>
       <div class="cards" id="ticCards"><div class="loading">로딩 중...</div></div>
     </div>
     <div class="two">
@@ -977,6 +977,17 @@ async function loadTIC(){
       if(/^\d{4}-\d{2}/.test(d)) return d.slice(0,4);
       return String(d).slice(0,4);
     };
+    // 최신 날짜 레이블 업데이트
+    if(allDates.length>0){
+      const ld=allDates[allDates.length-1];
+      const fmtLd=d=>{
+        if(/^\d{6}$/.test(d)) return d.slice(0,4)+'년 '+d.slice(4,6)+'월';
+        if(/^\d{4}-\d{2}/.test(d)) return d.slice(0,4)+'년 '+d.slice(5,7)+'월';
+        return d;
+      };
+      const dlbl=document.getElementById('ticDateLbl');
+      if(dlbl) dlbl.textContent='TIC — 국가별 미국채 보유 ('+fmtLd(ld)+' 기준)';
+    }
     const rangeLbl=document.getElementById('ticRangeLbl');
     if(rangeLbl&&allDates.length>1){
       const y0=getYear(allDates[0]),y1=getYear(allDates[allDates.length-1]);
