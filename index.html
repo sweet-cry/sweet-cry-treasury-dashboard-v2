@@ -98,6 +98,8 @@ tr:hover td{background:var(--surf2)}
 .qt-bar-fill{height:100%;border-radius:5px;transition:width .5s}
 .qt-foot{display:flex;justify-content:space-between;font-size:10px;color:#484f58;margin-top:2px}
 .qt-interp{font-size:10px;color:var(--muted);background:var(--bg);border-radius:6px;padding:6px 10px;margin-top:8px;line-height:1.6;border-left:3px solid var(--brd)}
+.qt-bar-paused{border:1px dashed var(--red)!important;position:relative;}
+.qt-bar-paused::after{content:'QT 중단 — 순증가 중';position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--red);font-weight:600;letter-spacing:.03em;white-space:nowrap;}
 /* SOMA ladder */
 .ladder-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--surf2)}
 .ladder-row:last-child{border-bottom:none}
@@ -414,8 +416,8 @@ tr:hover td{background:var(--surf2)}
     <div class="qt-gauge">
       <div class="qt-title">QT 진행 속도 — 월별 감소폭 vs 상한</div>
       <div class="qt-row">
-        <div class="qt-head"><span class="qt-label">국채 (UST) 감소</span><span class="qt-val" id="c-qt-ust-val" style="color:var(--amber)">— / 상한 25B$</span></div>
-        <div class="qt-bar-bg"><div class="qt-bar-fill" id="qt-bar-ust" style="width:0%;background:var(--amber)"></div></div>
+        <div class="qt-head"><span class="qt-label">국채 (UST) 감소 <span id="qt-ust-badge" style="display:none;font-size:9px;padding:2px 6px;border-radius:4px;font-weight:600;background:rgba(248,81,73,.15);color:var(--red);margin-left:4px">QT 중단</span></span><span class="qt-val" id="c-qt-ust-val" style="color:var(--amber)">— / 상한 25B$</span></div>
+        <div class="qt-bar-bg" id="qt-bar-ust-bg" style="height:22px"><div class="qt-bar-fill" id="qt-bar-ust" style="width:0%;background:var(--amber);height:100%"></div></div>
         <div class="qt-foot"><span>0</span><span>상한 $25B</span></div>
       </div>
       <div class="qt-row">
@@ -956,8 +958,11 @@ async function loadH41(){
       // QT 게이지
       const ustPct=isQTon?Math.min(Math.round(ustChgB/25*100),100):0;
       const el1=document.getElementById('qt-bar-ust'),ev1=document.getElementById('c-qt-ust-val');
-      if(el1){el1.style.width=ustPct+'%';el1.style.background=isQTon?'var(--amber)':'var(--green)';}
-      if(ev1)ev1.textContent=(isQTon?('-'+ustChgB.toFixed(0)+'B$ / 상한 25B$'):('+'+Math.abs(ustChgB).toFixed(0)+'B$ 순증가'));
+      const bg1=document.getElementById('qt-bar-ust-bg'),badge1=document.getElementById('qt-ust-badge');
+      if(el1){el1.style.width=ustPct+'%';el1.style.background=isQTon?'var(--amber)':'transparent';}
+      if(ev1){ev1.textContent=(isQTon?('-'+ustChgB.toFixed(0)+'B$ / 상한 25B$'):('+'+Math.abs(ustChgB).toFixed(0)+'B$ 순증가'));ev1.style.color=isQTon?'var(--amber)':'var(--red)';}
+      if(bg1){if(isQTon){bg1.classList.remove('qt-bar-paused');}else{bg1.classList.add('qt-bar-paused');}}
+      if(badge1)badge1.style.display=isQTon?'none':'inline';
     }
     if(mbs.length>=5){
       const recent=mbs.slice(-5);
@@ -972,10 +977,13 @@ async function loadH41(){
       const ustChgB=(ust.slice(-5)[0].v-ust.slice(-5)[4].v)/1e3;
       const mbsChgB=(mbs.slice(-5)[0].v-mbs.slice(-5)[4].v)/1e3;
       if(ustChgB<=0){
-        qtInterp.innerHTML='<span style="color:var(--green)">▲ UST 순증가 +'+Math.abs(ustChgB).toFixed(0)+'B$</span> — QT 사실상 중단 또는 만기 재투자 집중 · MBS 자연상환 '+Math.abs(mbsChgB).toFixed(0)+'B$';
+        qtInterp.style.borderLeftColor='var(--red)';
+        qtInterp.style.background='rgba(248,81,73,0.07)';
+        qtInterp.innerHTML='<b style="color:var(--red)">⚠ UST QT 중단</b> — 4주간 +'+Math.abs(ustChgB).toFixed(0)+'B$ 순증가 (만기 전액 재투자 또는 순매입 중) · MBS 자연상환 '+Math.abs(mbsChgB).toFixed(0)+'B$ 진행';
       }else{
+        qtInterp.style.borderLeftColor='';qtInterp.style.background='';
         const ustPct=Math.round(ustChgB/25*100);
-        qtInterp.textContent='UST 월간 감소 '+ustChgB.toFixed(0)+'B$ — 상한($25B)의 '+ustPct+'% 소화 중 · MBS 자연상환 '+Math.abs(mbsChgB).toFixed(0)+'B$'+(ustPct<30?' ⚠ QT 속도 둔화 — 사실상 중단 접근':'');
+        qtInterp.innerHTML='UST 감소 <b style="color:var(--amber)">-'+ustChgB.toFixed(0)+'B$</b> — 상한($25B)의 '+ustPct+'% 소화 중 · MBS 자연상환 '+Math.abs(mbsChgB).toFixed(0)+'B$'+(ustPct<30?' <span style="color:var(--red)">⚠ QT 속도 30% 미만 — 중단 임박</span>':'');
       }
     }
     // 차트 — 연도 레이블 처리
