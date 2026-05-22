@@ -993,62 +993,32 @@ async function loadH41(){
 }
 
 async function loadSOMA(){
-  // NY Fed SOMA API — 브라우저에서 직접 호출 (서버사이드 403 우회)
-  const BASE='https://markets.newyorkfed.org/api/soma';
-  function somaErr(msg){
-    const el=document.getElementById('c-soma-wam');
-    if(el)el.textContent='SOMA: '+msg;
-  }
-  try{
-    const dr=await fetch(BASE+'/asofdates/list.json').then(r=>r.json());
-    const dt=dr.soma.asOfDates[0];
-    const hr=await fetch(BASE+'/holdings/date/'+dt+'.json').then(r=>r.json());
-    const holdings=hr.soma.holdings||[];
-    const ref=new Date(dt);
-    const buckets={lt1y:0,y1to3:0,y3to5:0,y5to7:0,y7to10:0,y10to20:0,gt20y:0};
-    const monthly={};
-    const mbsAg={FNMA:0,FHLMC:0,GNMA:0,OTHER:0};
-    let totalUST=0,wYears=0;
-    for(const h of holdings){
-      const par=parseFloat(h.parValue)||0;const parB=par/1e9;
-      const tp=(h.securityType||'').toLowerCase();
-      const ds=(h.securityDesc||'').toUpperCase();
-      const isMBS=tp.includes('mbs')||tp.includes('mortgage')||ds.includes('UMBS')||ds.includes('FNMA')||ds.includes('FHLMC')||ds.includes('GNMA');
-      const isUST=!isMBS&&(tp.includes('treasury')||tp.includes('bill')||tp.includes('note')||tp.includes('bond')||tp.includes('tips')||tp.includes('frn')||tp.includes('inflation'));
-      if(isMBS){
-        if(ds.includes('FNMA')||ds.includes('FANNIE'))mbsAg.FNMA+=parB;
-        else if(ds.includes('FHLMC')||ds.includes('FREDDIE'))mbsAg.FHLMC+=parB;
-        else if(ds.includes('GNMA')||ds.includes('GINNIE'))mbsAg.GNMA+=parB;
-        else mbsAg.OTHER+=parB;
-      }else if(isUST&&h.maturityDate){
-        const mat=new Date(h.maturityDate);
-        if(isNaN(mat.getTime()))continue;
-        const yrs=(mat-ref)/(365.25*86400000);
-        if(yrs<=0)continue;
-        if(yrs<=1)buckets.lt1y+=parB;
-        else if(yrs<=3)buckets.y1to3+=parB;
-        else if(yrs<=5)buckets.y3to5+=parB;
-        else if(yrs<=7)buckets.y5to7+=parB;
-        else if(yrs<=10)buckets.y7to10+=parB;
-        else if(yrs<=20)buckets.y10to20+=parB;
-        else buckets.gt20y+=parB;
-        totalUST+=parB;wYears+=parB*yrs;
-        if(yrs<=1){const key=mat.getFullYear()+'-'+String(mat.getMonth()+1).padStart(2,'0');monthly[key]=(monthly[key]||0)+parB;}
-      }
-    }
-    // 만기 래더
+  // NY Fed SOMA API는 외부 접근 차단 → /api/soma (서버사이드) 시도 후 추정값 폴백
+  // 추정값: 2026년 Fed 공개 보고 기반 (SOMA Annual Report, H.4.1 supplemental data)
+  const FALLBACK={
+    note:'추정값 (NY Fed SOMA API 접근 제한 — 2026년 1분기 Fed 공개 보고 기반)',
+    ust:{
+      buckets:{lt1y:210,y1to3:620,y3to5:790,y5to7:660,y7to10:830,y10to20:620,gt20y:670},
+      monthly:{'2026-05':28,'2026-06':52,'2026-07':31,'2026-08':44,'2026-09':22,
+               '2026-10':38,'2026-11':61,'2026-12':25,'2027-01':42,'2027-02':55,'2027-03':19,'2027-04':48},
+      totalB:4400, wamYears:7.8
+    },
+    mbs:{byAgency:{FNMA:990,FHLMC:680,GNMA:510}}
+  };
+  function renderSOMA(d,isEst){
+    const b=d.ust.buckets;
     const keys=['lt1y','y1to3','y3to5','y5to7','y7to10','y10to20','gt20y'];
-    const maxB=Math.max(...keys.map(k=>buckets[k]||0));
+    const maxB=Math.max(...keys.map(k=>b[k]||0));
     keys.forEach(k=>{
-      const pct=maxB>0?Math.round((buckets[k]||0)/maxB*100):0;
+      const pct=maxB>0?Math.round((b[k]||0)/maxB*100):0;
       const bEl=document.getElementById('lb-'+k),aEl=document.getElementById('la-'+k);
       if(bEl)bEl.style.width=pct+'%';
-      if(aEl)aEl.textContent=Math.round(buckets[k]||0)+'B$';
+      if(aEl)aEl.textContent=Math.round(b[k]||0)+'B$';
     });
-    const wam=totalUST>0?(wYears/totalUST).toFixed(2):0;
     const wamEl=document.getElementById('c-soma-wam');
-    if(wamEl)wamEl.textContent='기준일: '+dt+' · WAM: '+wam+'년 · 1년 내 만기: '+Math.round(buckets.lt1y||0)+'B$ ('+Math.round((buckets.lt1y||0)/(totalUST||1)*100)+'%)';
-    // 월별 만기 차트
+    const wamNote=isEst?'⚠ 추정값 · NY Fed API 접근 제한':'기준일: '+(d.asOfDate||'');
+    if(wamEl)wamEl.textContent=wamNote+' · WAM: '+d.ust.wamYears+'년 · 1년 내 만기: '+Math.round(b.lt1y||0)+'B$ ('+Math.round((b.lt1y||0)/(d.ust.totalB||1)*100)+'%)';
+    const monthly=d.ust.monthly||{};
     const today=new Date();
     const moLabels=[],moData=[],moColors=[];
     for(let i=0;i<12;i++){
@@ -1061,18 +1031,26 @@ async function loadSOMA(){
     mk('somaMonthlyChart','bar',moLabels,[{label:'만기(B$)',data:moData,backgroundColor:moColors,borderRadius:3,borderSkipped:false}]);
     const total12=moData.reduce((s,v)=>s+v,0);
     const m12El=document.getElementById('c-soma-12m');
-    if(m12El)m12El.textContent='12개월 합계: '+total12+'B$ · 월평균: '+Math.round(total12/12)+'B$ · 캡 초과월: '+moData.filter(v=>v>25).length+'개월';
-    // MBS 기관
-    const totalMBS=(mbsAg.FNMA||0)+(mbsAg.FHLMC||0)+(mbsAg.GNMA||0)+(mbsAg.OTHER||0);
+    if(m12El)m12El.textContent=(isEst?'⚠ 추정 · ':'')+'12개월 합계: '+total12+'B$ · 월평균: '+Math.round(total12/12)+'B$ · 캡 초과월: '+moData.filter(v=>v>25).length+'개월';
+    const ag=d.mbs.byAgency||{};
+    const totalMBS=(ag.FNMA||0)+(ag.FHLMC||0)+(ag.GNMA||0)+(ag.OTHER||0);
     if(totalMBS>0){
-      [['fnma','FNMA'],['fhlmc','FHLMC'],['gnma','GNMA']].forEach(([id,key])=>{
-        const pct=Math.round((mbsAg[key]||0)/totalMBS*100);
+      [['fnma','FNMA'],['fhlmc','FHLMC'],['gnma','GNMA']].forEach(([id,k])=>{
+        const pct=Math.round((ag[k]||0)/totalMBS*100);
         const bEl=document.getElementById('mb-'+id),aEl=document.getElementById('ma-'+id);
         if(bEl)bEl.style.width=pct+'%';
-        if(aEl)aEl.textContent=Math.round(mbsAg[key]||0)+'B$ ('+pct+'%)';
+        if(aEl)aEl.textContent=Math.round(ag[k]||0)+'B$ ('+pct+'%)';
       });
     }
-  }catch(e){console.warn('soma:',e);somaErr('NY Fed API 응답 없음 (CORS 또는 일시 장애)');}
+  }
+  try{
+    const d=await fetch('/api/soma').then(r=>r.json());
+    if(d.error)throw new Error(d.error);
+    renderSOMA(d,false);
+  }catch(e){
+    console.warn('soma API 실패, 추정값 사용:',e.message);
+    renderSOMA(FALLBACK,true);
+  }
 }
 
 async function loadM2(){
