@@ -795,7 +795,7 @@ async function loadNL(){
       fred('WALCL',90),
       fetch('/api/dts').then(x=>x.json()),
       fred('RRPONTSYD',90),
-      fred('SP500',90),
+      fred('SP500',500),
       fred('WRESBAL',90)
     ]);
 
@@ -828,10 +828,10 @@ async function loadNL(){
 
     // 최신 NL (WALCL 기준)
     const latestTga=getTga(lw.date);
-    const latestRrp=rM[lw.date]||lr.v;
+    const latestRrp=rM[lw.date]!=null?rM[lw.date]:lr.v;
     const nlV=lw.v-latestTga-latestRrp;
     const prevW=w.length>1?w[w.length-2]:null;
-    const dod=prevW?(nlV-(prevW.v-getTga(prevW.date)-(rM[prevW.date]||lr.v))):0;
+    const dod=prevW?(nlV-(prevW.v-getTga(prevW.date)-(rM[prevW.date]!=null?rM[prevW.date]:lr.v))):0;
     _sigData.nl={val:B(nlV*1e6),dod:dod*1e6};
 
     document.getElementById('c-nl').textContent=B(nlV*1e6);
@@ -849,14 +849,16 @@ async function loadNL(){
     if(lr2){document.getElementById('c-res').textContent=B(lr2.v*1e6);const rd=document.getElementById('c-res-d');rd.textContent=lr2.v<3000?'⚠ LCLoR 근접':lr2.date;if(lr2.v<3000)rd.className='cs dn';}
 
     const spM={};s.forEach(x=>spM[x.date]=x.v);
+    const spSorted=s.slice().sort((a,b)=>a.date.localeCompare(b.date));
+    const getSpx=date=>{const f=spSorted.filter(x=>x.date<=date);return f.length?f[f.length-1].v:null;};
     const wDates=w.map(x=>x.date.slice(5));
     mk('nlChart','line',wDates,[
-      {label:'NL',data:w.map(x=>x.v-getTga(x.date)-(rM[x.date]||lr.v)),borderColor:'#58a6ff',backgroundColor:'rgba(88,166,255,0.06)',borderWidth:2,pointRadius:0,fill:true,tension:0.3},
-      {label:'SPX',data:w.map(x=>spM[x.date]||null),borderColor:'#f85149',borderWidth:1.5,pointRadius:0,tension:0.3,yAxisID:'y2'}
+      {label:'NL',data:w.map(x=>x.v-getTga(x.date)-(rM[x.date]!=null?rM[x.date]:lr.v)),borderColor:'#58a6ff',backgroundColor:'rgba(88,166,255,0.06)',borderWidth:2,pointRadius:0,fill:true,tension:0.3},
+      {label:'SPX',data:w.map(x=>getSpx(x.date)),borderColor:'#f85149',borderWidth:1.5,pointRadius:0,tension:0.3,yAxisID:'y2'}
     ],{y2:true});
     mk('compChart','line',wDates,[
       {label:'WALCL',data:w.map(x=>x.v),borderColor:'#58a6ff',borderWidth:1.5,pointRadius:0,tension:0.3},
-      {label:'TGA',data:w.map(x=>tM[x.date]||null),borderColor:'#f85149',borderWidth:1.5,pointRadius:0,tension:0.3},
+      {label:'TGA',data:w.map(x=>getTga(x.date)),borderColor:'#f85149',borderWidth:1.5,pointRadius:0,tension:0.3},
       {label:'RRP',data:w.map(x=>rM[x.date]||null),borderColor:'#d29922',borderWidth:1.5,pointRadius:0,tension:0.3}
     ]);
     if(res.length)mk('resChart','line',res.map(x=>x.date.slice(5)),[
@@ -883,7 +885,7 @@ async function loadNL(){
     document.getElementById('nlTbody').innerHTML=tDates.map((x,i)=>{
       const wv=getWalcl(x.date);
       const tv=getTga(x.date);
-      const rv=rM[x.date]||lr.v;
+      const rv=rM[x.date]!=null?rM[x.date]:lr.v;
       const n2=wv-tv-rv;
       const px=tDates[i+1];
       const d2=px?n2-nlFromDate(px.date):0;
