@@ -936,32 +936,41 @@ async function loadH41(){
     // UST 월간 감소 (최근 4주 평균)
     if(ust.length>=5){
       const recent=ust.slice(-5);
-      const ustChgB=(recent[0].v-recent[4].v)/1e3; // millions→billions, 4주 감소
+      // recent[0]=5주전, recent[4]=최신 / 양수=감소(QT), 음수=증가(QT둔화/중단)
+      const ustChgB=(recent[0].v-recent[4].v)/1e3;
+      const isQTon=ustChgB>0;
       const chgEl=document.getElementById('c-ust-chg');
       const chgDs=document.getElementById('c-ust-chg-d');
-      if(chgEl){chgEl.textContent=(ustChgB<0?'':'-')+Math.abs(ustChgB).toFixed(0)+'B$';chgEl.className='cv '+(ustChgB<=0?'dn':'up');}
-      const capPct=Math.round(Math.abs(ustChgB)/25*100);
-      if(chgDs)chgDs.textContent='상한 $25B 대비 '+capPct+'%';
+      if(chgEl){
+        chgEl.textContent=(isQTon?'-':'+')+Math.abs(ustChgB).toFixed(0)+'B$';
+        chgEl.className='cv '+(isQTon?'dn':'up');
+      }
+      const capPct=isQTon?Math.round(ustChgB/25*100):0;
+      if(chgDs)chgDs.textContent=isQTon?('상한 $25B 대비 '+capPct+'%'):'순증가 — QT 중단/둔화';
       // QT 게이지
-      const ustPct=Math.min(Math.round(Math.abs(ustChgB)/25*100),100);
+      const ustPct=isQTon?Math.min(Math.round(ustChgB/25*100),100):0;
       const el1=document.getElementById('qt-bar-ust'),ev1=document.getElementById('c-qt-ust-val');
-      if(el1)el1.style.width=ustPct+'%';
-      if(ev1)ev1.textContent='-'+Math.abs(ustChgB).toFixed(0)+'B$ / 상한 25B$';
+      if(el1){el1.style.width=ustPct+'%';el1.style.background=isQTon?'var(--amber)':'var(--green)';}
+      if(ev1)ev1.textContent=(isQTon?('-'+ustChgB.toFixed(0)+'B$ / 상한 25B$'):('+'+Math.abs(ustChgB).toFixed(0)+'B$ 순증가'));
     }
     if(mbs.length>=5){
       const recent=mbs.slice(-5);
       const mbsChgB=(recent[0].v-recent[4].v)/1e3;
-      const mbsPct=Math.min(Math.round(Math.abs(mbsChgB)/35*100),100);
+      const mbsPct=mbsChgB>0?Math.min(Math.round(mbsChgB/35*100),100):0;
       const el2=document.getElementById('qt-bar-mbs'),ev2=document.getElementById('c-qt-mbs-val');
       if(el2)el2.style.width=mbsPct+'%';
-      if(ev2)ev2.textContent='-'+Math.abs(mbsChgB).toFixed(0)+'B$ / 상한 35B$';
+      if(ev2)ev2.textContent=mbsChgB>0?('-'+mbsChgB.toFixed(0)+'B$ / 상한 35B$'):('+'+Math.abs(mbsChgB).toFixed(0)+'B$ 순증가');
     }
     const qtInterp=document.getElementById('c-qt-interp');
     if(qtInterp&&ust.length>=5&&mbs.length>=5){
       const ustChgB=(ust.slice(-5)[0].v-ust.slice(-5)[4].v)/1e3;
       const mbsChgB=(mbs.slice(-5)[0].v-mbs.slice(-5)[4].v)/1e3;
-      const ustPct=Math.round(Math.abs(ustChgB)/25*100);
-      qtInterp.textContent='UST 월간 감소 '+Math.abs(ustChgB).toFixed(0)+'B$ — 상한($25B)의 '+ustPct+'% 소화 중 · MBS 자연상환 '+Math.abs(mbsChgB).toFixed(0)+'B$'+(ustPct<50?' ⚠ UST 감소 속도 저하 — QT 사실상 둔화 신호':'');
+      if(ustChgB<=0){
+        qtInterp.innerHTML='<span style="color:var(--green)">▲ UST 순증가 +'+Math.abs(ustChgB).toFixed(0)+'B$</span> — QT 사실상 중단 또는 만기 재투자 집중 · MBS 자연상환 '+Math.abs(mbsChgB).toFixed(0)+'B$';
+      }else{
+        const ustPct=Math.round(ustChgB/25*100);
+        qtInterp.textContent='UST 월간 감소 '+ustChgB.toFixed(0)+'B$ — 상한($25B)의 '+ustPct+'% 소화 중 · MBS 자연상환 '+Math.abs(mbsChgB).toFixed(0)+'B$'+(ustPct<30?' ⚠ QT 속도 둔화 — 사실상 중단 접근':'');
+      }
     }
     // 차트 — 연도 레이블 처리
     const ustLabels=ust.map((x,i)=>{
@@ -984,51 +993,86 @@ async function loadH41(){
 }
 
 async function loadSOMA(){
+  // NY Fed SOMA API — 브라우저에서 직접 호출 (서버사이드 403 우회)
+  const BASE='https://markets.newyorkfed.org/api/soma';
+  function somaErr(msg){
+    const el=document.getElementById('c-soma-wam');
+    if(el)el.textContent='SOMA: '+msg;
+  }
   try{
-    const d=await fetch('/api/soma').then(r=>r.json());
-    if(d.error){console.warn('soma:',d.error);return;}
-    // UST 만기 래더
-    const b=d.ust.buckets;
+    const dr=await fetch(BASE+'/asofdates/list.json').then(r=>r.json());
+    const dt=dr.soma.asOfDates[0];
+    const hr=await fetch(BASE+'/holdings/date/'+dt+'.json').then(r=>r.json());
+    const holdings=hr.soma.holdings||[];
+    const ref=new Date(dt);
+    const buckets={lt1y:0,y1to3:0,y3to5:0,y5to7:0,y7to10:0,y10to20:0,gt20y:0};
+    const monthly={};
+    const mbsAg={FNMA:0,FHLMC:0,GNMA:0,OTHER:0};
+    let totalUST=0,wYears=0;
+    for(const h of holdings){
+      const par=parseFloat(h.parValue)||0;const parB=par/1e9;
+      const tp=(h.securityType||'').toLowerCase();
+      const ds=(h.securityDesc||'').toUpperCase();
+      const isMBS=tp.includes('mbs')||tp.includes('mortgage')||ds.includes('UMBS')||ds.includes('FNMA')||ds.includes('FHLMC')||ds.includes('GNMA');
+      const isUST=!isMBS&&(tp.includes('treasury')||tp.includes('bill')||tp.includes('note')||tp.includes('bond')||tp.includes('tips')||tp.includes('frn')||tp.includes('inflation'));
+      if(isMBS){
+        if(ds.includes('FNMA')||ds.includes('FANNIE'))mbsAg.FNMA+=parB;
+        else if(ds.includes('FHLMC')||ds.includes('FREDDIE'))mbsAg.FHLMC+=parB;
+        else if(ds.includes('GNMA')||ds.includes('GINNIE'))mbsAg.GNMA+=parB;
+        else mbsAg.OTHER+=parB;
+      }else if(isUST&&h.maturityDate){
+        const mat=new Date(h.maturityDate);
+        if(isNaN(mat.getTime()))continue;
+        const yrs=(mat-ref)/(365.25*86400000);
+        if(yrs<=0)continue;
+        if(yrs<=1)buckets.lt1y+=parB;
+        else if(yrs<=3)buckets.y1to3+=parB;
+        else if(yrs<=5)buckets.y3to5+=parB;
+        else if(yrs<=7)buckets.y5to7+=parB;
+        else if(yrs<=10)buckets.y7to10+=parB;
+        else if(yrs<=20)buckets.y10to20+=parB;
+        else buckets.gt20y+=parB;
+        totalUST+=parB;wYears+=parB*yrs;
+        if(yrs<=1){const key=mat.getFullYear()+'-'+String(mat.getMonth()+1).padStart(2,'0');monthly[key]=(monthly[key]||0)+parB;}
+      }
+    }
+    // 만기 래더
     const keys=['lt1y','y1to3','y3to5','y5to7','y7to10','y10to20','gt20y'];
-    const maxB=Math.max(...keys.map(k=>b[k]||0));
+    const maxB=Math.max(...keys.map(k=>buckets[k]||0));
     keys.forEach(k=>{
-      const pct=maxB>0?Math.round((b[k]||0)/maxB*100):0;
-      const bEl=document.getElementById('lb-'+k);
-      const aEl=document.getElementById('la-'+k);
+      const pct=maxB>0?Math.round((buckets[k]||0)/maxB*100):0;
+      const bEl=document.getElementById('lb-'+k),aEl=document.getElementById('la-'+k);
       if(bEl)bEl.style.width=pct+'%';
-      if(aEl)aEl.textContent=Math.round(b[k]||0)+'B$';
+      if(aEl)aEl.textContent=Math.round(buckets[k]||0)+'B$';
     });
+    const wam=totalUST>0?(wYears/totalUST).toFixed(2):0;
     const wamEl=document.getElementById('c-soma-wam');
-    if(wamEl)wamEl.textContent='가중평균 잔존만기: '+d.ust.wamYears+'년 · 1년 내 만기: '+Math.round(b.lt1y||0)+'B$ (총 보유의 '+Math.round((b.lt1y||0)/(d.ust.totalB||1)*100)+'%)';
+    if(wamEl)wamEl.textContent='기준일: '+dt+' · WAM: '+wam+'년 · 1년 내 만기: '+Math.round(buckets.lt1y||0)+'B$ ('+Math.round((buckets.lt1y||0)/(totalUST||1)*100)+'%)';
     // 월별 만기 차트
-    const monthly=d.ust.monthly||{};
     const today=new Date();
     const moLabels=[],moData=[],moColors=[];
     for(let i=0;i<12;i++){
-      const dt=new Date(today.getFullYear(),today.getMonth()+i,1);
-      const key=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0');
+      const d2=new Date(today.getFullYear(),today.getMonth()+i,1);
+      const key=d2.getFullYear()+'-'+String(d2.getMonth()+1).padStart(2,'0');
       const val=Math.round(monthly[key]||0);
-      moLabels.push(String(dt.getMonth()+1).padStart(2,'0')+'/'+String(dt.getFullYear()).slice(2));
-      moData.push(val);
-      moColors.push(val>25?'#f85149':'#58a6ff');
+      moLabels.push(String(d2.getMonth()+1).padStart(2,'0')+'/'+String(d2.getFullYear()).slice(2));
+      moData.push(val);moColors.push(val>25?'#f85149':'#58a6ff');
     }
     mk('somaMonthlyChart','bar',moLabels,[{label:'만기(B$)',data:moData,backgroundColor:moColors,borderRadius:3,borderSkipped:false}]);
     const total12=moData.reduce((s,v)=>s+v,0);
     const m12El=document.getElementById('c-soma-12m');
     if(m12El)m12El.textContent='12개월 합계: '+total12+'B$ · 월평균: '+Math.round(total12/12)+'B$ · 캡 초과월: '+moData.filter(v=>v>25).length+'개월';
-    // MBS 발행기관
-    const ag=d.mbs.byAgency||{};
-    const totalMBS=(ag.FNMA||0)+(ag.FHLMC||0)+(ag.GNMA||0)+(ag.OTHER||0);
+    // MBS 기관
+    const totalMBS=(mbsAg.FNMA||0)+(mbsAg.FHLMC||0)+(mbsAg.GNMA||0)+(mbsAg.OTHER||0);
     if(totalMBS>0){
       [['fnma','FNMA'],['fhlmc','FHLMC'],['gnma','GNMA']].forEach(([id,key])=>{
-        const pct=Math.round((ag[key]||0)/totalMBS*100);
-        const bEl=document.getElementById('mb-'+id);
-        const aEl=document.getElementById('ma-'+id);
+        const pct=Math.round((mbsAg[key]||0)/totalMBS*100);
+        const bEl=document.getElementById('mb-'+id),aEl=document.getElementById('ma-'+id);
         if(bEl)bEl.style.width=pct+'%';
-        if(aEl)aEl.textContent=Math.round(ag[key]||0)+'B$ ('+pct+'%)';
+        if(aEl)aEl.textContent=Math.round(mbsAg[key]||0)+'B$ ('+pct+'%)';
       });
     }
-  }catch(e){console.error('soma:',e);}
+  }catch(e){console.warn('soma:',e);somaErr('NY Fed API 응답 없음 (CORS 또는 일시 장애)');}
 }
 
 async function loadM2(){
