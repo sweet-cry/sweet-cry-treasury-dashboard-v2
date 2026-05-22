@@ -1583,14 +1583,25 @@ const FIXED_EVENTS = [
   {y:2027,m:2,d:3,type:'qra',name:'QRA 리펀딩 상세 발표 (Q1)',badge:'eb-qra'}
 ];
 
-// 국채 만기는 매월 15일, 말일에 집중 (Treasury 정기 만기 패턴)
+// 주말이면 다음 영업일로 이월 (토→월, 일→월)
+function nextBizDay(y, m, d) {
+  const dt = new Date(y, m-1, d);
+  const dow = dt.getDay();
+  if (dow === 6) dt.setDate(dt.getDate() + 2);
+  else if (dow === 0) dt.setDate(dt.getDate() + 1);
+  return {y: dt.getFullYear(), m: dt.getMonth()+1, d: dt.getDate()};
+}
+
+// 국채 만기는 매월 15일, 말일에 집중 (Treasury 정기 만기 패턴) — 주말 이월 처리
 function genMaturityEvents(startY, endY) {
   const out = [];
   for (let y = startY; y <= endY; y++) {
     for (let m = 1; m <= 12; m++) {
-      out.push({y, m, d:15, type:'matur', name:'국채 만기 (월 중순)', badge:'eb-matur'});
+      const d15 = nextBizDay(y, m, 15);
+      out.push({...d15, type:'matur', name:'국채 만기 (월 중순)', badge:'eb-matur'});
       const lastDay = new Date(y, m, 0).getDate();
-      out.push({y, m, d:lastDay, type:'matur', name:'국채 만기 (월말)', badge:'eb-matur'});
+      const dEnd = nextBizDay(y, m, lastDay);
+      out.push({...dEnd, type:'matur', name:'국채 만기 (월말)', badge:'eb-matur'});
     }
   }
   return out;
@@ -1668,7 +1679,9 @@ function renderCal(){
     else if(evs.some(e=>e.type==='qra'))cls+=' qra';
     else if(evs.some(e=>e.type==='matur'))cls+=' matur';
     else if(evs.some(e=>e.type==='h41'))cls+=' h41';
-    const dot=evs.length?'<div class="ev" style="background:'+(evs[0].type==='fomc'?'#a371f7':evs[0].type==='tax'?'#f85149':evs[0].type==='qra'?'#d29922':'#3fb950')+'"></div>':'';
+    const typeColor=t=>t==='fomc'?'#a371f7':t==='tax'?'#f85149':t==='qra'?'#d29922':t==='h41'?'#58a6ff':'#3fb950';
+    const uniqueTypes=[...new Set(evs.map(e=>e.type))].slice(0,3);
+    const dot=uniqueTypes.length?'<div style="display:flex;gap:2px;justify-content:center;margin-top:2px">'+uniqueTypes.map(t=>'<div class="ev" style="background:'+typeColor(t)+'"></div>').join('')+'</div>':'';
     html+='<div class="'+cls+'">'+d+dot+'</div>';
   }
   grid.innerHTML=html;
@@ -1676,9 +1689,12 @@ function renderCal(){
   if(!evList)return;
   const now=new Date();
   const today2=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-  // 현재 보고 있는 달(calYear/calMonth)의 오늘 이후 이벤트만
+  // 현재 달이면 → 오늘부터 60일; 다른 달이면 → 해당 달 전체
+  const isCurrentMonth=calYear===today2.getFullYear()&&calMonth===today2.getMonth()+1;
+  const windowStart=isCurrentMonth?today2:new Date(calYear,calMonth-1,1);
+  const windowEnd=isCurrentMonth?new Date(today2.getTime()+60*86400000):new Date(calYear,calMonth,0);
   const upcoming=FISCAL_EVENTS
-    .filter(e=>e.y===calYear&&e.m===calMonth&&new Date(e.y,e.m-1,e.d)>=today2)
+    .filter(e=>{const d=new Date(e.y,e.m-1,e.d);return d>=windowStart&&d<=windowEnd;})
     .sort((a,b)=>new Date(a.y,a.m-1,a.d)-new Date(b.y,b.m-1,b.d));
   evList.innerHTML=upcoming.map(e=>{
     const d=new Date(e.y,e.m-1,e.d);
