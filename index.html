@@ -7,7 +7,7 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0d1117;--surf:#161b22;--surf2:#21262d;--brd:#30363d;
+  --bg:#0d1117;--surf:#161b22;--surf2:#21262d;--bg2:#21262d;--brd:#30363d;
   --tx:#e6edf3;--muted:#8b949e;
   --blue:#58a6ff;--green:#3fb950;--red:#f85149;--amber:#d29922;--purple:#a371f7;
   --r:8px;--rl:12px;
@@ -901,7 +901,7 @@ async function loadRates(){
     const[sofr,iorb,tbill,effr,t10y2y]=await Promise.all([fred('SOFR',90),fred('IORB',90),fred('DTB3',90),fred('EFFR',90),fred('T10Y2Y',90)]);
     const ls=last(sofr),li=last(iorb),lt=last(tbill),le=last(effr);
     if(ls){document.getElementById('c-sofr').textContent=ls.v.toFixed(2)+'%';_sigData.sofr=ls.v;}
-    if(li)document.getElementById('c-iorb').textContent=li.v.toFixed(2)+'%';
+    if(li){document.getElementById('c-iorb').textContent=li.v.toFixed(2)+'%';_sigData.iorb=li.v;}
     if(lt)document.getElementById('c-tbill').textContent=lt.v.toFixed(2)+'%';
     if(le)document.getElementById('c-effr').textContent=le.v.toFixed(2)+'%';
     if(ls&&li){const sp=(ls.v-li.v)*100;const se=document.getElementById('c-spread');se.textContent=sp.toFixed(1)+'bp';se.className='cv '+(sp<0?'dn':'up');}
@@ -912,9 +912,18 @@ async function loadRates(){
       {label:'T-Bill',data:sofr.map(x=>tM[x.date]||null),borderColor:'#d29922',borderWidth:1.5,pointRadius:0,tension:0.2},
       {label:'EFFR',data:sofr.map(x=>eM[x.date]||null),borderColor:'#f85149',borderWidth:1.5,pointRadius:0,tension:0.2,borderDash:[2,4]}
     ]);
-    if(t10y2y.length)mk('yieldChart','line',t10y2y.map(x=>x.date.slice(5)),[
-      {label:'10Y-2Y',data:t10y2y.map(x=>x.v),borderColor:'#58a6ff',backgroundColor:t10y2y.map(x=>x.v<0?'rgba(248,81,73,0.12)':'rgba(88,166,255,0.06)'),borderWidth:1.5,pointRadius:0,fill:true,tension:0.2}
-    ]);
+    if(t10y2y.length){
+      if(C['yieldChart'])C['yieldChart'].destroy();
+      const yctx=document.getElementById('yieldChart');
+      if(yctx){C['yieldChart']=new Chart(yctx,{type:'line',
+        data:{labels:t10y2y.map(x=>x.date.slice(5)),datasets:[{label:'10Y-2Y',data:t10y2y.map(x=>x.v),borderColor:'#58a6ff',backgroundColor:t10y2y.map(x=>x.v<0?'rgba(248,81,73,0.12)':'rgba(88,166,255,0.06)'),borderWidth:1.5,pointRadius:0,fill:true,tension:0.2}]},
+        options:{responsive:true,maintainAspectRatio:false,
+          plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,backgroundColor:'#21262d',borderColor:'#444c56',borderWidth:1,titleColor:'#e6edf3',bodyColor:'#8b949e',padding:10}},
+          scales:{
+            x:{ticks:{color:'#8b949e',font:{size:10},maxRotation:0,maxTicksLimit:8},grid:{color:'rgba(48,54,61,0.6)'}},
+            y:{ticks:{color:'#8b949e',font:{size:10},maxTicksLimit:5},grid:{color:ctx=>ctx.tick.value===0?'rgba(139,148,158,0.7)':'rgba(48,54,61,0.6)'},border:{dash:ctx=>ctx.tick.value===0?[4,3]:[]}}
+          }}});}
+    }
   }catch(e){console.error('rates:',e);}
 }
 
@@ -1499,9 +1508,18 @@ function updateSignalPanel(data){
   }
   if(data.sofr){
     const v=data.sofr;
-    const col=v<4.5?'#3fb950':v>5.0?'#f85149':'#d29922';
-    setSig('rates',v.toFixed(2)+'%',v<4.5?'SOFR 안정. 단기자금 정상 작동.':v>5.0?'SOFR 상승. 단기금리 압박.':'SOFR 중립 수준.',65,col);
-    scores.push(v<4.5?2:v>5.0?0:1);
+    const iorb=data.iorb||null;
+    let col,desc,score;
+    if(iorb!=null){
+      const sp=+((v-iorb)*100).toFixed(1); // bp
+      col=sp<-3?'#3fb950':sp>0?'#f85149':'#d29922';
+      desc=sp<-3?'SOFR < IORB ('+sp+'bp). 담보자금 여유 — 정상.':sp>0?'SOFR > IORB (+'+sp+'bp). 담보금리 상승 — 경계.':'SOFR ≈ IORB ('+sp+'bp). 스프레드 축소 — 주시.';
+      score=sp<-3?2:sp>0?0:1;
+    }else{
+      col='#d29922';desc='IORB 데이터 로딩 중...';score=1;
+    }
+    setSig('rates',v.toFixed(2)+'%',desc,65,col);
+    scores.push(score);
   }
   if(data.dts){
     const net=data.dts.net;
@@ -1769,7 +1787,7 @@ function switchLCLoR(mode,btn){
 
 async function loadAll(){
   document.getElementById('ts').textContent='업데이트 중...';
-  _sigData={};
+  _sigData={};_srfData=null;
   await Promise.all([loadNL(),loadRates(),loadH41(),loadSOMA(),loadM2(),loadDTS(),loadQRA(),loadTIC()]);
   _updateSignals();
   const kst=new Date(Date.now()+9*3600*1000);
