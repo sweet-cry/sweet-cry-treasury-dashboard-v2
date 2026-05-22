@@ -432,7 +432,7 @@ tr:hover td{background:var(--surf2)}
         <div style="position:relative;height:240px"><canvas id="ustChart"></canvas></div>
       </div>
       <div class="cc">
-        <div class="ct">Discount Window 추이 <span style="font-size:10px;color:#484f58">(DISCBORR)</span></div>
+        <div class="ct">Discount Window 추이 <span style="font-size:10px;color:#484f58">(DISCBORR · 5년)</span></div>
         <div class="leg"><span><span class="ld" style="background:#d29922"></span>DW (B$)</span></div>
         <div style="position:relative;height:240px"><canvas id="dwChart"></canvas></div>
       </div>
@@ -928,7 +928,7 @@ function h41Status(isoDate){
 
 async function loadH41(){
   try{
-    const[ust,mbs,dw]=await Promise.all([fred('TREAST',900),fred('WSHOMCB',900),fred('DISCBORR',900)]);
+    const[ust,mbs,dw]=await Promise.all([fred('TREAST',900),fred('WSHOMCB',900),fred('DISCBORR',260)]);
     const lu=last(ust),lm=last(mbs),ld=last(dw);
     if(lu){document.getElementById('c-ust').textContent=B(lu.v*1e6);document.getElementById('c-ust-d').textContent=h41Status(lu.date);}
     if(lm){document.getElementById('c-mbs').textContent=B(lm.v*1e6);document.getElementById('c-mbs-d').textContent=h41Status(lm.date);}
