@@ -86,6 +86,25 @@ tr:hover td{background:var(--surf2)}
 .badge-green{background:rgba(63,185,80,.15);color:var(--green)}
 .badge-red{background:rgba(248,81,73,.15);color:var(--red)}
 .badge-blue{background:rgba(88,166,255,.15);color:var(--blue)}
+.badge-amber{background:rgba(210,153,34,.15);color:var(--amber)}
+/* QT gauge */
+.qt-gauge{background:var(--surf);border:1px solid var(--brd);border-radius:var(--rl);padding:16px 18px;margin-bottom:14px}
+.qt-title{font-size:12px;font-weight:600;color:var(--tx);margin-bottom:12px}
+.qt-row{display:flex;flex-direction:column;gap:3px;margin-bottom:10px}
+.qt-head{display:flex;justify-content:space-between;align-items:baseline}
+.qt-label{font-size:12px;color:var(--muted)}
+.qt-val{font-size:12px;font-weight:600}
+.qt-bar-bg{height:9px;background:var(--surf2);border-radius:5px;overflow:hidden}
+.qt-bar-fill{height:100%;border-radius:5px;transition:width .5s}
+.qt-foot{display:flex;justify-content:space-between;font-size:10px;color:#484f58;margin-top:2px}
+.qt-interp{font-size:10px;color:var(--muted);background:var(--bg);border-radius:6px;padding:6px 10px;margin-top:8px;line-height:1.6;border-left:3px solid var(--brd)}
+/* SOMA ladder */
+.ladder-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--surf2)}
+.ladder-row:last-child{border-bottom:none}
+.ladder-lbl{font-size:11px;color:var(--muted);width:50px;flex-shrink:0}
+.ladder-bar-bg{flex:1;height:7px;background:var(--surf2);border-radius:4px;overflow:hidden}
+.ladder-bar-fill{height:100%;border-radius:4px;transition:width .5s}
+.ladder-amt{font-size:11px;font-weight:600;width:58px;text-align:right;flex-shrink:0}
 
 /* divider */
 .divider{height:1px;background:var(--brd);margin:20px 0}
@@ -385,22 +404,67 @@ tr:hover td{background:var(--surf2)}
     <div class="sec">
       <div class="stitle">H.4.1 — 연준 대차대조표</div>
       <div class="cards">
-        <div class="card"><div class="cl">UST 보유 <button class="ib" onclick="tip('ust',this)">i</button></div><div class="cv" id="c-ust">—</div><div class="cs" id="c-ust-d">TREAST</div></div>
-        <div class="card"><div class="cl">MBS 보유 <button class="ib" onclick="tip('mbs',this)">i</button></div><div class="cv" id="c-mbs">—</div><div class="cs" id="c-mbs-d">MBST</div></div>
-        <div class="card"><div class="cl">BTFP <button class="ib" onclick="tip('btfp',this)">i</button></div><div class="cv" id="c-btfp">—</div><div class="cs" id="c-btfp-d">BTFP</div></div>
+        <div class="card"><div class="cl">UST 보유 <span class="badge badge-blue" style="margin-left:2px">QT 진행</span></div><div class="cv" id="c-ust">—</div><div class="cs" id="c-ust-d">TREAST</div></div>
+        <div class="card"><div class="cl">MBS 보유 <button class="ib" onclick="tip('mbs',this)">i</button></div><div class="cv" id="c-mbs">—</div><div class="cs" id="c-mbs-d">WSHOMCB</div></div>
         <div class="card"><div class="cl">Discount Window <button class="ib" onclick="tip('dw',this)">i</button></div><div class="cv" id="c-dw">—</div><div class="cs" id="c-dw-d">DISCBORR</div></div>
+        <div class="card"><div class="cl">UST 월간 감소</div><div class="cv" id="c-ust-chg">—</div><div class="cs" id="c-ust-chg-d">상한 $25B 대비 —</div></div>
       </div>
+    </div>
+    <!-- QT 속도 게이지 -->
+    <div class="qt-gauge">
+      <div class="qt-title">QT 진행 속도 — 월별 감소폭 vs 상한</div>
+      <div class="qt-row">
+        <div class="qt-head"><span class="qt-label">국채 (UST) 감소</span><span class="qt-val" id="c-qt-ust-val" style="color:var(--amber)">— / 상한 25B$</span></div>
+        <div class="qt-bar-bg"><div class="qt-bar-fill" id="qt-bar-ust" style="width:0%;background:var(--amber)"></div></div>
+        <div class="qt-foot"><span>0</span><span>상한 $25B</span></div>
+      </div>
+      <div class="qt-row">
+        <div class="qt-head"><span class="qt-label">MBS 감소 <span style="font-size:10px;color:#484f58">(자연감소)</span></span><span class="qt-val" id="c-qt-mbs-val" style="color:var(--green)">— / 상한 35B$</span></div>
+        <div class="qt-bar-bg"><div class="qt-bar-fill" id="qt-bar-mbs" style="width:0%;background:var(--green)"></div></div>
+        <div class="qt-foot"><span>0</span><span>상한 $35B</span></div>
+      </div>
+      <div class="qt-interp" id="c-qt-interp">데이터 로딩 중...</div>
     </div>
     <div class="two">
       <div class="cc">
-        <div class="ct">UST · MBS 보유 추이</div>
+        <div class="ct">UST · MBS 보유 추이 <span style="font-size:10px;color:#484f58">(전체 · 2009~)</span></div>
         <div class="leg"><span><span class="ld" style="background:#58a6ff"></span>UST</span><span><span class="ld" style="background:#3fb950"></span>MBS</span></div>
         <div style="position:relative;height:240px"><canvas id="ustChart"></canvas></div>
       </div>
       <div class="cc">
-        <div class="ct">BTFP · Discount Window</div>
-        <div class="leg"><span><span class="ld" style="background:#f85149"></span>BTFP</span><span><span class="ld" style="background:#d29922"></span>DW</span></div>
-        <div style="position:relative;height:240px"><canvas id="btfpChart"></canvas></div>
+        <div class="ct">Discount Window 추이 <span style="font-size:10px;color:#484f58">(DISCBORR)</span></div>
+        <div class="leg"><span><span class="ld" style="background:#d29922"></span>DW (B$)</span></div>
+        <div style="position:relative;height:240px"><canvas id="dwChart"></canvas></div>
+      </div>
+    </div>
+    <!-- SOMA 보유 구조 -->
+    <div class="sec" style="margin-top:4px"><div class="stitle">SOMA 보유 구조 <span class="badge badge-blue" style="margin-left:6px">NY Fed</span></div></div>
+    <div class="two" style="margin-bottom:14px">
+      <div class="cc">
+        <div class="ct">UST 잔존만기 구간별 분포 <span style="font-size:10px;color:#484f58">(B$)</span></div>
+        <div style="margin-top:10px">
+          <div class="ladder-row"><span class="ladder-lbl">~1Y</span><div class="ladder-bar-bg"><div class="ladder-bar-fill" id="lb-lt1y" style="width:0%;background:var(--amber)"></div></div><span class="ladder-amt" id="la-lt1y" style="color:var(--amber)">—</span></div>
+          <div class="ladder-row"><span class="ladder-lbl">1~3Y</span><div class="ladder-bar-bg"><div class="ladder-bar-fill" id="lb-y1to3" style="width:0%;background:var(--blue)"></div></div><span class="ladder-amt" id="la-y1to3" style="color:var(--blue)">—</span></div>
+          <div class="ladder-row"><span class="ladder-lbl">3~5Y</span><div class="ladder-bar-bg"><div class="ladder-bar-fill" id="lb-y3to5" style="width:0%;background:var(--blue)"></div></div><span class="ladder-amt" id="la-y3to5" style="color:var(--blue)">—</span></div>
+          <div class="ladder-row"><span class="ladder-lbl">5~7Y</span><div class="ladder-bar-bg"><div class="ladder-bar-fill" id="lb-y5to7" style="width:0%;background:#388bfd"></div></div><span class="ladder-amt" id="la-y5to7" style="color:#388bfd">—</span></div>
+          <div class="ladder-row"><span class="ladder-lbl">7~10Y</span><div class="ladder-bar-bg"><div class="ladder-bar-fill" id="lb-y7to10" style="width:0%;background:#388bfd"></div></div><span class="ladder-amt" id="la-y7to10" style="color:#388bfd">—</span></div>
+          <div class="ladder-row"><span class="ladder-lbl">10~20Y</span><div class="ladder-bar-bg"><div class="ladder-bar-fill" id="lb-y10to20" style="width:0%;background:#3d444d"></div></div><span class="ladder-amt" id="la-y10to20" style="color:var(--muted)">—</span></div>
+          <div class="ladder-row"><span class="ladder-lbl">20Y+</span><div class="ladder-bar-bg"><div class="ladder-bar-fill" id="lb-gt20y" style="width:0%;background:#3d444d"></div></div><span class="ladder-amt" id="la-gt20y" style="color:var(--muted)">—</span></div>
+        </div>
+        <div class="qt-interp" id="c-soma-wam" style="margin-top:10px">가중평균 잔존만기: —</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="cc" style="flex:1">
+          <div class="ct">향후 12개월 월별 만기 <span style="font-size:10px;color:#484f58">(B$ · 빨강=캡 초과)</span></div>
+          <div style="position:relative;height:160px"><canvas id="somaMonthlyChart"></canvas></div>
+          <div class="qt-interp" id="c-soma-12m" style="margin-top:8px">12개월 합계: —</div>
+        </div>
+        <div class="cc" style="flex:1">
+          <div class="ct">MBS 발행기관 비중</div>
+          <div class="ladder-row"><span class="ladder-lbl" style="width:74px">Fannie (FNMA)</span><div class="ladder-bar-bg"><div class="ladder-bar-fill" id="mb-fnma" style="width:0%;background:var(--blue)"></div></div><span class="ladder-amt" id="ma-fnma" style="color:var(--blue)">—</span></div>
+          <div class="ladder-row"><span class="ladder-lbl" style="width:74px">Freddie (FHLMC)</span><div class="ladder-bar-bg"><div class="ladder-bar-fill" id="mb-fhlmc" style="width:0%;background:var(--blue)"></div></div><span class="ladder-amt" id="ma-fhlmc" style="color:var(--blue)">—</span></div>
+          <div class="ladder-row"><span class="ladder-lbl" style="width:74px">Ginnie (GNMA)</span><div class="ladder-bar-bg"><div class="ladder-bar-fill" id="mb-gnma" style="width:0%;background:var(--green)"></div></div><span class="ladder-amt" id="ma-gnma" style="color:var(--green)">—</span></div>
+        </div>
       </div>
     </div>
   </div>
@@ -864,23 +928,107 @@ function h41Status(isoDate){
 
 async function loadH41(){
   try{
-    const[ust,mbs,btfp,dw]=await Promise.all([fred('TREAST',60),fred('WSHOMCB',60),fred('H41RESPPALDKNWW',60),fred('WLCFLL',60)]);
-    const lu=last(ust),lm=last(mbs),lb=last(btfp),ld=last(dw);
+    const[ust,mbs,dw]=await Promise.all([fred('TREAST',900),fred('WSHOMCB',900),fred('DISCBORR',900)]);
+    const lu=last(ust),lm=last(mbs),ld=last(dw);
     if(lu){document.getElementById('c-ust').textContent=B(lu.v*1e6);document.getElementById('c-ust-d').textContent=h41Status(lu.date);}
     if(lm){document.getElementById('c-mbs').textContent=B(lm.v*1e6);document.getElementById('c-mbs-d').textContent=h41Status(lm.date);}
-    if(lb){document.getElementById('c-btfp').textContent=B(lb.v*1e6);document.getElementById('c-btfp-d').textContent=h41Status(lb.date);}
     if(ld){document.getElementById('c-dw').textContent=B(ld.v*1e6);document.getElementById('c-dw-d').textContent=h41Status(ld.date);}
+    // UST 월간 감소 (최근 4주 평균)
+    if(ust.length>=5){
+      const recent=ust.slice(-5);
+      const ustChgB=(recent[0].v-recent[4].v)/1e3; // millions→billions, 4주 감소
+      const chgEl=document.getElementById('c-ust-chg');
+      const chgDs=document.getElementById('c-ust-chg-d');
+      if(chgEl){chgEl.textContent=(ustChgB<0?'':'-')+Math.abs(ustChgB).toFixed(0)+'B$';chgEl.className='cv '+(ustChgB<=0?'dn':'up');}
+      const capPct=Math.round(Math.abs(ustChgB)/25*100);
+      if(chgDs)chgDs.textContent='상한 $25B 대비 '+capPct+'%';
+      // QT 게이지
+      const ustPct=Math.min(Math.round(Math.abs(ustChgB)/25*100),100);
+      const el1=document.getElementById('qt-bar-ust'),ev1=document.getElementById('c-qt-ust-val');
+      if(el1)el1.style.width=ustPct+'%';
+      if(ev1)ev1.textContent='-'+Math.abs(ustChgB).toFixed(0)+'B$ / 상한 25B$';
+    }
+    if(mbs.length>=5){
+      const recent=mbs.slice(-5);
+      const mbsChgB=(recent[0].v-recent[4].v)/1e3;
+      const mbsPct=Math.min(Math.round(Math.abs(mbsChgB)/35*100),100);
+      const el2=document.getElementById('qt-bar-mbs'),ev2=document.getElementById('c-qt-mbs-val');
+      if(el2)el2.style.width=mbsPct+'%';
+      if(ev2)ev2.textContent='-'+Math.abs(mbsChgB).toFixed(0)+'B$ / 상한 35B$';
+    }
+    const qtInterp=document.getElementById('c-qt-interp');
+    if(qtInterp&&ust.length>=5&&mbs.length>=5){
+      const ustChgB=(ust.slice(-5)[0].v-ust.slice(-5)[4].v)/1e3;
+      const mbsChgB=(mbs.slice(-5)[0].v-mbs.slice(-5)[4].v)/1e3;
+      const ustPct=Math.round(Math.abs(ustChgB)/25*100);
+      qtInterp.textContent='UST 월간 감소 '+Math.abs(ustChgB).toFixed(0)+'B$ — 상한($25B)의 '+ustPct+'% 소화 중 · MBS 자연상환 '+Math.abs(mbsChgB).toFixed(0)+'B$'+(ustPct<50?' ⚠ UST 감소 속도 저하 — QT 사실상 둔화 신호':'');
+    }
+    // 차트 — 연도 레이블 처리
+    const ustLabels=ust.map((x,i)=>{
+      if(i===0)return x.date.slice(0,4);
+      return ust[i-1].date.slice(0,4)!==x.date.slice(0,4)?x.date.slice(0,4):x.date.slice(5);
+    });
     const mbsM={};mbs.forEach(x=>mbsM[x.date]=x.v);
-    mk('ustChart','line',ust.map(x=>x.date.slice(5)),[
+    mk('ustChart','line',ustLabels,[
       {label:'UST',data:ust.map(x=>x.v),borderColor:'#58a6ff',backgroundColor:'rgba(88,166,255,0.06)',borderWidth:2,pointRadius:0,fill:true,tension:0.3},
       {label:'MBS',data:ust.map(x=>mbsM[x.date]||null),borderColor:'#3fb950',backgroundColor:'rgba(63,185,80,0.06)',borderWidth:2,pointRadius:0,fill:true,tension:0.3}
     ]);
-    const dwM={};dw.forEach(x=>dwM[x.date]=x.v);
-    mk('btfpChart','line',btfp.map(x=>x.date.slice(5)),[
-      {label:'BTFP',data:btfp.map(x=>x.v),borderColor:'#f85149',backgroundColor:'rgba(248,81,73,0.06)',borderWidth:2,pointRadius:0,fill:true,tension:0.3},
-      {label:'DW',data:btfp.map(x=>dwM[x.date]||null),borderColor:'#d29922',borderWidth:1.5,pointRadius:0,tension:0.3}
+    const dwLabels=dw.map((x,i)=>{
+      if(i===0)return x.date.slice(0,4);
+      return dw[i-1].date.slice(0,4)!==x.date.slice(0,4)?x.date.slice(0,4):x.date.slice(5);
+    });
+    mk('dwChart','line',dwLabels,[
+      {label:'DW',data:dw.map(x=>x.v),borderColor:'#d29922',backgroundColor:'rgba(210,153,34,0.06)',borderWidth:2,pointRadius:0,fill:true,tension:0.3}
     ]);
   }catch(e){console.error('h41:',e);}
+}
+
+async function loadSOMA(){
+  try{
+    const d=await fetch('/api/soma').then(r=>r.json());
+    if(d.error){console.warn('soma:',d.error);return;}
+    // UST 만기 래더
+    const b=d.ust.buckets;
+    const keys=['lt1y','y1to3','y3to5','y5to7','y7to10','y10to20','gt20y'];
+    const maxB=Math.max(...keys.map(k=>b[k]||0));
+    keys.forEach(k=>{
+      const pct=maxB>0?Math.round((b[k]||0)/maxB*100):0;
+      const bEl=document.getElementById('lb-'+k);
+      const aEl=document.getElementById('la-'+k);
+      if(bEl)bEl.style.width=pct+'%';
+      if(aEl)aEl.textContent=Math.round(b[k]||0)+'B$';
+    });
+    const wamEl=document.getElementById('c-soma-wam');
+    if(wamEl)wamEl.textContent='가중평균 잔존만기: '+d.ust.wamYears+'년 · 1년 내 만기: '+Math.round(b.lt1y||0)+'B$ (총 보유의 '+Math.round((b.lt1y||0)/(d.ust.totalB||1)*100)+'%)';
+    // 월별 만기 차트
+    const monthly=d.ust.monthly||{};
+    const today=new Date();
+    const moLabels=[],moData=[],moColors=[];
+    for(let i=0;i<12;i++){
+      const dt=new Date(today.getFullYear(),today.getMonth()+i,1);
+      const key=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0');
+      const val=Math.round(monthly[key]||0);
+      moLabels.push(String(dt.getMonth()+1).padStart(2,'0')+'/'+String(dt.getFullYear()).slice(2));
+      moData.push(val);
+      moColors.push(val>25?'#f85149':'#58a6ff');
+    }
+    mk('somaMonthlyChart','bar',moLabels,[{label:'만기(B$)',data:moData,backgroundColor:moColors,borderRadius:3,borderSkipped:false}]);
+    const total12=moData.reduce((s,v)=>s+v,0);
+    const m12El=document.getElementById('c-soma-12m');
+    if(m12El)m12El.textContent='12개월 합계: '+total12+'B$ · 월평균: '+Math.round(total12/12)+'B$ · 캡 초과월: '+moData.filter(v=>v>25).length+'개월';
+    // MBS 발행기관
+    const ag=d.mbs.byAgency||{};
+    const totalMBS=(ag.FNMA||0)+(ag.FHLMC||0)+(ag.GNMA||0)+(ag.OTHER||0);
+    if(totalMBS>0){
+      [['fnma','FNMA'],['fhlmc','FHLMC'],['gnma','GNMA']].forEach(([id,key])=>{
+        const pct=Math.round((ag[key]||0)/totalMBS*100);
+        const bEl=document.getElementById('mb-'+id);
+        const aEl=document.getElementById('ma-'+id);
+        if(bEl)bEl.style.width=pct+'%';
+        if(aEl)aEl.textContent=Math.round(ag[key]||0)+'B$ ('+pct+'%)';
+      });
+    }
+  }catch(e){console.error('soma:',e);}
 }
 
 async function loadM2(){
@@ -1580,7 +1728,7 @@ function switchLCLoR(mode,btn){
 async function loadAll(){
   document.getElementById('ts').textContent='업데이트 중...';
   _sigData={};
-  await Promise.all([loadNL(),loadRates(),loadH41(),loadM2(),loadDTS(),loadQRA(),loadTIC()]);
+  await Promise.all([loadNL(),loadRates(),loadH41(),loadSOMA(),loadM2(),loadDTS(),loadQRA(),loadTIC()]);
   _updateSignals();
   const kst=new Date(Date.now()+9*3600*1000);
   document.getElementById('ts').textContent='업데이트: '+kst.toISOString().slice(0,16).replace('T',' ')+' KST';
