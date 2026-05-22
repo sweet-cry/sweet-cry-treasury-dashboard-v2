@@ -862,8 +862,8 @@ async function loadNL(){
       {label:'RRP',data:w.map(x=>rM[x.date]||null),borderColor:'#d29922',borderWidth:1.5,pointRadius:0,tension:0.3}
     ]);
     if(res.length)mk('resChart','line',res.map(x=>x.date.slice(5)),[
-      {label:'준비금',data:res.map(x=>x.v),borderColor:'#3fb950',backgroundColor:'rgba(63,185,80,0.06)',borderWidth:2,pointRadius:0,fill:true,tension:0.3},
-      {label:'LCLoR',data:res.map(()=>3000),borderColor:'#f85149',borderWidth:1,borderDash:[5,4],pointRadius:0}
+      {label:'준비금 (B$)',data:res.map(x=>+(x.v/1000).toFixed(1)),borderColor:'#3fb950',backgroundColor:'rgba(63,185,80,0.06)',borderWidth:2,pointRadius:0,fill:true,tension:0.3},
+      {label:'LCLoR ~$3T',data:res.map(()=>3000),borderColor:'#f85149',borderWidth:1,borderDash:[5,4],pointRadius:0}
     ]);
 
     // 테이블: 일간 TGA 기준 (주말·공휴일 제외 영업일)
