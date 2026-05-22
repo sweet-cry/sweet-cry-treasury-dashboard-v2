@@ -438,7 +438,13 @@ tr:hover td{background:var(--surf2)}
       </div>
     </div>
     <!-- SOMA 보유 구조 -->
-    <div class="sec" style="margin-top:4px"><div class="stitle">SOMA 보유 구조 <span class="badge badge-blue" style="margin-left:6px">NY Fed</span></div></div>
+    <div class="sec" style="margin-top:4px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <div class="stitle">SOMA 보유 구조 <span class="badge badge-blue" style="margin-left:6px">NY Fed</span></div>
+      <div style="display:flex;gap:10px;font-size:11px">
+        <a href="https://www.newyorkfed.org/markets/soma-holdings" target="_blank" style="color:var(--blue);text-decoration:none">SOMA Holdings ↗</a>
+        <a href="https://markets.newyorkfed.org/soma/dataDownload.html" target="_blank" style="color:var(--muted);text-decoration:none">데이터 다운로드 ↗</a>
+      </div>
+    </div>
     <div class="two" style="margin-bottom:14px">
       <div class="cc">
         <div class="ct">UST 잔존만기 구간별 분포 <span style="font-size:10px;color:#484f58">(B$)</span></div>
@@ -1016,8 +1022,14 @@ async function loadSOMA(){
       if(aEl)aEl.textContent=Math.round(b[k]||0)+'B$';
     });
     const wamEl=document.getElementById('c-soma-wam');
-    const wamNote=isEst?'⚠ 추정값 · NY Fed API 접근 제한':'기준일: '+(d.asOfDate||'');
-    if(wamEl)wamEl.textContent=wamNote+' · WAM: '+d.ust.wamYears+'년 · 1년 내 만기: '+Math.round(b.lt1y||0)+'B$ ('+Math.round((b.lt1y||0)/(d.ust.totalB||1)*100)+'%)';
+    const wamBody=' · WAM: '+d.ust.wamYears+'년 · 1년 내 만기: '+Math.round(b.lt1y||0)+'B$ ('+Math.round((b.lt1y||0)/(d.ust.totalB||1)*100)+'%)';
+    if(wamEl){
+      if(isEst){
+        wamEl.innerHTML='⚠ 추정값 (NY Fed API 접근 제한)'+wamBody+' — <a href="https://www.newyorkfed.org/markets/soma-holdings" target="_blank" style="color:var(--blue)">실제 데이터 확인 ↗</a>';
+      }else{
+        wamEl.textContent='기준일: '+(d.asOfDate||'')+wamBody;
+      }
+    }
     const monthly=d.ust.monthly||{};
     const today=new Date();
     const moLabels=[],moData=[],moColors=[];
