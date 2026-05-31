@@ -783,7 +783,10 @@ function mk(id,type,labels,datasets,ex={}){
 
 async function fred(s,n=90,f=''){
   let u=`/api/fred?series=${s}&count=${n}`;if(f)u+=`&freq=${f}`;
-  const r=await fetch(u);const d=await r.json();
+  const r=await fetch(u);
+  if(r.status===503||r.status===429){console.warn('FRED rate limit:',s);return[];}
+  const d=await r.json();
+  if(d.error_code===429){console.warn('FRED rate limit (body):',s);return[];}
   if(!d.observations)return[];
   return d.observations.filter(o=>o.value!=='.').map(o=>({date:o.date,v:parseFloat(o.value)})).reverse();
 }
