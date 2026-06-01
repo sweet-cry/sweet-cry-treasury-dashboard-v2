@@ -1809,7 +1809,12 @@ function switchLCLoR(mode,btn){
 async function loadAll(){
   document.getElementById('ts').textContent='업데이트 중...';
   _sigData={};_srfData=null;
-  await Promise.all([loadNL(),loadRates(),loadH41(),loadSOMA(),loadM2(),loadDTS(),loadQRA(),loadTIC()]);
+  // 1단계: 핵심 지표 (NL·금리·H41) — 신호 패널에 필요
+  await Promise.all([loadNL(), loadRates(), loadDTS()]);
+  _updateSignals();
+  // 2단계: 보조 지표 — 0.5초 간격 후 (rate limit 완화)
+  await new Promise(r=>setTimeout(r,500));
+  await Promise.all([loadH41(), loadSOMA(), loadM2(), loadQRA(), loadTIC()]);
   _updateSignals();
   const kst=new Date(Date.now()+9*3600*1000);
   document.getElementById('ts').textContent='업데이트: '+kst.toISOString().slice(0,16).replace('T',' ')+' KST';
