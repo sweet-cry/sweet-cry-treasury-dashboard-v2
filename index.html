@@ -377,8 +377,8 @@ tr:hover td{background:var(--surf2)}
         <div id="srf-reason" style="font-size:11px;color:var(--muted)">로딩 중...</div>
       </div>
       <div style="font-size:10px;color:var(--muted);line-height:1.5;max-width:240px;border-left:1px solid var(--brd);padding-left:10px">
-        GREEN: SRF=0 + SOFR≤IORB · 여유<br>
-        YELLOW: 잔액 발생 또는 스프레드 축소 · 주의<br>
+        GREEN: SRF=0 + 스프레드≤-3bp · 여유<br>
+        YELLOW: 잔액 발생 또는 스프레드&gt;-3bp · 주의<br>
         RED: SRF&gt;$10B 또는 스프레드&gt;+5bp · 경고
       </div>
     </div>
@@ -1491,7 +1491,7 @@ const TIPS={
 'srf-7d':['SRF 7일 누적','계산값','최근 7영업일 SRF 이용 총액. 일회성 vs 구조적 압박 구분 용도.','단일일 $5B는 세금·경매일 영향일 수 있으나 7일 누적 $20B↑은 지속적 담보 희소성 신호.'],
 'sofr-iorb-bp':['SOFR − IORB 스프레드','FRED 계산','(SOFR - IORB) × 100 bp. IORB는 은행 예치금 하한, SOFR은 실거래 담보 금리.','정상 상태 = SOFR < IORB (담보 이점). 음수 -3~-5bp 건강 / 0 근접 경계 / 양수 레포 경직. 2019.9 직전 8월부터 +2~5bp 부풀림 패턴 주의.'],
 'sofr99-gap':['SOFR 99퍼센타일 갭','FRED SOFR99','SOFR 99퍼센타일 - 중앙값 (bp). SOFR 분포의 꼬리 압력 측정.','평균이 잠잠해도 상위 1% 거래 금리가 튀면 특정 딜러 대상 자금 경색. 5bp 이하 정상 / 10bp↑ 특정 참여자 제약 / 20bp↑ 시스템 위기 전조.'],
-'srf-signal':['SRF 신호등','종합 판정','SRF 이용액 + SOFR-IORB 스프레드 종합 판정.','GREEN: SRF=0 + SOFR≤IORB (여유). YELLOW: 잔액 발생 또는 스프레드 축소 (주의). RED: SRF>$10B 또는 스프레드>+5bp (2019.9 재현 경고).'],
+'srf-signal':['SRF 신호등','종합 판정','SRF 이용액 + SOFR-IORB 스프레드 종합 판정. 상단 신호 판독 요약의 단기금리 칸과 같은 임계값을 쓴다.','GREEN: SRF=0 + 스프레드≤-3bp (여유). YELLOW: 잔액 발생 또는 스프레드>-3bp (주의) — 0bp 근처는 이미 노랑이다. RED: SRF>$10B 또는 스프레드>+5bp (2019.9 재현 경고).'],
 'srf-shock':['과거 repo 쇼크 비교','FRED 과거 데이터','쇼크일 day 0 기준 ±30일 SOFR-IORB 오버레이. 세 사건 모두 쇼크 전 스프레드 점진 상승 공통.','2019-09-17: 법인세+경매 정산 중복, +282bp 스파이크 → SRF 상설화 계기. 2020-03-15: COVID dash for cash, +60bp. 2023-03-13: SVB, +24bp (SRF 첫 실전, 제한적).'],
 'lclor-gauge':['LCLoR 근접도 게이지','계산값','준비금이 Lowest Comfortable Level of Reserves에 얼마나 근접했는지 0~100% 측정. Abundant<40 / Ample<70 / Approaching<85 / Scarce.','Scarce 접근 시 SRF 이용·SOFR 스파이크 발생 → Fed QT 종료 트리거. 2024.6 Fed가 70% 근처에서 QT taper 50% 감속 전례.'],
 'lclor-calc':['근접도 계산식','수식','reserves ≥ upper×1.3 → 0% / reserves=upper → 40% / reserves=lower → 85% / reserves ≤ lower×0.9 → 100%. 구간별 선형 보간.','Fed 기준: lower=$2,800B, upper=$3,200B (파월 커뮤니케이션). GDP 기준: lower=GDP×8%, upper=lower×1.15 (NY Fed Afonso et al. 프레임).'],
@@ -1563,9 +1563,13 @@ function updateSignalPanel(data){
     let col,desc,score;
     if(iorb!=null){
       const sp=+((v-iorb)*100).toFixed(1); // bp
-      col=sp<-3?'#3fb950':sp>0?'#f85149':'#d29922';
-      desc=sp<-3?'SOFR < IORB ('+sp+'bp). 담보자금 여유 — 정상.':sp>0?'SOFR > IORB (+'+sp+'bp). 담보금리 상승 — 경계.':'SOFR ≈ IORB ('+sp+'bp). 스프레드 축소 — 주시.';
-      score=sp<-3?2:sp>0?0:1;
+      // 임계값은 '금리·자금시장' 탭 SRF 신호등과 같은 값을 쓴다(green≤-3 / red>+5).
+      // 예전엔 여기만 +0bp 초과를 곧장 빨강으로 봐서, 같은 스프레드를 두고
+      // 상단 신호판은 빨강·SRF 신호등은 노랑으로 갈리는 구간(0<sp≤5)이 있었다.
+      // 월말·분기말엔 +1~2bp가 흔해 그 기준으로는 경보가 상시 켜진다.
+      col=sp<=-3?'#3fb950':sp>5?'#f85149':'#d29922';
+      desc=sp<=-3?'SOFR < IORB ('+sp+'bp). 담보자금 여유 — 정상.':sp>5?'SOFR > IORB (+'+sp+'bp). 레포 경직 — 경고.':(sp>0?'SOFR > IORB (+'+sp+'bp). 담보금리 상승 — 주의.':'SOFR ≈ IORB ('+sp+'bp). 스프레드 축소 — 주시.');
+      score=sp<=-3?2:sp>5?0:1;
     }else{
       col='#d29922';desc='IORB 데이터 로딩 중...';score=1;
     }
@@ -1792,7 +1796,7 @@ async function loadRatesSRF(){
     _srfData={srf,spread};
     // 신호등
     let lv='green',reason='SRF 미이용, 스프레드 여유 — 정상';
-    if(srf_last>10||(si_bp!=null&&si_bp>5)){lv='red';reason='SRF 대규모 이용 또는 SOFR-IORB 양수 — 경고';}
+    if(srf_last>10||(si_bp!=null&&si_bp>5)){lv='red';reason='SRF 대규모 이용 또는 SOFR-IORB +5bp 초과 — 경고';}
     else if(srf_last>0||(si_bp!=null&&si_bp>-3)){lv='yellow';reason='SRF 잔액 발생 또는 스프레드 축소 — 주의';}
     const light=document.getElementById('srf-light');
     if(light){light.className='';light.classList.add(lv);}
