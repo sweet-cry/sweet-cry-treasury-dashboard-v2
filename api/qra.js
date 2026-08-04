@@ -53,6 +53,8 @@ export default async function handler(req, res) {
       else if (t==='TIPS') qMap[key].tips += amt;
       else if (t==='FRN')  qMap[key].frn  += amt;
       qMap[key].total += amt;
+      // planned는 사실상 항상 0이다 — auctions_query에는 미래 행이 한 건도 없다.
+      // 예정 물량은 아래 upcoming_auctions에서 따로 받는다. 프론트는 이 값을 쓰지 않는다.
       if (x.auction_date > todayStr) qMap[key].planned += amt;
     }
     const quarters = Object.values(qMap).sort((a,b) => a.q.localeCompare(b.q));

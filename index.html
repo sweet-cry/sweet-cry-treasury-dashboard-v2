@@ -583,7 +583,7 @@ tr:hover td{background:var(--surf2)}
     </div>
     <!-- 이번 분기 요약 — 직선 게이지 -->
     <div class="sec" style="margin-top:14px">
-      <div class="stitle">이번 분기 계획 <span id="qraQtrLabel" style="font-size:12px;color:var(--muted);font-weight:400"></span></div>
+      <div class="stitle">이번 분기 발행 실적 <span id="qraQtrLabel" style="font-size:12px;color:var(--muted);font-weight:400"></span></div>
       <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;margin-top:12px">
         <!-- 좌: 총액 + NL 시그널 -->
         <div style="min-width:150px">
@@ -1164,7 +1164,9 @@ async function loadQRA(){
     if(d.quarters&&d.quarters.length){
       const qtrs=d.quarters.slice(-7); // 최근 7분기
       const todayQ=(()=>{const n=new Date();return`${n.getFullYear()}-Q${Math.ceil((n.getMonth()+1)/3)}`;})();
-      document.getElementById('qraQtrNote').textContent='— 음영 분기는 예정 포함';
+      // 이 차트는 '실제로 열린 경매'만 쌓는다. 예정분은 auctions_query에 아예 없어
+      // (별도 upcoming_auctions 소관) 진행 중인 분기의 막대는 항상 짧게 보인다.
+      document.getElementById('qraQtrNote').textContent='— 경매 실시분 누계 · 예정분 미포함';
       try{mk('qraQtrChart','bar',qtrs.map(q=>q.q),[
         {label:'T-Bill', data:qtrs.map(q=>Math.round(q.bill)), backgroundColor:'rgba(88,166,255,0.75)', stack:'s'},
         {label:'Notes',  data:qtrs.map(q=>Math.round(q.note)), backgroundColor:'rgba(63,185,80,0.75)',  stack:'s'},
@@ -1184,9 +1186,11 @@ async function loadQRA(){
         const t=cur.total||1;
         const billPct=cur.bill/t*100, notePct=cur.note/t*100;
         const bondPct=cur.bond/t*100, tipsPct=(cur.tips+cur.frn)/t*100;
-        document.getElementById('qraQtrLabel').textContent=cur.q+(cur.planned>0?' (일부 예정)':'');
+        // planned는 구조적으로 항상 0이다 — auctions_query는 확정된 '결과' 전용이라
+        // 미래 행이 한 건도 없다. 예정 포함인 척하는 분기를 만들지 말고 누계임을 밝힌다.
+        document.getElementById('qraQtrLabel').textContent=cur.q+' 누계';
         document.getElementById('c-qra-total').textContent=N(Math.round(cur.total))+'B$';
-        document.getElementById('c-qra-total-cs').textContent=cur.planned>0?`예정 ${N(Math.round(cur.planned))}B$ 포함`:'실적 기준';
+        document.getElementById('c-qra-total-cs').textContent='경매 실시분 · 예정분 미포함';
         // 바 너비
         document.getElementById('qra-bar-bill').style.width=billPct.toFixed(1)+'%';
         document.getElementById('qra-bar-note').style.width=notePct.toFixed(1)+'%';
@@ -1617,15 +1621,7 @@ const FIXED_EVENTS = [
   {y:2027,m:4,d:15,type:'tax',name:'Tax Day — 개인소득세 + Q1 추정세',badge:'eb-tax'},
   {y:2027,m:6,d:15,type:'tax',name:'Q2 추정세 납부 (6/15)',badge:'eb-tax'},
   {y:2027,m:9,d:15,type:'tax',name:'Q3 추정세 납부 (9/15)',badge:'eb-tax'},
-  // ===== QRA 2026 (분기별 발표: 통상 2월·5월·8월·11월 첫째 주) =====
-  {y:2026,m:4,d:27,type:'qra',name:'QRA 분기 차입 수요 발표',badge:'eb-qra'},
-  {y:2026,m:4,d:29,type:'qra',name:'QRA 리펀딩 상세 발표',badge:'eb-qra'},
-  {y:2026,m:7,d:27,type:'qra',name:'QRA 분기 차입 수요 발표 (Q3)',badge:'eb-qra'},
-  {y:2026,m:7,d:29,type:'qra',name:'QRA 리펀딩 상세 발표 (Q3)',badge:'eb-qra'},
-  {y:2026,m:11,d:2,type:'qra',name:'QRA 분기 차입 수요 발표 (Q4)',badge:'eb-qra'},
-  {y:2026,m:11,d:4,type:'qra',name:'QRA 리펀딩 상세 발표 (Q4)',badge:'eb-qra'},
-  {y:2027,m:2,d:1,type:'qra',name:'QRA 분기 차입 수요 발표 (Q1)',badge:'eb-qra'},
-  {y:2027,m:2,d:3,type:'qra',name:'QRA 리펀딩 상세 발표 (Q1)',badge:'eb-qra'}
+  // ===== QRA는 하드코딩하지 않는다 → genQRAEvents() 참조 =====
 ];
 
 // 주말이면 다음 영업일로 이월 (토→월, 일→월)
@@ -1683,12 +1679,36 @@ function genH41Events(startY, endY) {
   return out;
 }
 
-// 런타임에 현재 연도 기준 ±2년치 생성 (H.4.1·국채만기)
+// 분기 리펀딩(QRA)은 2·5·8·11월 '첫째 수요일' 8:30am ET에 리펀딩 성명이,
+// 같은 주 월요일 3:00pm ET에 분기 차입 수요 추정이 나온다.
+// 하드코딩하던 시절 Q2·Q3가 그 달 FOMC 날짜(4/28~29·7/28~29)로 잘못 박혀 있어
+// 실제 발표일(2026-05-06·2026-08-05)이 캘린더에서 통째로 빠져 있었다.
+// Q4(11/2·11/4)와 2027 Q1(2/1·2/3)만 맞았고, 그 뒤로는 항목 자체가 없었다.
+function genQRAEvents(startY, endY) {
+  const out = [];
+  for (let y = startY; y <= endY; y++) {
+    for (const m of [2, 5, 8, 11]) {
+      const wed = new Date(y, m-1, 1);
+      while (wed.getDay() !== 3) wed.setDate(wed.getDate() + 1);   // 그 달 첫 수요일
+      // 월요일은 setDate로 뺀다 — ms 연산은 DST 경계(11월 첫 주)에서 한 시간 어긋난다
+      const mon = new Date(wed); mon.setDate(wed.getDate() - 2);
+      const q = 'Q' + Math.ceil(m/3);   // 2월=Q1 · 5월=Q2 · 8월=Q3 · 11월=Q4
+      out.push({y:mon.getFullYear(), m:mon.getMonth()+1, d:mon.getDate(),
+                type:'qra', name:'QRA 분기 차입 수요 발표 ('+q+')', badge:'eb-qra'});
+      out.push({y:wed.getFullYear(), m:wed.getMonth()+1, d:wed.getDate(),
+                type:'qra', name:'QRA 리펀딩 상세 발표 ('+q+')', badge:'eb-qra'});
+    }
+  }
+  return out;
+}
+
+// 런타임에 현재 연도 기준 ±2년치 생성 (H.4.1·국채만기·QRA)
 const _curY = new Date().getFullYear();
 const FISCAL_EVENTS = [
   ...FIXED_EVENTS,
   ...genH41Events(_curY - 1, _curY + 3),
-  ...genMaturityEvents(_curY - 1, _curY + 3)
+  ...genMaturityEvents(_curY - 1, _curY + 3),
+  ...genQRAEvents(_curY - 1, _curY + 3)
 ];
 
 const _calNow=new Date(); let calYear=_calNow.getFullYear(), calMonth=_calNow.getMonth()+1;
