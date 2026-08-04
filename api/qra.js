@@ -1,5 +1,24 @@
 export const config = { runtime: "nodejs" };
 
+// TIPS·FRN은 security_type이 'Note'/'Bond'로 내려오므로 전용 플래그로 되살린다
+function classify(x) {
+  if (x.inflation_index_security === 'Yes') return 'TIPS';
+  if (x.floating_rate === 'Yes') return 'FRN';
+  return x.security_type;
+}
+
+// 낙찰 지표는 증권 종류마다 다른 필드로 온다. high_yield 하나만 읽으면
+//   Bill : 항상 null → 표의 대부분이 '—'
+//   FRN  : 항상 null (실제 낙찰은 할인마진)
+//   TIPS : 값은 있으나 '실질'금리라 명목물과 같은 칸에서 오독된다
+function auctionRate(x, type) {
+  const num = v => { const n = parseFloat(v); return isNaN(n) ? null : n; };
+  if (type === 'Bill') return { v: num(x.high_investment_rate), kind: 'bey' };    // 채권등가수익률
+  if (type === 'FRN')  return { v: num(x.high_discnt_margin),   kind: 'margin' }; // 할인마진(%)
+  if (type === 'TIPS') return { v: num(x.high_yield),           kind: 'real' };
+  return { v: num(x.high_yield), kind: 'nominal' };
+}
+
 export default async function handler(req, res) {
   try {
     const today = new Date();
@@ -7,7 +26,10 @@ export default async function handler(req, res) {
     const future = new Date(today.getTime() + 90*24*3600*1000).toISOString().slice(0,10);
     const past   = new Date(today.getTime() - 600*24*3600*1000).toISOString().slice(0,10); // ~20개월
 
-    const fields = 'security_type,security_term,offering_amt,auction_date,high_yield,bid_to_cover_ratio';
+    // security_type은 TIPS·FRN도 'Note'/'Bond'로 내려온다. 실제 구분은 아래 두 플래그로만 가능하며,
+    // 이를 빼면 10년 TIPS 실질금리(예: 2.438%)가 명목 10년물 낙찰금리로 표시된다.
+    const fields = 'security_type,security_term,offering_amt,auction_date,high_yield,bid_to_cover_ratio'
+                 + ',inflation_index_security,floating_rate,high_investment_rate,high_discnt_margin';
     const url = `https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/auctions_query`
       + `?fields=${fields}&filter=auction_date:gte:${past},auction_date:lte:${future}`
       + `&sort=auction_date&page[size]=2000`;
@@ -24,7 +46,7 @@ export default async function handler(req, res) {
       const [y, m] = x.auction_date.split('-').map(Number);
       const key = `${y}-Q${Math.ceil(m/3)}`;
       if (!qMap[key]) qMap[key] = { q: key, bill:0, note:0, bond:0, tips:0, frn:0, total:0, planned:0 };
-      const t = x.security_type;
+      const t = classify(x);
       if (t==='Bill') qMap[key].bill += amt;
       else if (t==='Note') qMap[key].note += amt;
       else if (t==='Bond') qMap[key].bond += amt;
@@ -35,28 +57,49 @@ export default async function handler(req, res) {
     }
     const quarters = Object.values(qMap).sort((a,b) => a.q.localeCompare(b.q));
 
-    // 향후 90일 예정
-    const upcoming = rows
-      .filter(x => x.auction_date > todayStr)
-      .map(x => ({
-        date: x.auction_date,
-        type: x.security_type,
-        term: x.security_term,
-        amount: Math.round(parseFloat(x.offering_amt)/1e9)
-      }));
+    // 향후 예정 경매
+    // auctions_query에는 미래 행이 존재하지 않는다(확정된 경매 '결과' 전용).
+    // 예정분은 별도 데이터셋 upcoming_auctions에서 받아야 하며, 발행액은 통상 경매 2일 전
+    // 공고라 대부분 null로 온다. 여기서 실패해도 나머지 QRA 지표는 살린다.
+    let upcoming = [];
+    try {
+      const upUrl = `https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/upcoming_auctions`
+        + `?filter=auction_date:gt:${todayStr}&sort=auction_date&page[size]=100`;
+      const upRes = await fetch(upUrl, { headers: { Accept: "application/json" } });
+      const upData = await upRes.json();
+      upcoming = (upData.data || []).map(x => {
+        const amt = parseFloat(x.offering_amt);
+        return {
+          date: x.auction_date,
+          type: x.security_type,
+          term: x.security_term,
+          amount: isNaN(amt) ? null : Math.round(amt / 1e9),
+          reopening: x.reopening === 'Yes'
+        };
+      });
+    } catch (e) {
+      upcoming = [];
+    }
 
     // 최근 30일 경매 (응찰률 포함)
     const past30 = new Date(today.getTime()-30*24*3600*1000).toISOString().slice(0,10);
+    // 최신순으로 내려보낸다 — 화면에서 상위 N건만 자르는 표가 있어 오름차순이면 가장 오래된 건만 보인다
     const recent = rows
       .filter(x => x.auction_date >= past30 && x.auction_date <= todayStr)
-      .map(x => ({
-        date: x.auction_date,
-        type: x.security_type,
-        term: x.security_term,
-        amount: Math.round(parseFloat(x.offering_amt)/1e9),
-        yield: x.high_yield,
-        btc: x.bid_to_cover_ratio
-      }));
+      .map(x => {
+        const type = classify(x);
+        const rate = auctionRate(x, type);
+        return {
+          date: x.auction_date,
+          type,
+          term: x.security_term,
+          amount: Math.round(parseFloat(x.offering_amt)/1e9),
+          yield: rate.v,
+          yieldKind: rate.kind,
+          btc: x.bid_to_cover_ratio
+        };
+      })
+      .sort((a, b) => b.date.localeCompare(a.date));
 
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Cache-Control", "s-maxage=3600");

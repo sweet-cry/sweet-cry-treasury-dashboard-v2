@@ -10,7 +10,7 @@ function getCacheMaxAge(series) {
   const hourET = (now.getUTCHours() - 4 + 24) % 24;  // ET = UTC-4 (DST 기준 근사)
 
   // H.4.1 주간 지표
-  const weeklyH41 = ['WALCL','TREAST','WSHOMCB','H41RESPPALDKNWW','WLCFLL','WRESBAL','WDTGAL'];
+  const weeklyH41 = ['WALCL','TREAST','WSHOMCB','H41RESPPALDKNWW','WLCFLL','WLCFLPCL','WRESBAL','WDTGAL'];
   if (weeklyH41.includes(series)) {
     // 목요일 16:30 ET ~ 금요일 10:00 ET: 짧은 캐시 (10분)
     if ((day === 4 && hourET >= 16) || (day === 5 && hourET < 10)) return 600;
@@ -18,7 +18,7 @@ function getCacheMaxAge(series) {
   }
 
   // 일간 지표 (SOFR, IORB, SP500, RRPONTSYD 등)
-  const daily = ['SOFR','IORB','DTB3','EFFR','T10Y2Y','SP500','RRPONTSYD','RPONTSYD','SOFR99','DISCBORR'];
+  const daily = ['SOFR','IORB','DTB3','EFFR','T10Y2Y','SP500','RRPONTSYD','RPONTSYD','SOFR99'];
   if (daily.includes(series)) {
     // 17:00~20:00 ET (FRED 일간 업데이트 직후): 5분
     if (hourET >= 17 && hourET < 20) return 300;

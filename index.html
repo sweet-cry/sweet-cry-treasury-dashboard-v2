@@ -87,6 +87,7 @@ tr:hover td{background:var(--surf2)}
 .badge-red{background:rgba(248,81,73,.15);color:var(--red)}
 .badge-blue{background:rgba(88,166,255,.15);color:var(--blue)}
 .badge-amber{background:rgba(210,153,34,.15);color:var(--amber)}
+.badge-purple{background:rgba(163,113,247,.15);color:var(--purple)}
 /* QT gauge */
 .qt-gauge{background:var(--surf);border:1px solid var(--brd);border-radius:var(--rl);padding:16px 18px;margin-bottom:14px}
 .qt-title{font-size:12px;font-weight:600;color:var(--tx);margin-bottom:12px}
@@ -402,13 +403,13 @@ tr:hover td{background:var(--surf2)}
   <!-- ── H41 ── -->
   <div id="t-h41" style="display:none">
 
-  <div class="tdesc"><div class="tdesc-hdr"><div class="tdesc-icon">H41</div><div><div class="tdesc-title">H.4.1 — 연준 대차대조표 상세</div><div class="tdesc-src">TREAST · MBST · BTFP · DISCBORR · FRED 주간</div></div></div><div class="tdesc-body">매주 수요일 기준 대차대조표, 목요일 16:30 ET 발표 (FRED 반영은 통상 목 저녁~금 오전). UST·MBS 감소 추세로 QT 진행 속도 확인. BTFP는 2023년 SVB 사태 대응 긴급 창구로 현재 잔액 소멸 진행 중. Discount Window 잔액 급등 시 특정 은행의 유동성 압박 또는 광범위한 시장 스트레스 신호.</div><div class="tdesc-tags"><span class="tdesc-tag b">QT 속도 주시</span><span class="tdesc-tag g">BTFP 만료 확인</span><span class="tdesc-tag r">DW 급증 = 위기</span><span class="tdesc-tag ">MBS 감소 완만</span><span class="tdesc-tag a">주간 발표</span></div><div class="tdesc-rels"><span><span style="color:#58a6ff">→</span> UST 감소 둔화 = QT 종료 신호</span><span><span style="color:#f85149">→</span> DW 급등 = 은행 스트레스</span><span><span style="color:#3fb950">→</span> BTFP 0 = 은행권 안정</span></div><div class="tdesc-links"><a class="tdesc-link" href="https://fred.stlouisfed.org/series/TREAST" target="_blank">TREAST ↗</a><a class="tdesc-link" href="https://fred.stlouisfed.org/series/MBST" target="_blank">MBST ↗</a><a class="tdesc-link" href="https://fred.stlouisfed.org/series/BTFP" target="_blank">BTFP ↗</a><a class="tdesc-link" href="https://fred.stlouisfed.org/series/DISCBORR" target="_blank">DISCBORR ↗</a><a class="tdesc-link" href="https://www.federalreserve.gov/releases/h41/" target="_blank">H.4.1 원문 ↗</a></div></div>
+  <div class="tdesc"><div class="tdesc-hdr"><div class="tdesc-icon">H41</div><div><div class="tdesc-title">H.4.1 — 연준 대차대조표 상세</div><div class="tdesc-src">TREAST · WSHOMCB · H41RESPPALDKNWW · WLCFLPCL · FRED 주간</div></div></div><div class="tdesc-body">매주 수요일 기준 대차대조표, 목요일 16:30 ET 발표 (FRED 반영은 통상 목 저녁~금 오전). UST·MBS 감소 추세로 QT 진행 속도 확인. BTFP는 2023년 SVB 사태 대응 긴급 창구로 현재 잔액 소멸 진행 중. Discount Window 잔액 급등 시 특정 은행의 유동성 압박 또는 광범위한 시장 스트레스 신호.</div><div class="tdesc-tags"><span class="tdesc-tag b">QT 속도 주시</span><span class="tdesc-tag g">BTFP 만료 확인</span><span class="tdesc-tag r">DW 급증 = 위기</span><span class="tdesc-tag ">MBS 감소 완만</span><span class="tdesc-tag a">주간 발표</span></div><div class="tdesc-rels"><span><span style="color:#58a6ff">→</span> UST 감소 둔화 = QT 종료 신호</span><span><span style="color:#f85149">→</span> DW 급등 = 은행 스트레스</span><span><span style="color:#3fb950">→</span> BTFP 0 = 은행권 안정</span></div><div class="tdesc-links"><a class="tdesc-link" href="https://fred.stlouisfed.org/series/TREAST" target="_blank">TREAST ↗</a><a class="tdesc-link" href="https://fred.stlouisfed.org/series/WSHOMCB" target="_blank">WSHOMCB ↗</a><a class="tdesc-link" href="https://fred.stlouisfed.org/series/H41RESPPALDKNWW" target="_blank">BTFP ↗</a><a class="tdesc-link" href="https://fred.stlouisfed.org/series/WLCFLPCL" target="_blank">WLCFLPCL ↗</a><a class="tdesc-link" href="https://www.federalreserve.gov/releases/h41/" target="_blank">H.4.1 원문 ↗</a></div></div>
     <div class="sec">
       <div class="stitle">H.4.1 — 연준 대차대조표</div>
       <div class="cards">
         <div class="card"><div class="cl">UST 보유 <span class="badge badge-blue" style="margin-left:2px">QT 진행</span></div><div class="cv" id="c-ust">—</div><div class="cs" id="c-ust-d">TREAST</div></div>
         <div class="card"><div class="cl">MBS 보유 <button class="ib" onclick="tip('mbs',this)">i</button></div><div class="cv" id="c-mbs">—</div><div class="cs" id="c-mbs-d">WSHOMCB</div></div>
-        <div class="card"><div class="cl">Discount Window <button class="ib" onclick="tip('dw',this)">i</button></div><div class="cv" id="c-dw">—</div><div class="cs" id="c-dw-d">DISCBORR</div></div>
+        <div class="card"><div class="cl">Discount Window <button class="ib" onclick="tip('dw',this)">i</button></div><div class="cv" id="c-dw">—</div><div class="cs" id="c-dw-d">WLCFLPCL</div></div>
         <div class="card"><div class="cl">UST 월간 감소</div><div class="cv" id="c-ust-chg">—</div><div class="cs" id="c-ust-chg-d">상한 $25B 대비 —</div></div>
       </div>
     </div>
@@ -434,7 +435,7 @@ tr:hover td{background:var(--surf2)}
         <div style="position:relative;height:240px"><canvas id="ustChart"></canvas></div>
       </div>
       <div class="cc">
-        <div class="ct">Discount Window 추이 <span style="font-size:10px;color:#484f58">(DISCBORR · 5년)</span></div>
+        <div class="ct">Discount Window 추이 <span style="font-size:10px;color:#484f58">(WLCFLPCL · 5년)</span></div>
         <div class="leg"><span><span class="ld" style="background:#d29922"></span>DW (B$)</span></div>
         <div style="position:relative;height:240px"><canvas id="dwChart"></canvas></div>
       </div>
@@ -794,13 +795,18 @@ const last=a=>a&&a.length?a[a.length-1]:null;
 
 async function loadNL(){
   try{
-    const[w, dtsRes, r, s, res]=await Promise.all([
+    const[w, dtsRes, rRaw, s, res]=await Promise.all([
       fred('WALCL',90),
       fetch('/api/dts').then(x=>x.json()),
       fred('RRPONTSYD',90),
       fred('SP500',500),
       fred('WRESBAL',90)
     ]);
+
+    // RRPONTSYD의 FRED 단위는 '십억$'이고 WALCL·TGA·WRESBAL은 '백만$'다.
+    // 그대로 섞으면 RRP만 1000배 작게 들어가 NL이 과대계상되고(RRP $2.5T 시절엔 오차도 그만큼),
+    // RRP 카드는 'B$'가 아니라 'M$'로, 30일 표의 RRP 열은 전부 0으로 찍힌다.
+    const r=rRaw.map(x=>({date:x.date,v:x.v*1000}));
 
     // 일간 TGA 잔액 (DTS operating_cash_balance)
     const tDaily=(dtsRes.tga||[])
@@ -825,29 +831,43 @@ async function loadNL(){
       return arr.length?arr[arr.length-1].v:lt.v;
     };
 
-    const rM={};r.forEach(x=>rM[x.date]=x.v);
     // 주간 TGA map (차트용)
     const tM={};tWeeklyArr.forEach(x=>tM[x.date]=x.v);
 
-    // 최신 NL (WALCL 기준)
-    const latestTga=getTga(lw.date);
-    const latestRrp=rM[lw.date]!=null?rM[lw.date]:lr.v;
-    const nlV=lw.v-latestTga-latestRrp;
-    const prevW=w.length>1?w[w.length-2]:null;
-    const dod=prevW?(nlV-(prevW.v-getTga(prevW.date)-(rM[prevW.date]!=null?rM[prevW.date]:lr.v))):0;
-    _sigData.nl={val:B(nlV*1e6),dod:dod*1e6};
+    // 세 구성요소를 임의 날짜에서 맞춰주는 forward-fill 헬퍼 (WALCL은 주간이라 필수)
+    const getWalcl=date=>{const a=w.filter(x=>x.date<=date);return a.length?a[a.length-1].v:lw.v;};
+    const getRrp=date=>{const a=r.filter(x=>x.date<=date);return a.length?a[a.length-1].v:lr.v;};
+    const nlFromDate=date=>getWalcl(date)-getTga(date)-getRrp(date);
+
+    // 헤드라인 기준일 — 일간 구성요소(TGA·RRP)가 둘 다 존재하는 가장 최근 날짜.
+    // 예전에는 NL을 WALCL 발표일로 계산하면서 카드에는 각 계열의 '최신값'을 따로 띄웠다.
+    // 그래서 화면의 WALCL − TGA − RRP가 헤드라인 NL과 맞지 않았다(서로 다른 날짜의 값이라).
+    const asOf=[lt.date,lr.date].sort()[0];
+    const walclV=getWalcl(asOf), tgaV=getTga(asOf), rrpV=getRrp(asOf);
+    const nlV=walclV-tgaV-rrpV;
+
+    // 변화폭은 5영업일(=7일 전 대비). 1일 변화는 TGA 스윙만으로 중앙값 ±21B$를 오가 방향 신호로 못 쓴다.
+    const [ay,am,ad]=asOf.split('-').map(Number);
+    const pD=new Date(ay,am-1,ad-7);
+    const p2d=n=>String(n).padStart(2,'0');
+    const prevDate=pD.getFullYear()+'-'+p2d(pD.getMonth()+1)+'-'+p2d(pD.getDate());
+    const wow=nlV-nlFromDate(prevDate);
+    _sigData.nl={val:B(nlV*1e6),wow:wow/1000,asOf};   // wow 단위: 십억$
 
     document.getElementById('c-nl').textContent=B(nlV*1e6);
     const de=document.getElementById('c-nl-dod');
-    de.textContent=(dod>=0?'▲':'▼')+B(Math.abs(dod)*1e6)+' DoD';
-    de.className='cs '+(dod>=0?'up':'dn');
-    document.getElementById('c-walcl').textContent=B(lw.v*1e6);document.getElementById('c-walcl-d').textContent=lw.date;
+    de.textContent=(wow>=0?'▲':'▼')+B(Math.abs(wow)*1e6)+' 주간 · 기준 '+asOf;
+    de.className='cs '+(wow>=0?'up':'dn');
+    // 아래 세 카드는 모두 asOf 기준값 — 그래야 화면에서 WALCL − TGA − RRP = NL이 성립한다.
+    // WALCL만 주간 발표라 실제 관측일(lw.date)을 함께 밝힌다.
+    document.getElementById('c-walcl').textContent=B(walclV*1e6);
+    document.getElementById('c-walcl-d').textContent=lw.date+(lw.date!==asOf?' (주간·유지)':'');
     const thW=document.getElementById('th-walcl');const thT=document.getElementById('th-tga');const thR=document.getElementById('th-rrp');
     if(thW)thW.textContent=lw.date.slice(5);
     if(thT)thT.textContent=lt.date.slice(5);
     if(thR)thR.textContent=lr.date.slice(5);
-    document.getElementById('c-tga').textContent=B(lt.v*1e6);document.getElementById('c-tga-d').textContent=lt.date;
-    document.getElementById('c-rrp').textContent=B(lr.v*1e6);document.getElementById('c-rrp-d').textContent=lr.date;
+    document.getElementById('c-tga').textContent=B(tgaV*1e6);document.getElementById('c-tga-d').textContent=asOf;
+    document.getElementById('c-rrp').textContent=B(rrpV*1e6);document.getElementById('c-rrp-d').textContent=asOf;
     const lr2=last(res);
     if(lr2){document.getElementById('c-res').textContent=B(lr2.v*1e6);const rd=document.getElementById('c-res-d');rd.textContent=lr2.v<3000?'⚠ LCLoR 근접':lr2.date;if(lr2.v<3000)rd.className='cs dn';}
 
@@ -856,13 +876,13 @@ async function loadNL(){
     const getSpx=date=>{const f=spSorted.filter(x=>x.date<=date);return f.length?f[f.length-1].v:null;};
     const wDates=w.map(x=>x.date.slice(5));
     mk('nlChart','line',wDates,[
-      {label:'NL',data:w.map(x=>x.v-getTga(x.date)-(rM[x.date]!=null?rM[x.date]:lr.v)),borderColor:'#58a6ff',backgroundColor:'rgba(88,166,255,0.06)',borderWidth:2,pointRadius:0,fill:true,tension:0.3},
+      {label:'NL',data:w.map(x=>nlFromDate(x.date)),borderColor:'#58a6ff',backgroundColor:'rgba(88,166,255,0.06)',borderWidth:2,pointRadius:0,fill:true,tension:0.3},
       {label:'SPX',data:w.map(x=>getSpx(x.date)),borderColor:'#f85149',borderWidth:1.5,pointRadius:0,tension:0.3,yAxisID:'y2'}
     ],{y2:true});
     mk('compChart','line',wDates,[
       {label:'WALCL',data:w.map(x=>x.v),borderColor:'#58a6ff',borderWidth:1.5,pointRadius:0,tension:0.3},
       {label:'TGA',data:w.map(x=>getTga(x.date)),borderColor:'#f85149',borderWidth:1.5,pointRadius:0,tension:0.3},
-      {label:'RRP',data:w.map(x=>rM[x.date]||null),borderColor:'#d29922',borderWidth:1.5,pointRadius:0,tension:0.3}
+      {label:'RRP',data:w.map(x=>getRrp(x.date)),borderColor:'#d29922',borderWidth:1.5,pointRadius:0,tension:0.3}
     ]);
     if(res.length)mk('resChart','line',res.map(x=>x.date.slice(5)),[
       {label:'준비금 (B$)',data:res.map(x=>+(x.v/1000).toFixed(1)),borderColor:'#3fb950',backgroundColor:'rgba(63,185,80,0.06)',borderWidth:2,pointRadius:0,fill:true,tension:0.3},
@@ -871,24 +891,14 @@ async function loadNL(){
 
     // 테이블: 일간 TGA 기준 (주말·공휴일 제외 영업일)
     const wMap={};w.forEach(x=>wMap[x.date]=x.v);
-    const getWalcl=date=>{
-      const arr=w.filter(x=>x.date<=date);
-      return arr.length?arr[arr.length-1].v:lw.v;
-    };
     // 일간 TGA가 있으면 일간, 없으면 주간 기준
     const tDates=tDaily.length
       ? tDaily.slice(-30).reverse()
       : tWeeklyArr.slice(-30).reverse();
-    const nlFromDate=date=>{
-      const wv=getWalcl(date);
-      const tv=getTga(date);
-      const rv=rM[date]||lr.v;
-      return wv-tv-rv;
-    };
     document.getElementById('nlTbody').innerHTML=tDates.map((x,i)=>{
       const wv=getWalcl(x.date);
       const tv=getTga(x.date);
-      const rv=rM[x.date]!=null?rM[x.date]:lr.v;
+      const rv=getRrp(x.date);
       const n2=wv-tv-rv;
       const px=tDates[i+1];
       const d2=px?n2-nlFromDate(px.date):0;
@@ -950,7 +960,8 @@ function h41Status(isoDate){
 
 async function loadH41(){
   try{
-    const[ust,mbs,dw]=await Promise.all([fred('TREAST',900),fred('WSHOMCB',900),fred('DISCBORR',260)]);
+    // DW는 WLCFLPCL(Primary Credit, 주간·백만$). 구 DISCBORR은 2020-08 중단 + 단위가 십억$라 1000배 어긋났다
+    const[ust,mbs,dw]=await Promise.all([fred('TREAST',900),fred('WSHOMCB',900),fred('WLCFLPCL',260)]);
     const lu=last(ust),lm=last(mbs),ld=last(dw);
     if(lu){document.getElementById('c-ust').textContent=B(lu.v*1e6);document.getElementById('c-ust-d').textContent=h41Status(lu.date);}
     if(lm){document.getElementById('c-mbs').textContent=B(lm.v*1e6);document.getElementById('c-mbs-d').textContent=h41Status(lm.date);}
@@ -1021,23 +1032,31 @@ async function loadH41(){
 }
 
 async function loadSOMA(){
-  // NY Fed SOMA API는 외부 접근 차단 → /api/soma (서버사이드) 시도 후 추정값 폴백
-  // 추정값: 2026년 Fed 공개 보고 기반 (SOMA Annual Report, H.4.1 supplemental data)
-  const FALLBACK={
-    note:'추정값 (NY Fed SOMA API 접근 제한 — 2026년 1분기 Fed 공개 보고 기반)',
-    ust:{
-      buckets:{lt1y:210,y1to3:620,y3to5:790,y5to7:660,y7to10:830,y10to20:620,gt20y:670},
-      monthly:{'2026-05':28,'2026-06':52,'2026-07':31,'2026-08':44,'2026-09':22,
-               '2026-10':38,'2026-11':61,'2026-12':25,'2027-01':42,'2027-02':55,'2027-03':19,'2027-04':48},
-      totalB:4400, wamYears:7.8
-    },
-    mbs:{byAgency:{FNMA:990,FHLMC:680,GNMA:510}}
-  };
-  function renderSOMA(d,isEst){
+  // SOMA는 /api/soma(서버사이드)가 NY Fed 원본을 집계한다.
+  // 실패 시 수치를 지어내지 않고 결측으로 표기한다 — 과거 폴백 추정값은 실제와 크게 어긋났다
+  // (1년 내 만기 210B로 표기했으나 실측 990B).
+  const SOMA_BUCKETS=['lt1y','y1to3','y3to5','y5to7','y7to10','y10to20','gt20y'];
+  function somaFailed(msg){
+    SOMA_BUCKETS.forEach(k=>{
+      const bEl=document.getElementById('lb-'+k),aEl=document.getElementById('la-'+k);
+      if(bEl)bEl.style.width='0%';
+      if(aEl)aEl.textContent='—';
+    });
+    ['fnma','fhlmc','gnma'].forEach(id=>{
+      const bEl=document.getElementById('mb-'+id),aEl=document.getElementById('ma-'+id);
+      if(bEl)bEl.style.width='0%';
+      if(aEl)aEl.textContent='—';
+    });
+    const note='⚠ NY Fed SOMA 데이터를 불러오지 못했습니다 — <a href="https://www.newyorkfed.org/markets/soma-holdings" target="_blank" style="color:var(--blue)">원본 확인 ↗</a>';
+    const wamEl=document.getElementById('c-soma-wam');
+    if(wamEl)wamEl.innerHTML=note;
+    const m12El=document.getElementById('c-soma-12m');
+    if(m12El)m12El.textContent='⚠ 데이터 없음 ('+msg+')';
+  }
+  function renderSOMA(d){
     const b=d.ust.buckets;
-    const keys=['lt1y','y1to3','y3to5','y5to7','y7to10','y10to20','gt20y'];
-    const maxB=Math.max(...keys.map(k=>b[k]||0));
-    keys.forEach(k=>{
+    const maxB=Math.max(...SOMA_BUCKETS.map(k=>b[k]||0));
+    SOMA_BUCKETS.forEach(k=>{
       const pct=maxB>0?Math.round((b[k]||0)/maxB*100):0;
       const bEl=document.getElementById('lb-'+k),aEl=document.getElementById('la-'+k);
       if(bEl)bEl.style.width=pct+'%';
@@ -1045,18 +1064,16 @@ async function loadSOMA(){
     });
     const wamEl=document.getElementById('c-soma-wam');
     const wamBody=' · WAM: '+d.ust.wamYears+'년 · 1년 내 만기: '+Math.round(b.lt1y||0)+'B$ ('+Math.round((b.lt1y||0)/(d.ust.totalB||1)*100)+'%)';
-    if(wamEl){
-      if(isEst){
-        wamEl.innerHTML='⚠ 추정값 (NY Fed API 접근 제한)'+wamBody+' — <a href="https://www.newyorkfed.org/markets/soma-holdings" target="_blank" style="color:var(--blue)">실제 데이터 확인 ↗</a>';
-      }else{
-        wamEl.textContent='기준일: '+(d.asOfDate||'')+wamBody;
-      }
-    }
+    if(wamEl)wamEl.textContent='기준일: '+(d.asOfDate||'')+wamBody;
     const monthly=d.ust.monthly||{};
-    const today=new Date();
+    // 12개월 창은 오늘이 아니라 SOMA 기준일의 달부터 잡는다.
+    // 오늘 기준으로 잡으면 기준일이 속한 달(주간 데이터라 최대 1주 과거)이 통째로 빠져
+    // 바로 위에 표시되는 '1년 내 만기' 합계와 어긋나 보인다.
+    const [by,bm]=String(d.asOfDate||'').split('-').map(Number);
+    const base=by?new Date(by,bm-1,1):new Date();
     const moLabels=[],moData=[],moColors=[];
     for(let i=0;i<12;i++){
-      const d2=new Date(today.getFullYear(),today.getMonth()+i,1);
+      const d2=new Date(base.getFullYear(),base.getMonth()+i,1);
       const key=d2.getFullYear()+'-'+String(d2.getMonth()+1).padStart(2,'0');
       const val=Math.round(monthly[key]||0);
       moLabels.push(String(d2.getMonth()+1).padStart(2,'0')+'/'+String(d2.getFullYear()).slice(2));
@@ -1065,7 +1082,7 @@ async function loadSOMA(){
     mk('somaMonthlyChart','bar',moLabels,[{label:'만기(B$)',data:moData,backgroundColor:moColors,borderRadius:3,borderSkipped:false}]);
     const total12=moData.reduce((s,v)=>s+v,0);
     const m12El=document.getElementById('c-soma-12m');
-    if(m12El)m12El.textContent=(isEst?'⚠ 추정 · ':'')+'12개월 합계: '+total12+'B$ · 월평균: '+Math.round(total12/12)+'B$ · 캡 초과월: '+moData.filter(v=>v>25).length+'개월';
+    if(m12El)m12El.textContent='12개월 합계: '+total12+'B$ · 월평균: '+Math.round(total12/12)+'B$ · 캡 초과월: '+moData.filter(v=>v>25).length+'개월';
     const ag=d.mbs.byAgency||{};
     const totalMBS=(ag.FNMA||0)+(ag.FHLMC||0)+(ag.GNMA||0)+(ag.OTHER||0);
     if(totalMBS>0){
@@ -1080,10 +1097,10 @@ async function loadSOMA(){
   try{
     const d=await fetch('/api/soma').then(r=>r.json());
     if(d.error)throw new Error(d.error);
-    renderSOMA(d,false);
+    renderSOMA(d);
   }catch(e){
-    console.warn('soma API 실패, 추정값 사용:',e.message);
-    renderSOMA(FALLBACK,true);
+    console.warn('soma API 실패:',e.message);
+    somaFailed(e.message);
   }
 }
 
@@ -1138,7 +1155,10 @@ async function loadDTS(){
 async function loadQRA(){
   try{
     const r=await fetch('/api/qra');const d=await r.json();
-    const typeBadge=t=>t==='Bill'?'badge badge-blue':t==='Note'?'badge badge-green':t==='Bond'?'badge badge-red':'badge';
+    // TIPS·FRN은 재무부 원본에서 security_type이 'Note'/'Bond'로 내려온다.
+    // /api/qra가 전용 플래그로 재분류해 보내므로 여기서도 별도 색으로 구분한다.
+    const BADGE_CLS={Bill:'badge badge-blue',Note:'badge badge-green',Bond:'badge badge-red',TIPS:'badge badge-amber',FRN:'badge badge-purple'};
+    const typeBadge=t=>BADGE_CLS[t]||'badge';
 
     // ① 분기별 추이 스택 바차트
     if(d.quarters&&d.quarters.length){
@@ -1197,9 +1217,13 @@ async function loadQRA(){
         const now=new Date();
         const qTotal=qEnd-qStart, qElapsed=Math.min(now-qStart,qTotal);
         const qPct=Math.round(qElapsed/qTotal*100);
-        const fmtD=d=>d.toISOString().slice(0,7);
+        // qStart·qEnd·now는 모두 로컬(KST) 기준으로 만든 값이다.
+        // toISOString()은 UTC로 변환하므로 KST 자정 날짜가 하루 앞으로 밀린다
+        // (2026-07-01 00:00 KST → 2026-06-30T15:00Z → '2026-06'으로 오표기).
+        const p2=n=>String(n).padStart(2,'0');
+        const fmtD=d=>d.getFullYear()+'-'+p2(d.getMonth()+1);
         document.getElementById('qra-prog-q').style.width=qPct+'%';
-        document.getElementById('c-qra-qprog-label').textContent=`${qPct}%  (${now.toISOString().slice(5,10).replace('-','/')}까지)`;
+        document.getElementById('c-qra-qprog-label').textContent=`${qPct}%  (${p2(now.getMonth()+1)}/${p2(now.getDate())}까지)`;
         document.getElementById('c-qra-qstart').textContent=fmtD(qStart);
         document.getElementById('c-qra-qend').textContent=fmtD(new Date(qEnd-1));
         // ② 발행 진행도
@@ -1223,26 +1247,36 @@ async function loadQRA(){
     // ③ 향후 예정 경매 테이블
     if(d.upcoming&&d.upcoming.length){
       document.getElementById('qraUpcomingCount').textContent=`— ${d.upcoming.length}건`;
-      document.getElementById('qraUpcoming').innerHTML=d.upcoming.map(x=>
-        `<tr><td>${x.date}</td><td><span class="${typeBadge(x.type)}">${x.type}</span></td><td>${x.term}</td><td>${x.amount}B$</td></tr>`
-      ).join('');
+      document.getElementById('qraUpcoming').innerHTML=d.upcoming.map(x=>{
+        // 발행액은 통상 경매 2일 전 공고 — 그전까지는 미정으로 온다
+        const amt=x.amount!=null?x.amount+'B$':'<span style="color:var(--muted)">미공고</span>';
+        const term=x.term+(x.reopening?' <span style="font-size:10px;color:var(--muted)">재발행</span>':'');
+        return`<tr><td>${x.date}</td><td><span class="${typeBadge(x.type)}">${x.type}</span></td><td>${term}</td><td>${amt}</td></tr>`;
+      }).join('');
     } else {
       document.getElementById('qraUpcoming').innerHTML='<tr><td colspan="4" style="color:var(--muted);text-align:center">예정 경매 없음</td></tr>';
     }
 
-    // ④ 최근 30일 경매 결과
+    // ④ 최근 30일 경매 결과 (/api/qra가 최신순으로 내려준다)
     const recent=d.recent||[];
+    // 낙찰 지표는 종류마다 성격이 달라 단위·기준을 함께 표기해야 나란히 읽을 수 있다.
+    // Bill=채권등가수익률, TIPS=실질금리, FRN=할인마진(bp)
+    const fmtYld=x=>{
+      const v=typeof x.yield==='number'?x.yield:parseFloat(x.yield);
+      if(v==null||isNaN(v))return'—';
+      if(x.yieldKind==='margin')return(v*100).toFixed(1)+'bp';
+      const tag=x.yieldKind==='real'?'실질':x.yieldKind==='bey'?'BEY':'';
+      return v.toFixed(3)+'%'+(tag?' <span style="font-size:9px;color:var(--muted)">'+tag+'</span>':'');
+    };
     document.getElementById('qraTbody').innerHTML=recent.map(x=>{
-      const yld=x.yield&&x.yield!=='null'?parseFloat(x.yield).toFixed(3)+'%':'—';
       const btc=x.btc&&x.btc!=='null'?parseFloat(x.btc).toFixed(2):'—';
-      return`<tr><td>${x.date}</td><td><span class="${typeBadge(x.type)}">${x.type}</span></td><td>${x.term}</td><td>${x.amount}B$</td><td>${yld}</td><td>${btc}</td></tr>`;
+      return`<tr><td>${x.date}</td><td><span class="${typeBadge(x.type)}">${x.type}</span></td><td>${x.term}</td><td>${x.amount}B$</td><td>${fmtYld(x)}</td><td>${btc}</td></tr>`;
     }).join('');
 
-    // ⑤ 캘린더 경매 결과 테이블
+    // ⑤ 캘린더 경매 결과 테이블 — 최신 10건
     const aBody=document.getElementById('auction-tbody');
     if(aBody&&recent.length){
       aBody.innerHTML=recent.slice(0,10).map(x=>{
-        const yld=x.yield&&x.yield!=='null'?parseFloat(x.yield).toFixed(3)+'%':'—';
         const btc=x.btc&&x.btc!=='null'?parseFloat(x.btc).toFixed(2):'—';
         return`<tr><td>${x.date}</td><td><span class="${typeBadge(x.type)}">${x.type}</span></td><td>${x.term}</td><td>${x.amount}B$</td><td>${btc}</td></tr>`;
       }).join('');
@@ -1505,11 +1539,19 @@ function setSig(id,val,desc,pct,color){
 function updateSignalPanel(data){
   const scores=[];
   if(data.nl){
-    const dod=data.nl.dod||0;
-    const col=dod>0?'#3fb950':dod<-100?'#f85149':'#d29922';
-    const pct=Math.min(100,Math.max(20,50+(dod/50)));
-    setSig('nl',data.nl.val,dod>0?'NL 증가 추세. 위험자산 우호 환경.':dod<-100?'NL 감소 추세. 유동성 압박.':'NL 보합. 방향 주시.',pct,col);
-    scores.push(dod>0?2:dod<-100?0:1);
+    // wow 단위는 십억$. 예전에는 달러 단위 값을 -100(달러)과 비교해
+    // 사실상 '부호만' 보는 판정이었고 게이지도 20%/100%로만 튀었다.
+    // 임계 ±50B$는 최근 5영업일 변화폭 중앙값(|Δ|≈70B$) 아래로 잡아 방향은 잡되 잡음은 거른다.
+    const wow=data.nl.wow||0;
+    const up=wow>50, dn=wow<-50;
+    const col=up?'#3fb950':dn?'#f85149':'#d29922';
+    const pct=Math.min(100,Math.max(20,50+wow/3));   // ±150B$가 게이지 양 끝
+    const sign=wow>=0?'+':'';
+    setSig('nl',data.nl.val,
+      (up?'NL 증가 추세. 위험자산 우호 환경.':dn?'NL 감소 추세. 유동성 압박.':'NL 보합. 방향 주시.')
+      +' (5영업일 '+sign+Math.round(wow)+'B$'+(data.nl.asOf?' · 기준 '+data.nl.asOf:'')+')',
+      pct,col);
+    scores.push(up?2:dn?0:1);
   }
   if(data.sofr){
     const v=data.sofr;
