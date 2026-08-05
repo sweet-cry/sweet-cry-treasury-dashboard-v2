@@ -1164,9 +1164,12 @@ async function loadQRA(){
     if(d.quarters&&d.quarters.length){
       const qtrs=d.quarters.slice(-7); // 최근 7분기
       const todayQ=(()=>{const n=new Date();return`${n.getFullYear()}-Q${Math.ceil((n.getMonth()+1)/3)}`;})();
-      // 이 차트는 '실제로 열린 경매'만 쌓는다. 예정분은 auctions_query에 아예 없어
-      // (별도 upcoming_auctions 소관) 진행 중인 분기의 막대는 항상 짧게 보인다.
-      document.getElementById('qraQtrNote').textContent='— 경매 실시분 누계 · 예정분 미포함';
+      // 이 차트는 '공고가 난 경매'를 쌓는다 — 아직 실시 전인 공고분도 이미 들어와 있다.
+      // 빠지는 건 공고 전 물량뿐이라 진행 중인 분기 막대는 분기 말로 갈수록 채워진다.
+      const curAnn=(d.quarters.find(q=>q.q===todayQ)||{}).announced||0;
+      document.getElementById('qraQtrNote').textContent = curAnn>0
+        ? `— 공고 기준 누계 · 이번 분기 미실시 공고분 ${Math.round(curAnn).toLocaleString()}B$ 포함`
+        : '— 공고 기준 누계 · 공고 전 물량 미포함';
       try{mk('qraQtrChart','bar',qtrs.map(q=>q.q),[
         {label:'T-Bill', data:qtrs.map(q=>Math.round(q.bill)), backgroundColor:'rgba(88,166,255,0.75)', stack:'s'},
         {label:'Notes',  data:qtrs.map(q=>Math.round(q.note)), backgroundColor:'rgba(63,185,80,0.75)',  stack:'s'},
@@ -1186,11 +1189,15 @@ async function loadQRA(){
         const t=cur.total||1;
         const billPct=cur.bill/t*100, notePct=cur.note/t*100;
         const bondPct=cur.bond/t*100, tipsPct=(cur.tips+cur.frn)/t*100;
-        // planned는 구조적으로 항상 0이다 — auctions_query는 확정된 '결과' 전용이라
-        // 미래 행이 한 건도 없다. 예정 포함인 척하는 분기를 만들지 말고 누계임을 밝힌다.
-        document.getElementById('qraQtrLabel').textContent=cur.q+' 누계';
+        // total은 '실시분 + 공고분'이다. auctions_query가 공고 즉시 행을 만들기 때문에
+        // 낙찰 전 물량이 이미 섞여 있다 — 어느 쪽인지 밝히지 않으면 실적으로 오독된다.
+        // QRA 쿠폰물이 공고되는 날엔 이 격차가 하루에 100B$ 단위로 벌어진다.
+        const ann=cur.announced||0, done=cur.total-ann;
+        document.getElementById('qraQtrLabel').textContent=cur.q+' 공고 기준 누계';
         document.getElementById('c-qra-total').textContent=N(Math.round(cur.total))+'B$';
-        document.getElementById('c-qra-total-cs').textContent='경매 실시분 · 예정분 미포함';
+        document.getElementById('c-qra-total-cs').textContent = ann>0
+          ? `실시 ${N(Math.round(done))} + 미실시 공고 ${N(Math.round(ann))}B$`
+          : '전액 낙찰 완료 · 공고 전 물량 미포함';
         // 바 너비
         document.getElementById('qra-bar-bill').style.width=billPct.toFixed(1)+'%';
         document.getElementById('qra-bar-note').style.width=notePct.toFixed(1)+'%';

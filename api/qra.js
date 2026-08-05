@@ -45,7 +45,7 @@ export default async function handler(req, res) {
       if (isNaN(amt) || amt <= 0) continue;
       const [y, m] = x.auction_date.split('-').map(Number);
       const key = `${y}-Q${Math.ceil(m/3)}`;
-      if (!qMap[key]) qMap[key] = { q: key, bill:0, note:0, bond:0, tips:0, frn:0, total:0, planned:0 };
+      if (!qMap[key]) qMap[key] = { q: key, bill:0, note:0, bond:0, tips:0, frn:0, total:0, announced:0 };
       const t = classify(x);
       if (t==='Bill') qMap[key].bill += amt;
       else if (t==='Note') qMap[key].note += amt;
@@ -53,16 +53,26 @@ export default async function handler(req, res) {
       else if (t==='TIPS') qMap[key].tips += amt;
       else if (t==='FRN')  qMap[key].frn  += amt;
       qMap[key].total += amt;
-      // planned는 사실상 항상 0이다 — auctions_query에는 미래 행이 한 건도 없다.
-      // 예정 물량은 아래 upcoming_auctions에서 따로 받는다. 프론트는 이 값을 쓰지 않는다.
-      if (x.auction_date > todayStr) qMap[key].planned += amt;
+      // 공고분(= 경매 공고는 났으나 아직 낙찰 전) 분리.
+      //
+      // auctions_query는 확정된 '결과' 전용이 아니다. 재무부가 경매를 공고하는 순간
+      // (통상 실시 2일 전, 리펀딩 쿠폰물은 QRA 당일) 발행액이 채워진 행이 먼저 올라오고
+      // 낙찰 지표 칸만 비어 있다. 즉 total에는 늘 미실시 물량이 섞여 들어온다.
+      // 2026-08-05 기준 미낙찰 3건(당일 17주 72B + 8/6 만기 빌 210B) 282B$가
+      // Q3 합계에 이미 들어 있는데도 화면은 그만큼이 빠져 있다고 적고 있었다.
+      //
+      // 판정은 날짜가 아니라 '낙찰 지표 유무'로 한다. 서버는 UTC라 ET 저녁이면
+      // todayStr이 하루 앞서 가고, 당일 경매는 낙찰 전후가 같은 날짜라 날짜만으론 못 가른다.
+      // 날짜 조건을 함께 두는 건 과거 행에 지표가 빠져 있을 때 공고분으로 새는 걸 막기 위한 것.
+      if (auctionRate(x, t).v == null && x.auction_date >= todayStr) qMap[key].announced += amt;
     }
     const quarters = Object.values(qMap).sort((a,b) => a.q.localeCompare(b.q));
 
     // 향후 예정 경매
-    // auctions_query에는 미래 행이 존재하지 않는다(확정된 경매 '결과' 전용).
-    // 예정분은 별도 데이터셋 upcoming_auctions에서 받아야 하며, 발행액은 통상 경매 2일 전
-    // 공고라 대부분 null로 온다. 여기서 실패해도 나머지 QRA 지표는 살린다.
+    // auctions_query는 공고가 난 뒤에야 행이 생기므로(위 announced 참고) '아직 공고 전'인
+    // 일정까지 보려면 upcoming_auctions가 필요하다. 대신 이쪽은 공고 전 행의 발행액이
+    // null로 온다 — 2026-08-05 QRA 직후 3Y·10Y·30Y가 일정만 잡히고 금액은 null이었다.
+    // 여기서 실패해도 나머지 QRA 지표는 살린다.
     let upcoming = [];
     try {
       const upUrl = `https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/upcoming_auctions`
