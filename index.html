@@ -656,6 +656,48 @@ tr:hover td{background:var(--surf2)}
         </div>
       </div>
     </div>
+    <!-- 재무부 현금잔액(TGA) 경로 — QRA 성명 가이던스 -->
+    <div class="sec" style="margin-top:14px">
+      <div class="stitle">재무부 현금잔액(TGA) 경로 — 성명 가이던스</div>
+      <div id="qra-cash-stale" style="display:none;font-size:11px;color:#f85149;background:rgba(248,81,73,.08);border-left:3px solid #f85149;border-radius:6px;padding:8px 10px;margin-bottom:10px;line-height:1.55"></div>
+      <div class="cards">
+        <div class="card">
+          <div class="cl">현재 TGA</div>
+          <div class="cv" id="c-tgapath-now">—</div>
+          <div class="cs" id="c-tgapath-now-d">—</div>
+        </div>
+        <div class="card">
+          <div class="cl">분기말 가정</div>
+          <div class="cv" id="c-tgapath-qend">—</div>
+          <div class="cs" id="c-tgapath-qend-d">—</div>
+        </div>
+        <div class="card">
+          <div class="cl">고점 전망</div>
+          <div class="cv" style="color:#d29922" id="c-tgapath-peak">—</div>
+          <div class="cs" id="c-tgapath-peak-d">—</div>
+        </div>
+        <div class="card">
+          <div class="cl">고점까지 격차</div>
+          <div class="cv" id="c-tgapath-gap">—</div>
+          <div class="cs" id="c-tgapath-gap-d">—</div>
+        </div>
+      </div>
+      <div style="background:var(--surf);border:1px solid var(--brd);border-radius:var(--rl);padding:14px 16px">
+        <div style="position:relative;height:14px;background:#21262d;border-radius:7px;overflow:hidden">
+          <div id="tgapath-band" style="position:absolute;top:0;bottom:0;left:0;width:0;background:rgba(210,153,34,.25)"></div>
+          <div id="tgapath-now" style="position:absolute;top:0;bottom:0;left:0;width:0;background:linear-gradient(90deg,#1f6feb,#58a6ff);border-radius:7px;transition:width .6s ease"></div>
+          <div id="tgapath-qend-tick" style="position:absolute;top:0;bottom:0;left:0;width:2px;background:#8b949e"></div>
+          <div id="tgapath-peak-tick" style="position:absolute;top:0;bottom:0;left:0;width:2px;background:#d29922"></div>
+        </div>
+        <div class="leg" style="margin-top:9px;margin-bottom:0">
+          <span><span class="ld" style="background:#58a6ff"></span>현재 <b id="tgapath-leg-now" style="color:var(--tx)">—</b></span>
+          <span><span class="ld" style="background:#8b949e"></span>분기말 가정 <b id="tgapath-leg-qend" style="color:var(--tx)">—</b></span>
+          <span><span class="ld" style="background:#d29922"></span>고점 전망 <b id="tgapath-leg-peak" style="color:var(--tx)">—</b></span>
+        </div>
+        <div id="c-tgapath-interp" style="font-size:11px;line-height:1.65;margin-top:11px;padding-top:11px;border-top:1px solid var(--brd);color:#8b949e">—</div>
+        <div id="c-tgapath-note" style="font-size:10px;color:var(--muted);line-height:1.65;margin-top:8px">—</div>
+      </div>
+    </div>
     <!-- 향후 90일 예정 경매 -->
     <div class="sec" style="margin-top:14px">
       <div class="stitle">향후 예정 경매 <span id="qraUpcomingCount" style="font-size:12px;color:var(--muted);font-weight:400"></span></div>
@@ -853,6 +895,9 @@ async function loadNL(){
     const prevDate=pD.getFullYear()+'-'+p2d(pD.getMonth()+1)+'-'+p2d(pD.getDate());
     const wow=nlV-nlFromDate(prevDate);
     _sigData.nl={val:B(nlV*1e6),wow:wow/1000,asOf};   // wow 단위: 십억$
+    // QRA 현금잔액 경로 패널이 쓴다. 원값(백만$)을 그대로 넘긴다 — nl.val은 포맷된 문자열이라 재계산에 못 쓴다.
+    // loadNL은 1단계, loadQRA는 2단계라 순서는 보장된다.
+    _sigData.tga={v:tgaV,asOf,daily:tDaily.some(x=>x.date===asOf)};
 
     document.getElementById('c-nl').textContent=B(nlV*1e6);
     const de=document.getElementById('c-nl-dod');
@@ -1152,7 +1197,86 @@ async function loadDTS(){
   }catch(e){console.error('dts:',e);}
 }
 
+// 재무부 리펀딩 성명의 현금잔액 가이던스.
+// fiscaldata는 경매 데이터만 주고 성명 '본문' 수치는 어떤 API에도 없다 → 원문에서 옮겨 적는다.
+// 분기 1회 갱신이라 다음 성명일을 함께 박아두고, 그날이 지나면 패널이 스스로 스테일을 알린다.
+// (갱신을 잊으면 지난 분기 전망이 현재 전망처럼 보인다 — 하드코딩 전망 박스의 전형적 사고.)
+const QRA_CASH={
+  stmt:'2026-08-05', id:'sb0590',
+  url:'https://home.treasury.gov/news/press-releases/sb0590',
+  next:'2026-11-04',                                   // 성명 말미 "next quarterly refunding announcement"
+  qEnd:950,  qEndLabel:'2026년 9월말',                  // "assuming a $950 billion cash balance at the end of September"
+  peak:1050, peakBand:50,                              // "could peak at $1.05 trillion (plus or minus $50 billion)"
+  peakLabel:'2026년 10월 말', peakEnd:'2026-10-31',
+  bills:'9월 단기물 축소(중순 법인세 유입) → 10월 커브 전반 증액'   // 같은 성명의 빌 발행 계획 = 재축적 재원
+};
+
 async function loadQRA(){
+  // ⓪ 현금잔액 경로 — /api/qra보다 먼저, 별도 try로 그린다.
+  // 성명 수치는 하드코딩이라 경매 API가 죽어도 이 패널은 살아야 한다.
+  try{
+    const p2c=n=>String(n).padStart(2,'0');
+    const nd=new Date();
+    // toISOString()은 KST 자정을 전날로 밀어 스테일 판정을 하루 앞당긴다 → 로컬 조립
+    const todayL=nd.getFullYear()+'-'+p2c(nd.getMonth()+1)+'-'+p2c(nd.getDate());
+    const staleMsg = todayL>QRA_CASH.next
+      ? `${QRA_CASH.next} 리펀딩 성명이 이미 발표됐다 — 아래는 ${QRA_CASH.stmt}(${QRA_CASH.id}) 기준이라 갱신이 필요하다.`
+      : todayL>QRA_CASH.peakEnd
+      ? `고점 시점(${QRA_CASH.peakLabel})이 지났다 — 다음 성명 ${QRA_CASH.next}에 갱신된다.`
+      : null;
+    const staleEl=document.getElementById('qra-cash-stale');
+    if(staleEl){staleEl.style.display=staleMsg?'block':'none';if(staleMsg)staleEl.textContent='⚠ '+staleMsg;}
+
+    const tga=_sigData.tga;                        // 1단계 loadNL이 채운다(백만$)
+    const nowB=tga?tga.v/1000:null;                // → 십억$
+    const gap=nowB!=null?QRA_CASH.peak-nowB:null;
+    const maxB=QRA_CASH.peak+QRA_CASH.peakBand;    // 바 축 상한 = 밴드 상단
+    const pct=v=>Math.max(0,Math.min(100,v/maxB*100));
+    const setT=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+
+    setT('c-tgapath-now',   nowB!=null?B(nowB*1e9):'—');
+    setT('c-tgapath-now-d', tga?`DTS 일간 · 기준 ${tga.asOf}`:'NL 로딩 대기');
+    setT('c-tgapath-qend',   B(QRA_CASH.qEnd*1e9));
+    setT('c-tgapath-qend-d', QRA_CASH.qEndLabel+' 가정');
+    setT('c-tgapath-peak',   B(QRA_CASH.peak*1e9));
+    setT('c-tgapath-peak-d', QRA_CASH.peakLabel+' · ±'+QRA_CASH.peakBand+'B$');
+    setT('c-tgapath-gap',    gap==null?'—':(gap>=0?'+':'−')+N(Math.round(Math.abs(gap)))+'B$');
+    setT('c-tgapath-gap-d',  gap==null?'—':gap>=0?'준비금 흡수 예상 규모':'고점 전망 상회 — 소진 여지');
+    const gapEl=document.getElementById('c-tgapath-gap');
+    if(gapEl)gapEl.style.color = gap==null?'var(--tx)':gap>100?'#f85149':gap>0?'#d29922':'#3fb950';
+
+    // 바: 밴드 음영 → 현재 잔액 → 가정·고점 눈금
+    const bL=pct(QRA_CASH.peak-QRA_CASH.peakBand), bR=pct(QRA_CASH.peak+QRA_CASH.peakBand);
+    const band=document.getElementById('tgapath-band');
+    if(band){band.style.left=bL+'%';band.style.width=(bR-bL)+'%';}
+    const nowBar=document.getElementById('tgapath-now');
+    if(nowBar)nowBar.style.width=(nowB!=null?pct(nowB):0)+'%';
+    const qt=document.getElementById('tgapath-qend-tick'); if(qt)qt.style.left=pct(QRA_CASH.qEnd)+'%';
+    const pt=document.getElementById('tgapath-peak-tick'); if(pt)pt.style.left=pct(QRA_CASH.peak)+'%';
+    setT('tgapath-leg-now',  nowB!=null?N(Math.round(nowB))+'B$':'—');
+    setT('tgapath-leg-qend', N(QRA_CASH.qEnd)+'B$');
+    setT('tgapath-leg-peak', N(QRA_CASH.peak)+'B$ (±'+QRA_CASH.peakBand+')');
+
+    const interp=document.getElementById('c-tgapath-interp');
+    if(interp){
+      if(nowB==null){
+        interp.textContent='현재 TGA를 불러오지 못했다 — 성명 가이던스만 표시한다.';
+        interp.style.color='#8b949e';
+      }else{
+        const dir=gap>0?`앞으로 ${N(Math.round(gap))}B$ 더 쌓아야 한다`
+                       :`이미 고점 전망을 ${N(Math.round(-gap))}B$ 넘어섰다`;
+        const eff=gap>0?'TGA 재축적은 그만큼 은행 준비금을 직접 흡수 → NL 하락 압력'
+                       :'TGA 소진 여지 → NL 상승 요인';
+        interp.textContent=`현재 ${N(Math.round(nowB))}B$ · ${QRA_CASH.peakLabel} 고점 전망 ${N(QRA_CASH.peak)}B$(±${QRA_CASH.peakBand}) → ${dir}. ${eff}.`;
+        interp.style.color=gap>100?'#f85149':gap>0?'#d29922':'#3fb950';
+      }
+    }
+    const noteEl=document.getElementById('c-tgapath-note');
+    if(noteEl)noteEl.innerHTML=`가정·전망치는 재무부 리펀딩 성명 원문 `
+      +`<a href="${QRA_CASH.url}" target="_blank" rel="noopener" style="color:#58a6ff;text-decoration:none">${QRA_CASH.stmt} ${QRA_CASH.id} ↗</a>`
+      +` — 어떤 API도 제공하지 않아 분기마다 수기 갱신한다. 재축적 재원: ${QRA_CASH.bills}. 다음 성명 ${QRA_CASH.next}.`;
+  }catch(e){console.error('qraCash:',e);}
+
   try{
     const r=await fetch('/api/qra');const d=await r.json();
     // TIPS·FRN은 재무부 원본에서 security_type이 'Note'/'Bond'로 내려온다.
