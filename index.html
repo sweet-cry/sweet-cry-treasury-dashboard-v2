@@ -17,7 +17,7 @@ a{color:var(--blue);text-decoration:none}
 .wrap{padding:20px;max-width:1280px;margin:0 auto}
 
 /* header */
-.hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--brd)}
+.hdr{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px 12px;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--brd)}
 .hdr-left{display:flex;align-items:center;gap:10px}
 .hdr h1{font-size:15px;font-weight:600;letter-spacing:-.01em}
 .dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:blink 2s infinite}
@@ -120,6 +120,37 @@ tr:hover td{background:var(--surf2)}
 
 /* divider */
 .divider{height:1px;background:var(--brd);margin:20px 0}
+
+/* 업데이트 내역 모달 */
+.chg-ov{position:fixed;inset:0;background:rgba(1,4,9,.74);z-index:10000;display:none;align-items:center;justify-content:center;padding:16px}
+.chg-ov.on{display:flex}
+.chg-box{background:var(--surf);border:1px solid var(--brd);border-radius:var(--rl);width:100%;max-width:680px;max-height:82vh;display:flex;flex-direction:column;box-shadow:0 16px 48px rgba(0,0,0,.55)}
+.chg-hd{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;border-bottom:1px solid var(--brd);flex-shrink:0}
+.chg-ti{font-size:14px;font-weight:600;color:var(--tx)}
+.chg-sub{font-size:10.5px;color:var(--muted);margin-top:2px}
+.chg-x{background:transparent;border:1px solid var(--brd);border-radius:var(--r);color:var(--muted);cursor:pointer;font-size:13px;line-height:1;padding:6px 10px;flex-shrink:0}
+.chg-x:hover{background:var(--bg2);color:var(--tx)}
+.chg-bd{overflow-y:auto;overflow-x:hidden;padding:14px 16px 18px}
+.chg-day{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin:18px 0 6px;padding-top:14px;border-top:1px solid var(--brd)}
+.chg-day:first-child{margin-top:0;padding-top:0;border-top:0}
+.chg-date{font-size:12px;font-weight:600;color:var(--blue);white-space:nowrap}
+.chg-cnt{font-size:10px;color:var(--muted)}
+.chg-it{display:flex;gap:8px;padding:8px 0;border-bottom:1px dashed rgba(48,54,61,.75)}
+.chg-it:last-child{border-bottom:0}
+.chg-tag{flex-shrink:0;font-size:9.5px;font-weight:600;padding:2px 6px;border-radius:4px;margin-top:2px;height:fit-content;letter-spacing:.02em}
+.chg-tag.f{background:rgba(63,185,80,.14);color:var(--green)}
+.chg-tag.x{background:rgba(248,81,73,.13);color:var(--red)}
+.chg-tag.c{background:rgba(139,148,158,.15);color:var(--muted)}
+.chg-txt{min-width:0;font-size:12px;line-height:1.6;color:var(--tx);word-break:break-word}
+.chg-why{display:block;font-size:11px;color:var(--muted);margin-top:3px;line-height:1.65}
+.chg-ft{font-size:10.5px;color:var(--muted);line-height:1.7;margin-top:16px;padding-top:12px;border-top:1px solid var(--brd)}
+@media(max-width:480px){
+  .chg-ov{padding:10px}
+  .chg-box{max-height:88vh}
+  .chg-bd{padding:12px 13px 16px}
+  .chg-txt{font-size:11.5px}
+  .chg-why{font-size:10.5px}
+}
 
 @media(max-width:700px){
   .two{grid-template-columns:minmax(0,1fr)}
@@ -253,9 +284,48 @@ tr:hover td{background:var(--surf2)}
       <span class="dot"></span>
       <h1>Fed Liquidity Dashboard</h1>
     </div>
-    <div style="display:flex;align-items:center;gap:12px">
+    <div style="display:flex;align-items:center;flex-wrap:wrap;justify-content:flex-end;gap:8px">
       <span class="ts" id="ts">로딩 중...</span>
-      <a href="https://stock-agent-dashboard.onrender.com" target="_blank" class="rbtn" style="text-decoration:none;display:inline-flex;align-items:center;gap:4px;margin-right:8px;color:var(--tx)">⚡ Stock Agent</a><button class="rbtn" onclick="loadAll()">↻ 새로고침</button>
+      <a href="https://sweeet1-stock-agent.hf.space" target="_blank" rel="noopener" class="rbtn" style="text-decoration:none;display:inline-flex;align-items:center;gap:4px;color:var(--tx)">⚡ Stock Agent</a><button class="rbtn" onclick="chgOpen()">📋 업데이트 내역</button><button class="rbtn" onclick="loadAll()">↻ 새로고침</button>
+    </div>
+  </div>
+
+  <!-- ── 업데이트 내역 ── -->
+  <div id="chgOv" class="chg-ov" onclick="if(event.target===this)chgClose()">
+    <div class="chg-box" role="dialog" aria-modal="true" aria-labelledby="chgTitle">
+      <div class="chg-hd">
+        <div>
+          <div class="chg-ti" id="chgTitle">📋 업데이트 내역</div>
+          <div class="chg-sub">2026-05-21 ~ 08-06 · 최근 주요 작업 중심</div>
+        </div>
+        <button class="chg-x" onclick="chgClose()" aria-label="닫기">✕ 닫기</button>
+      </div>
+      <div class="chg-bd">
+
+        <div class="chg-day"><span class="chg-date">2026-08-06</span><span class="chg-cnt">6건</span></div>
+        <div class="chg-it"><span class="chg-tag x">FIX</span><span class="chg-txt">SOFR − IORB 카드를 날짜 대조 방식으로 교체<span class="chg-why">두 계열의 마지막 행을 그냥 빼고 있었다. IORB는 당일, SOFR은 T+1이라 최신 날짜가 어긋나 있어, FOMC가 IORB를 바꾸는 날 하루 동안 없는 스프레드가 만들어지고 그 값이 SRF 신호등 임계값을 그대로 굴린다. 바로 아래 추이 차트는 이미 날짜를 맞대고 있었다.</span></span></div>
+        <div class="chg-it"><span class="chg-tag x">FIX</span><span class="chg-txt">금리·SRF 카드 9장에 관측 기준일 표기<span class="chg-why">계열마다 발표 시차가 다른데(SOFR·DTB3·EFFR T+1, IORB 당일) 화면엔 숫자만 있었다. 준비금/GDP 게이지도 어느 분기 GDP인지 함께 적는다.</span></span></div>
+        <div class="chg-it"><span class="chg-tag x">FIX</span><span class="chg-txt">Stock Agent 링크 교체 — 이전 주소는 404였다</span></div>
+        <div class="chg-it"><span class="chg-tag x">FIX</span><span class="chg-txt">TIC 탭에서 기준월에 없는 국가 제외<span class="chg-why">재무부 Major Foreign Holders 표는 상위권만 싣기 때문에 순위에서 밀린 나라는 계열이 통째로 끊긴다. 몇 년 전 잔량이 '2026년 05월' 위젯에 섞여 점유율 분모가 1,183B$(15.7%) 과대였고, 순매수/매도 랭킹엔 2021년 Korea와 2020년 Spain의 변화가 '전월 대비'로 올라와 있었다.</span></span></div>
+        <div class="chg-it"><span class="chg-tag x">FIX</span><span class="chg-txt">모바일 가로 스크롤 제거<span class="chg-why">그리드 1fr의 최소폭이 자식 min-content로 잡혀 넓은 표·차트가 페이지를 밀어냈다. 320·375·753·910·1280px 전부 넘침 0 확인.</span></span></div>
+        <div class="chg-it"><span class="chg-tag f">NEW</span><span class="chg-txt">TGA 고점 전망 패널<span class="chg-why">8/4 분기 리펀딩 성명의 현금잔액 가이던스(9월말 950B$ · 10월말 1.05T$ ±50B)를 잔액 추이 위에 겹쳐 표시. 어떤 API에도 없는 하드코딩이라 만료일을 코드에 함께 박아, 지나면 패널이 스스로 스테일 배너를 띄운다.</span></span></div>
+
+        <div class="chg-day"><span class="chg-date">2026-08-05</span><span class="chg-cnt">1건</span></div>
+        <div class="chg-it"><span class="chg-tag x">FIX</span><span class="chg-txt">QRA 공고분을 발행 누계에서 분리 표기<span class="chg-why">'예정분 미포함'이라는 라벨이 거짓이었다. 재무부는 공고 순간 발행액이 채워진 행을 올리고 낙찰 지표 칸만 비워둔다. 당일 실제 발표로 양방향 확인 — 공고 직후 282 → 407B$, 낙찰 직후 335B$.</span></span></div>
+
+        <div class="chg-day"><span class="chg-date">2026-08-04</span><span class="chg-cnt">3건</span></div>
+        <div class="chg-it"><span class="chg-tag x">FIX</span><span class="chg-txt">TGA를 개장 잔액에서 마감 잔액으로 전환<span class="chg-why">재무부 DTS의 '개장(D)'은 곧 '마감(D−1)'이라 화면 전체가 1영업일 밀려 있었다. 월말 7/31 하루가 −121B$였던 탓에 Net Liquidity 헤드라인이 정반대로 나왔다(🔴압박 → 🟡보합).</span></span></div>
+        <div class="chg-it"><span class="chg-tag x">FIX</span><span class="chg-txt">캘린더 QRA 일정을 규칙 계산으로 전환 + SOFR 신호 임계값 통일<span class="chg-why">한 파일 안에 임계값이 세 갈래였고 범례 텍스트가 자기 코드와도 어긋나 있었다. SOFR−IORB 0bp는 '여유'가 아니라 이미 주의 구간이다(정상은 −3~−5bp).</span></span></div>
+        <div class="chg-it"><span class="chg-tag x">FIX</span><span class="chg-txt">2개월 방치분 일괄 점검 — 죽은 데이터 복구<span class="chg-why">FRED 단위가 계열마다 달라(WALCL·TGA는 백만, RRP는 십억) RRP만 1000배 작게 들어가 Net Liquidity가 과대계상. 폐지된 계열(DISCBORR)이 조용한 영구 결측이 돼 있었고, SOMA 엔드포인트 이관·경매 낙찰 필드 종류별 분기도 함께 수정.</span></span></div>
+
+        <div class="chg-day"><span class="chg-date">2026-05-31 ~ 06-02</span><span class="chg-cnt">2건</span></div>
+        <div class="chg-it"><span class="chg-tag x">FIX</span><span class="chg-txt">FRED 호출 한도 대응 — 캐시 강화 · 429 처리 · loadAll() 2단계 분리</span></div>
+
+        <div class="chg-day"><span class="chg-date">2026-05-21 ~ 05-23</span><span class="chg-cnt">약 35건 · 요약</span></div>
+        <div class="chg-it"><span class="chg-tag c">초기</span><span class="chg-txt">대시보드 초기 구축<span class="chg-why">7개 탭(Net Liquidity · 금리·자금시장 · H.4.1 · 재무부 · TIC · SOMA · 캘린더), TIC 10년+ 역사 데이터 파서, QRA 발행 진행도 게이지, SRF 경색 신호등, LCLoR 준비금 게이지, QT 게이지를 이 기간에 만들었다.</span></span></div>
+
+        <div class="chg-ft">FRED · 재무부 DTS/QRA · NY Fed SOMA · TIC 공개 데이터를 직접 읽어 계산합니다. 발표 시차가 있는 값은 카드마다 관측 기준일을 함께 적습니다.</div>
+      </div>
     </div>
   </div>
 
@@ -355,11 +425,11 @@ tr:hover td{background:var(--surf2)}
     <div class="sec">
       <div class="stitle">단기금리 · 스프레드</div>
       <div class="cards">
-        <div class="card"><div class="cl">SOFR <button class="ib" onclick="tip('sofr',this)">i</button></div><div class="cv" id="c-sofr">—</div><div class="cs">Secured Overnight</div></div>
-        <div class="card"><div class="cl">IORB <button class="ib" onclick="tip('iorb',this)">i</button></div><div class="cv" id="c-iorb">—</div><div class="cs">Interest on Reserves</div></div>
-        <div class="card"><div class="cl">T-Bill 3M <button class="ib" onclick="tip('tbill',this)">i</button></div><div class="cv" id="c-tbill">—</div><div class="cs">DTB3</div></div>
-        <div class="card"><div class="cl">EFFR <button class="ib" onclick="tip('effr',this)">i</button></div><div class="cv" id="c-effr">—</div><div class="cs">Fed Funds Rate</div></div>
-        <div class="card"><div class="cl">SOFR − IORB <button class="ib" onclick="tip('spread',this)">i</button></div><div class="cv" id="c-spread">—</div><div class="cs">bp</div></div>
+        <div class="card"><div class="cl">SOFR <button class="ib" onclick="tip('sofr',this)">i</button></div><div class="cv" id="c-sofr">—</div><div class="cs" id="s-sofr">Secured Overnight</div></div>
+        <div class="card"><div class="cl">IORB <button class="ib" onclick="tip('iorb',this)">i</button></div><div class="cv" id="c-iorb">—</div><div class="cs" id="s-iorb">Interest on Reserves</div></div>
+        <div class="card"><div class="cl">T-Bill 3M <button class="ib" onclick="tip('tbill',this)">i</button></div><div class="cv" id="c-tbill">—</div><div class="cs" id="s-tbill">DTB3</div></div>
+        <div class="card"><div class="cl">EFFR <button class="ib" onclick="tip('effr',this)">i</button></div><div class="cv" id="c-effr">—</div><div class="cs" id="s-effr">Fed Funds Rate</div></div>
+        <div class="card"><div class="cl">SOFR − IORB <button class="ib" onclick="tip('spread',this)">i</button></div><div class="cv" id="c-spread">—</div><div class="cs" id="s-spread">bp</div></div>
       </div>
     </div>
     <div class="cc">
@@ -396,10 +466,10 @@ tr:hover td{background:var(--surf2)}
     </div>
     <!-- 카드 -->
     <div class="cards">
-      <div class="card"><div class="cl">SRF 일간 <button class="ib" onclick="tip('srf-daily',this)">i</button></div><div class="cv" id="c-srf-daily">—</div><div class="cs">RPONTSYD · $B</div></div>
-      <div class="card"><div class="cl">SRF 7일 누적</div><div class="cv" id="c-srf-7d">—</div><div class="cs">$B</div></div>
-      <div class="card"><div class="cl">SOFR − IORB <button class="ib" onclick="tip('sofr-iorb-bp',this)">i</button></div><div class="cv" id="c-sofr-iorb-bp">—</div><div class="cs">bp · 음수=건강</div></div>
-      <div class="card"><div class="cl">SOFR99 갭</div><div class="cv" id="c-sofr99-gap">—</div><div class="cs">bp · 꼬리압력</div></div>
+      <div class="card"><div class="cl">SRF 일간 <button class="ib" onclick="tip('srf-daily',this)">i</button></div><div class="cv" id="c-srf-daily">—</div><div class="cs" id="s-srf-daily">RPONTSYD · $B</div></div>
+      <div class="card"><div class="cl">SRF 7일 누적</div><div class="cv" id="c-srf-7d">—</div><div class="cs" id="s-srf-7d">$B</div></div>
+      <div class="card"><div class="cl">SOFR − IORB <button class="ib" onclick="tip('sofr-iorb-bp',this)">i</button></div><div class="cv" id="c-sofr-iorb-bp">—</div><div class="cs" id="s-sofr-iorb-bp">bp · 음수=건강</div></div>
+      <div class="card"><div class="cl">SOFR99 갭</div><div class="cv" id="c-sofr99-gap">—</div><div class="cs" id="s-sofr99-gap">bp · 꼬리압력</div></div>
     </div>
     <div class="ct" style="margin-top:18px">SOFR − IORB 스프레드 (90일) <button class="ib" onclick="tip('sofr-iorb-bp',this)">i</button></div>
     <div class="leg"><span><span class="ld" style="background:#58a6ff"></span>SOFR-IORB (bp)</span></div>
@@ -972,12 +1042,19 @@ async function loadRates(){
   try{
     const[sofr,iorb,tbill,effr,t10y2y]=await Promise.all([fred('SOFR',90),fred('IORB',90),fred('DTB3',90),fred('EFFR',90),fred('T10Y2Y',90)]);
     const ls=last(sofr),li=last(iorb),lt=last(tbill),le=last(effr);
-    if(ls){document.getElementById('c-sofr').textContent=ls.v.toFixed(2)+'%';_sigData.sofr=ls.v;}
-    if(li){document.getElementById('c-iorb').textContent=li.v.toFixed(2)+'%';_sigData.iorb=li.v;}
-    if(lt)document.getElementById('c-tbill').textContent=lt.v.toFixed(2)+'%';
-    if(le)document.getElementById('c-effr').textContent=le.v.toFixed(2)+'%';
-    if(ls&&li){const sp=(ls.v-li.v)*100;const se=document.getElementById('c-spread');se.textContent=sp.toFixed(1)+'bp';se.className='cv '+(sp<0?'dn':'up');}
+    // 계열마다 발표 시차가 다르다(SOFR·DTB3·EFFR은 T+1, IORB는 당일 반영). 카드마다 실제
+    // 관측일을 함께 적어 어느 날 값인지 감추지 않는다.
+    const sub=(id,base,d)=>{const el=document.getElementById(id);if(el)el.textContent=base+(d?' · '+d.slice(5)+' 기준':'');};
+    if(ls){document.getElementById('c-sofr').textContent=ls.v.toFixed(2)+'%';_sigData.sofr=ls.v;sub('s-sofr','Secured Overnight',ls.date);}
+    if(li){document.getElementById('c-iorb').textContent=li.v.toFixed(2)+'%';_sigData.iorb=li.v;sub('s-iorb','Interest on Reserves',li.date);}
+    if(lt){document.getElementById('c-tbill').textContent=lt.v.toFixed(2)+'%';sub('s-tbill','DTB3',lt.date);}
+    if(le){document.getElementById('c-effr').textContent=le.v.toFixed(2)+'%';sub('s-effr','Fed Funds Rate',le.date);}
     const iM={},tM={},eM={};iorb.forEach(x=>iM[x.date]=x.v);tbill.forEach(x=>tM[x.date]=x.v);effr.forEach(x=>eM[x.date]=x.v);
+    // ⚠️ 두 계열의 마지막 행을 그냥 빼면 안 된다. IORB는 당일, SOFR은 T+1이라 최신 날짜가
+    //    어긋나 있고, FOMC가 IORB를 바꾸는 날엔 하루 동안 없는 스프레드(약 25bp)가 만들어진다.
+    //    아래 추이 차트는 이미 iM[x.date]로 날짜를 맞대고 있다 — 카드도 같은 규칙을 쓴다.
+    const spRow=[...sofr].reverse().find(x=>iM[x.date]!=null);
+    if(spRow){const sp=(spRow.v-iM[spRow.date])*100;const se=document.getElementById('c-spread');se.textContent=sp.toFixed(1)+'bp';se.className='cv '+(sp<0?'dn':'up');sub('s-spread','bp',spRow.date);}
     mk('ratesChart','line',sofr.map(x=>x.date.slice(5)),[
       {label:'SOFR',data:sofr.map(x=>x.v),borderColor:'#58a6ff',borderWidth:1.5,pointRadius:0,tension:0.2},
       {label:'IORB',data:sofr.map(x=>iM[x.date]||null),borderColor:'#3fb950',borderWidth:1.5,pointRadius:0,tension:0.2,borderDash:[5,4]},
@@ -1664,6 +1741,10 @@ function tip(key,btn){
 }
 document.addEventListener('click',e=>{const el=document.getElementById('tipEl');if(el&&!e.target.classList.contains('ib'))el.style.display='none';});
 
+/* 업데이트 내역 모달 — 배경 클릭·✕·ESC로 닫힌다 */
+function chgOpen(){const o=document.getElementById('chgOv');if(!o)return;o.classList.add('on');document.body.style.overflow='hidden';const b=o.querySelector('.chg-bd');if(b)b.scrollTop=0;}
+function chgClose(){const o=document.getElementById('chgOv');if(!o)return;o.classList.remove('on');document.body.style.overflow='';}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')chgClose();});
 
 const TABS=['nl','rates','h41','m2','dts','tic','cal'];
 function sw(name,btn){
@@ -1933,13 +2014,18 @@ async function loadRatesSRF(){
     ]);
     const iorbMap=Object.fromEntries(iorb.map(x=>[x.date,x.v]));
     const spread=sofr.filter(x=>iorbMap[x.date]!=null).map(x=>({date:x.date,bp:+((x.v-iorbMap[x.date])*100).toFixed(2)}));
-    const srf_last=srf.length?srf[srf.length-1].v/1000:0;
-    const sofr_last=sofr.length?sofr[sofr.length-1].v:null;
-    const iorb_last=iorb.length?iorb[iorb.length-1].v:null;
-    const si_bp=sofr_last!=null&&iorb_last!=null?+((sofr_last-iorb_last)*100).toFixed(1):null;
-    const s99_last=sofr99.length?sofr99[sofr99.length-1].v:null;
-    const s99_gap=s99_last!=null&&sofr_last!=null?+((s99_last-sofr_last)*100).toFixed(1):null;
-    const srf7=srf.slice(-7).reduce((a,x)=>a+x.v,0)/1000;
+    const srfL=srf.length?srf[srf.length-1]:null;
+    const srf_last=srfL?srfL.v/1000:0;
+    // ⚠️ 카드도 위 spread 차트와 같은 규칙 — 인덱스가 아니라 두 계열이 함께 있는 마지막 날짜.
+    //    IORB는 당일, SOFR은 T+1이라 최신 행의 날짜가 다르다. 인덱스로 빼면 FOMC가 IORB를
+    //    바꾸는 날 하루 동안 가짜 25bp가 잡히고, 그 값이 아래 신호등 임계값을 그대로 굴린다.
+    const siRow=spread.length?spread[spread.length-1]:null;
+    const si_bp=siRow?+siRow.bp.toFixed(1):null;
+    const s99Map=Object.fromEntries(sofr99.map(x=>[x.date,x.v]));
+    const g99Row=[...sofr].reverse().find(x=>s99Map[x.date]!=null)||null;
+    const s99_gap=g99Row?+((s99Map[g99Row.date]-g99Row.v)*100).toFixed(1):null;
+    const srf7w=srf.slice(-7);
+    const srf7=srf7w.reduce((a,x)=>a+x.v,0)/1000;
     _srfData={srf,spread};
     // 신호등
     let lv='green',reason='SRF 미이용, 스프레드 여유 — 정상';
@@ -1952,10 +2038,15 @@ async function loadRatesSRF(){
     if(rsEl)rsEl.textContent=reason;
     // 카드
     const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+    const md=d=>d?d.slice(5):'';
     set('c-srf-daily',srf_last.toFixed(2)+'B');
+    set('s-srf-daily','RPONTSYD · $B'+(srfL?' · '+md(srfL.date)+' 기준':''));
     set('c-srf-7d',srf7.toFixed(2)+'B');
+    set('s-srf-7d','$B'+(srf7w.length?' · '+md(srf7w[0].date)+'~'+md(srf7w[srf7w.length-1].date):''));
     set('c-sofr-iorb-bp',si_bp!=null?(si_bp>0?'+':'')+si_bp+'bp':'—');
+    set('s-sofr-iorb-bp','bp · 음수=건강'+(siRow?' · '+md(siRow.date)+' 기준':''));
     set('c-sofr99-gap',s99_gap!=null?(s99_gap>0?'+':'')+s99_gap+'bp':'—');
+    set('s-sofr99-gap','bp · 꼬리압력'+(g99Row?' · '+md(g99Row.date)+' 기준':''));
     // 차트
     const sctx=document.getElementById('srfSpreadChart');
     if(sctx){
@@ -1977,12 +2068,17 @@ async function loadLCLoR(mode){
   try{
     const [wresbal,gdp] = await Promise.all([fred('WRESBAL',120,'w'), fred('GDP',20,'q')]);
     if(!wresbal.length)return;
-    const res_b=wresbal[wresbal.length-1].v/1000;
+    const resL=wresbal[wresbal.length-1];
+    const res_b=resL.v/1000;
     let lower_b,upper_b,label;
     if(_lclorMode==='reserves_gdp'&&gdp.length){
-      const gdp_b=gdp[gdp.length-1].v;
+      // 준비금은 주간, GDP는 분기라 두 계열의 최신 날짜가 석 달 넘게 벌어진다. 분기물이라
+      // 그게 정상이지만 화면에는 어느 분기 GDP인지 반드시 적어야 한다.
+      const gq=gdp[gdp.length-1];
+      const gdp_b=gq.v;
       lower_b=gdp_b*0.08;upper_b=lower_b*1.15;
-      label=`GDP $${gdp_b.toFixed(0)}B × 8%`;
+      const qLbl=/^\d{4}-\d{2}/.test(gq.date)?`${gq.date.slice(0,4)} Q${Math.floor((+gq.date.slice(5,7)-1)/3)+1}`:'';
+      label=`GDP $${gdp_b.toFixed(0)}B${qLbl?` (${qLbl})`:''} × 8%`;
     }else{lower_b=2800;upper_b=3200;label='Fed 기준 $2.8~3.2T';}
     function prox(r,lo,up){
       if(r<=lo*0.9)return 100;
@@ -1995,7 +2091,7 @@ async function loadLCLoR(mode){
     const z=p<40?'abundant':p<70?'ample':p<85?'approaching scarcity':'scarce';
     document.getElementById('lclor-prox').textContent=p+'%';
     document.getElementById('lclor-zone').textContent=z.toUpperCase()+' · '+label;
-    document.getElementById('lclor-detail').textContent=`Reserves $${res_b.toFixed(1)}B / Upper $${upper_b.toFixed(0)}B`;
+    document.getElementById('lclor-detail').textContent=`Reserves $${res_b.toFixed(1)}B (${resL.date.slice(5)} 기준) / Upper $${upper_b.toFixed(0)}B`;
     const ang=-90+(p/100)*180;
     const rad=ang*Math.PI/180;
     const x2=100+72*Math.cos(rad),y2=100+72*Math.sin(rad);
