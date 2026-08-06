@@ -780,7 +780,7 @@ tr:hover td{background:var(--surf2)}
         <div style="position:relative;height:260px"><canvas id="ticChangeChart"></canvas></div>
       </div>
       <div class="cc">
-        <div class="ct">외국인 보유 점유율</div>
+        <div class="ct">외국인 보유 점유율 <span id="ticShareNote" style="font-size:11px;color:var(--muted);font-weight:400"></span></div>
         <div class="tic-share" style="display:flex;align-items:center;gap:16px">
           <div style="position:relative;height:260px;flex:0 0 260px"><canvas id="ticShareChart"></canvas></div>
           <div id="ticShareLegend" style="display:flex;flex-direction:column;gap:7px;font-size:12px"></div>
@@ -1434,29 +1434,42 @@ async function loadQRA(){
 async function loadTIC(){
   try{
     const r=await fetch('/api/tic');const raw=await r.json();
-    const NM={'Japan':'일본','China, Mainland':'중국','United Kingdom':'영국','Belgium':'벨기에','Canada':'캐나다','Luxembourg':'룩셈부르크','Cayman Islands':'케이맨제도','France':'프랑스','Ireland':'아일랜드','Taiwan':'대만','Switzerland':'스위스','Singapore':'싱가포르','Hong Kong':'홍콩','Brazil':'브라질','India':'인도','Norway':'노르웨이','Saudi Arabia':'사우디','Korea, South':'한국'};
+    const NM={'Japan':'일본','China, Mainland':'중국','United Kingdom':'영국','Belgium':'벨기에','Canada':'캐나다','Luxembourg':'룩셈부르크','Cayman Islands':'케이맨제도','France':'프랑스','Ireland':'아일랜드','Taiwan':'대만','Switzerland':'스위스','Singapore':'싱가포르','Hong Kong':'홍콩','Brazil':'브라질','India':'인도','Norway':'노르웨이','Saudi Arabia':'사우디','Korea, South':'한국','United Arab Emirates':'아랍에미리트','Israel':'이스라엘'};
     const SKIP_SET=new Set(['Country','All Other','Grand Total','Of Which: Foreign Official','Of Which: Foreign Official Treasury Bills','Of Which: Foreign Official T-Bonds & Notes','For. Official','T-Bonds & Notes','T-Bills','Treasury Bills']);
     const isSkip=k=>SKIP_SET.has(k)||/\d/.test(k)||k.toLowerCase().includes('total')||k.toLowerCase().includes('of which');
 
     // 신규 포맷: {country: [{date, value}]} 배열 or 구 포맷: {country: {value, date}}
     const isNew=v=>Array.isArray(v);
 
-    const latestMap={}, histMap={}, dateSet=new Set();
+    // ⚠️ 국가별 배열의 마지막 두 행을 그대로 '이번 달·전월'로 쓰면 안 된다. 재무부 Major Foreign
+    //    Holders 표는 상위권만 싣기 때문에 순위에서 밀린 나라는 그 시점에 계열이 통째로 끊긴다
+    //    (Spain 2020-10, Russia 2017-10 등. 'Korea'는 2021-10에서 끊기고 이후 'Korea, South'가 별도 키).
+    //    끊긴 계열을 섞으면 몇 년 전 잔량이 점유율 분모와 순매수/매도 랭킹에 그대로 들어온다.
+    //    → 먼저 기준월을 정하고, 그 달에 값이 있는 국가만 '현재' 위젯(카드·바·도넛·랭킹)에 넣는다.
+    //    추이 차트는 과거 시계열이므로 histMap 전체를 그대로 쓴다.
+    const histMap={}, dateSet=new Set();
     for(const [k,v] of Object.entries(raw)){
       if(isSkip(k)) continue;
       if(isNew(v)){
         if(!v.length) continue;
-        const sorted=[...v].sort((a,b)=>a.date.localeCompare(b.date));
-        const last=sorted[sorted.length-1];
-        const prev=sorted.length>1?sorted[sorted.length-2]:null;
-        latestMap[k]={value:last.value,prev:prev?.value||null,date:last.date};
-        histMap[k]=sorted;
-        sorted.forEach(x=>dateSet.add(x.date));
+        histMap[k]=[...v].sort((a,b)=>a.date.localeCompare(b.date));
       } else {
-        latestMap[k]={value:v.value,prev:null,date:v.date};
+        if(!v||v.value==null) continue;
         histMap[k]=[{date:v.date,value:v.value}];
-        if(v.date) dateSet.add(v.date);
       }
+      histMap[k].forEach(x=>{if(x.date) dateSet.add(x.date);});
+    }
+    const allDates=[...dateSet].sort();
+    const curD=allDates[allDates.length-1]||null, prevD=allDates[allDates.length-2]||null;
+    const fmtYm=d=>!d?'':(/^\d{6}$/.test(d)?d.slice(0,4)+'년 '+d.slice(4,6)+'월'
+                        :/^\d{4}-\d{2}/.test(d)?d.slice(0,4)+'년 '+d.slice(5,7)+'월':d);
+
+    const latestMap={};
+    for(const [k,s] of Object.entries(histMap)){
+      const cur=s.find(x=>x.date===curD);
+      if(!cur) continue;                             // 기준월에 값이 없는 국가 = 표에서 밀려난 계열
+      const pv=prevD?s.find(x=>x.date===prevD):null; // 전월도 인덱스가 아니라 날짜로 조회
+      latestMap[k]={value:cur.value,prev:pv?pv.value:null,date:cur.date};
     }
 
     // 상위 10개국
@@ -1491,7 +1504,6 @@ async function loadTIC(){
       {key:'Ireland',name:'아일랜드',color:'#ff7b72',on:false},
       {key:'Switzerland',name:'스위스',color:'#e3b341',on:false},
     ];
-    const allDates=[...dateSet].sort();
     const fmtD=d=>{
       if(!d) return d;
       if(/^\d{6}$/.test(d)) return d.slice(2,4)+'-'+d.slice(4,6); // "202601"→"26-01"
@@ -1504,15 +1516,9 @@ async function loadTIC(){
       return String(d).slice(0,4);
     };
     // 최신 날짜 레이블 업데이트
-    if(allDates.length>0){
-      const ld=allDates[allDates.length-1];
-      const fmtLd=d=>{
-        if(/^\d{6}$/.test(d)) return d.slice(0,4)+'년 '+d.slice(4,6)+'월';
-        if(/^\d{4}-\d{2}/.test(d)) return d.slice(0,4)+'년 '+d.slice(5,7)+'월';
-        return d;
-      };
+    if(curD){
       const dlbl=document.getElementById('ticDateLbl');
-      if(dlbl) dlbl.textContent='TIC — 국가별 미국채 보유 ('+fmtLd(ld)+' 기준)';
+      if(dlbl) dlbl.textContent='TIC — 국가별 미국채 보유 ('+fmtYm(curD)+' 기준)';
     }
     const rangeLbl=document.getElementById('ticRangeLbl');
     if(rangeLbl&&allDates.length>1){
@@ -1554,14 +1560,9 @@ async function loadTIC(){
     }
 
     // 변화 차트 기간 레이블
-    if(allDates.length>=2){
-      const fmtM=d=>{
-        if(/^\d{6}$/.test(d)) return d.slice(0,4)+'년 '+d.slice(4,6)+'월';
-        if(/^\d{4}-\d{2}/.test(d)) return d.slice(0,4)+'년 '+d.slice(5,7)+'월';
-        return d;
-      };
+    if(curD&&prevD){
       const cp=document.getElementById('ticChangePeriod');
-      if(cp) cp.textContent='('+fmtM(allDates[allDates.length-2])+' → '+fmtM(allDates[allDates.length-1])+')';
+      if(cp) cp.textContent='('+fmtYm(prevD)+' → '+fmtYm(curD)+')';
     }
     // ③ 순매수/매도 랭킹
     const chgList=Object.entries(latestMap)
@@ -1578,7 +1579,10 @@ async function loadTIC(){
 
     // ④ 점유율 도넛
     const top5=data.slice(0,5);
+    // 분모는 '전체 외국인 보유'가 아니라 기준월 표에 실린 국가들의 합계다(피드에 Grand Total 행이 없음).
     const grandTotal=Object.values(latestMap).reduce((s,v)=>s+(v.value||0),0);
+    const shareNote=document.getElementById('ticShareNote');
+    if(shareNote) shareNote.textContent='('+fmtYm(curD)+' 표 수록 '+Object.keys(latestMap).length+'개국 합계 기준)';
     const othersVal=Math.round(grandTotal-top5.reduce((s,x)=>s+x.val,0));
     const shareColors=['#58a6ff','#f85149','#3fb950','#d29922','#a371f7','#8b949e'];
     const shareLabels=[...top5.map(x=>x.name),'기타'];
