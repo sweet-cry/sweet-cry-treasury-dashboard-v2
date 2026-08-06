@@ -54,8 +54,17 @@ a{color:var(--blue);text-decoration:none}
 .ld{width:9px;height:9px;border-radius:2px;flex-shrink:0}
 
 /* layout */
-.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+/* 트랙은 minmax(0,1fr). 맨 1fr은 minmax(auto,1fr)이라 트랙 최소폭이 자식의 min-content로 잡혀
+   넓은 표·차트가 들어오면 트랙이 컨테이너보다 커진다(그리드 blowout) → 페이지 전체 가로 스크롤. */
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
 .full{grid-column:1/-1}
+/* Chart.js가 인라인 style.width를 px로 박는데, 리사이즈 반영이 한 프레임 늦으면 캔버스가
+   컨테이너보다 넓은 채로 남아 페이지를 밀어낸다. 폭이 좁을수록 잘 드러난다(320px에서 재현). */
+canvas{max-width:100%}
+/* TIC 도넛은 flex:0 0 260px라 축소되지 않는다. 범례(≈118px)와 나란히 두면 약 394px가 필요한데
+   .two가 균등 분할이라 뷰포트 ~910px 아래에선 카드가 그만큼 못 준다 → 안 들어가면 스스로 접히게 한다.
+   (미디어쿼리로 끊으면 701~910 구간이 빈다. 넓은 화면에선 그대로 가로 배치.) */
+.tic-share{flex-wrap:wrap}
 
 /* info btn */
 .ib{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;border:1px solid var(--brd);font-size:9px;color:var(--muted);cursor:pointer;background:transparent;flex-shrink:0;transition:all .15s}
@@ -113,20 +122,23 @@ tr:hover td{background:var(--surf2)}
 .divider{height:1px;background:var(--brd);margin:20px 0}
 
 @media(max-width:700px){
-  .two{grid-template-columns:1fr}
-  .cards{grid-template-columns:1fr 1fr}
+  .two{grid-template-columns:minmax(0,1fr)}
+  .cards{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
   .wrap{padding:14px}
+  /* 좁은 폭에선 도넛·범례를 각각 한 줄 전체로 */
+  .tic-share>div{flex:1 1 100%!important;min-width:0}
+  .tic-share>div:first-child{height:230px!important}
   .cv{font-size:18px}
   .hdr h1{font-size:13px}
   .tabs{gap:0}
   .tab{padding:7px 12px;font-size:12px}
   .tdesc-rels{gap:8px}
-  .sp-grid{grid-template-columns:1fr 1fr}
+  .sp-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
   .sig-val{font-size:14px}
 }
 @media(max-width:480px){
-  .cards{grid-template-columns:1fr 1fr}
-  .sp-grid{grid-template-columns:1fr 1fr}
+  .cards{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .sp-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
   .tab{padding:6px 10px;font-size:11px}
   .cc{padding:12px}
   .card{padding:10px 12px}
@@ -134,8 +146,8 @@ tr:hover td{background:var(--surf2)}
   .auction-explain{font-size:10px}
 }
 @media(max-width:400px){
-  .cards{grid-template-columns:1fr}
-  .sp-grid{grid-template-columns:1fr}
+  .cards{grid-template-columns:minmax(0,1fr)}
+  .sp-grid{grid-template-columns:minmax(0,1fr)}
   .cv{font-size:15px}
 }
 
@@ -144,7 +156,7 @@ tr:hover td{background:var(--surf2)}
 .sp-hdr h2{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
 .sp-overall{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:500}
 .sp-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.sp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.sp-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
 .sig{background:var(--surf2);border-radius:var(--r);padding:10px 12px}
 .sig-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
 .sig-name{font-size:10px;color:var(--muted);font-weight:500}
@@ -174,9 +186,9 @@ tr:hover td{background:var(--surf2)}
 .cal-nav button{font-size:11px;padding:2px 9px;border:1px solid var(--brd);border-radius:5px;background:transparent;color:var(--muted);cursor:pointer}
 .cal-nav button:hover{background:var(--surf2);color:var(--tx)}
 .cal-wrap{max-width:480px}
-.cal-dow-row{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px}
+.cal-dow-row{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;margin-bottom:3px}
 .cal-dow{font-size:9px;color:var(--muted);text-align:center;padding:2px 0;font-weight:500}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:10px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;margin-bottom:10px}
 .cd{height:32px;border-radius:5px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;color:var(--muted);background:var(--surf2);cursor:default;position:relative}
 .cd.empty{background:transparent}
 .cd.today{border:1px solid var(--blue);color:var(--blue);font-weight:600}
@@ -206,12 +218,12 @@ tr:hover td{background:var(--surf2)}
 .auction-step{display:flex;gap:10px;margin-bottom:6px}
 .auction-step-num{width:18px;height:18px;border-radius:50%;background:rgba(88,166,255,0.15);color:var(--blue);font-size:9px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
 @media(max-width:700px){
-  .sp-grid{grid-template-columns:1fr 1fr}
+  .sp-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
   .cal-wrap{max-width:100%}
   .cd{height:28px;font-size:9px}
 }
 @media(max-width:400px){
-  .sp-grid{grid-template-columns:1fr}
+  .sp-grid{grid-template-columns:minmax(0,1fr)}
   .cd{height:24px;font-size:8px}
 }
 
@@ -769,7 +781,7 @@ tr:hover td{background:var(--surf2)}
       </div>
       <div class="cc">
         <div class="ct">외국인 보유 점유율</div>
-        <div style="display:flex;align-items:center;gap:16px">
+        <div class="tic-share" style="display:flex;align-items:center;gap:16px">
           <div style="position:relative;height:260px;flex:0 0 260px"><canvas id="ticShareChart"></canvas></div>
           <div id="ticShareLegend" style="display:flex;flex-direction:column;gap:7px;font-size:12px"></div>
         </div>
