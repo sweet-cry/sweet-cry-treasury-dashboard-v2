@@ -777,6 +777,7 @@ tr:hover td{background:var(--surf2)}
           <span><span class="ld" style="background:#d29922"></span>고점 전망 <b id="tgapath-leg-peak" style="color:var(--tx)">—</b></span>
         </div>
         <div id="c-tgapath-interp" style="font-size:11px;line-height:1.65;margin-top:11px;padding-top:11px;border-top:1px solid var(--brd);color:#8b949e">—</div>
+        <div id="c-tgapath-buyback" style="display:none;font-size:11px;line-height:1.65;margin-top:10px;padding-top:10px;border-top:1px dashed var(--brd)"></div>
         <div id="c-tgapath-note" style="font-size:10px;color:var(--muted);line-height:1.65;margin-top:8px">—</div>
       </div>
     </div>
@@ -1297,7 +1298,17 @@ const QRA_CASH={
   qEnd:950,  qEndLabel:'2026년 9월말',                  // "assuming a $950 billion cash balance at the end of September"
   peak:1050, peakBand:50,                              // "could peak at $1.05 trillion (plus or minus $50 billion)"
   peakLabel:'2026년 10월 말', peakEnd:'2026-10-31',
-  bills:'9월 단기물 축소(중순 법인세 유입) → 10월 커브 전반 증액'   // 같은 성명의 빌 발행 계획 = 재축적 재원
+  bills:'9월 단기물 축소(중순 법인세 유입) → 10월 커브 전반 증액',   // 같은 성명의 빌 발행 계획 = 재축적 재원
+  // ── 반대 방향(TGA 소진) 단서 두 건 — 둘 다 11/4 리펀딩까지 한시라 위 next·스테일 판정을 공유한다.
+  buyback:{
+    // 공식 — 장기물 유동성지원 바이백 '회당 상한' $2B→$4B+ 상향, 9/9 발효~11/4 (10Y~30Y 명목쿠폰)
+    op:{ id:'sb0607', date:'2026-08-19',
+         url:'https://home.treasury.gov/news/press-releases/sb0607',
+         sizeOld:2, sizeNew:4, sectors:'10Y~20Y·20Y~30Y', from:'2026-09-09' },
+    // 보도·미확정 — 재무부 관계자, 바이백 '가용 현금' 기준을 과거 $550~600B → 최대 ~$950B로 검토(금액·시점 미정)
+    tgaFund:{ date:'2026-08-24', prevLo:550, prevHi:600, avail:950,
+              src:'CNBC', url:'https://finance.yahoo.com/economy/policy/articles/treasury-eyes-950b-cash-account-120527032.html' }
+  }
 };
 
 async function loadQRA(){
@@ -1364,6 +1375,22 @@ async function loadQRA(){
     if(noteEl)noteEl.innerHTML=`가정·전망치는 재무부 리펀딩 성명 원문 `
       +`<a href="${QRA_CASH.url}" target="_blank" rel="noopener" style="color:#58a6ff;text-decoration:none">${QRA_CASH.stmt} ${QRA_CASH.id} ↗</a>`
       +` — 어떤 API도 제공하지 않아 분기마다 수기 갱신한다. 재축적 재원: ${QRA_CASH.bills}. 다음 성명 ${QRA_CASH.next}.`;
+
+    // 반대 방향(소진) 단서 — 위 '재축적 → NL 하락' 해석의 균형. 공식·보도를 라벨로 구분한다.
+    const bbEl=document.getElementById('c-tgapath-buyback');
+    if(bbEl){
+      const o=QRA_CASH.buyback.op, t=QRA_CASH.buyback.tgaFund;
+      const lnk=(u,s)=>`<a href="${u}" target="_blank" rel="noopener" style="color:#58a6ff;text-decoration:none">${s} ↗</a>`;
+      bbEl.style.display='block';
+      bbEl.innerHTML=
+        `<div style="color:var(--tx);font-weight:600;margin-bottom:6px">반대 방향 단서 — TGA 소진(바이백)</div>`
+        +`<div style="color:#8b949e;margin-bottom:5px">`
+          +`<b style="color:#3fb950">공식</b> 장기물 유동성지원 바이백 회당 상한 $${o.sizeOld}B→$${o.sizeNew}B+ (${o.sectors}), ${o.from} 발효 · ${lnk(o.url,o.date+' '+o.id)}`
+        +`</div>`
+        +`<div style="color:#8b949e">`
+          +`<b style="color:#d29922">보도·미확정</b> 재무부 관계자, 바이백 가용 현금 기준 $${t.prevLo}~${t.prevHi}B → 최대 ~$${t.avail}B 검토(금액·시점 미정) → 재축적 대신 <b style="color:#3fb950">소진 시 NL 상승 요인</b> · ${lnk(t.url,t.src+'·'+t.date)}`
+        +`</div>`;
+    }
   }catch(e){console.error('qraCash:',e);}
 
   try{
