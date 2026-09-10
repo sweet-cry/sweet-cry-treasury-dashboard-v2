@@ -87,6 +87,8 @@ td{text-align:right;padding:7px 12px;border-bottom:1px solid #21262d;color:var(-
 td:first-child{text-align:left;color:var(--muted)}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:var(--surf2)}
+#c-tgapath-bbops table{font-size:11px}
+#c-tgapath-bbops th,#c-tgapath-bbops td{padding:5px 8px}
 
 .loading{color:var(--muted);font-size:13px;padding:24px;text-align:center}
 
@@ -296,11 +298,18 @@ tr:hover td{background:var(--surf2)}
       <div class="chg-hd">
         <div>
           <div class="chg-ti" id="chgTitle">📋 업데이트 내역</div>
-          <div class="chg-sub">2026-05-21 ~ 08-06 · 최근 주요 작업 중심</div>
+          <div class="chg-sub">2026-05-21 ~ 09-10 · 최근 주요 작업 중심</div>
         </div>
         <button class="chg-x" onclick="chgClose()" aria-label="닫기">✕ 닫기</button>
       </div>
       <div class="chg-bd">
+
+        <div class="chg-day"><span class="chg-date">2026-09-10</span><span class="chg-cnt">2건</span></div>
+        <div class="chg-it"><span class="chg-tag f">NEW</span><span class="chg-txt">바이백 '실시' 이력을 재무부 fiscaldata에서 직접 수집<span class="chg-why">성명 '본문' 수치와 달리 실시 이력엔 API가 있다(buybacks_operations). 회차·회당 상한·낙찰/응찰을 자동으로 받아 실시할 때마다 손으로 고치던 스테일을 없앴다. 결과 유무는 날짜가 아니라 낙찰액 유무로 가른다 — 공고 행이 운영 1~2일 전에 먼저 올라오고 결과 칸만 비어 있다. 장기물 판정엔 security_type이 필요하다: 만기대만 보면 TIPS 바이백('10Y to 30Y')이 명목 장기물로 섞여 든다.</span></span></div>
+        <div class="chg-it"><span class="chg-tag x">FIX</span><span class="chg-txt">바이백 패널이 8/19 '상향 예고'에 멈춰 있던 것<span class="chg-why">9/9 공고·9/10 실시로 첫 확대분이 나왔다 — 10Y~20Y 최대 60억$로, 예고했던 '$4B 이상'을 넘고 직전 상한 $2B의 3배다. 그런데도 10년물은 4.85%(+6bp·2023-11 이후 최고)로 올랐다. '바이백 확대 = 장기금리 하락'으로 읽히지 않도록 시장 반응을 한 줄로 함께 박았다.</span></span></div>
+
+        <div class="chg-day"><span class="chg-date">2026-08-25</span><span class="chg-cnt">1건</span></div>
+        <div class="chg-it"><span class="chg-tag f">NEW</span><span class="chg-txt">TGA 경로 패널에 반대 방향(소진) 단서<span class="chg-why">패널이 '재축적 → 준비금 흡수 → NL 하락' 한쪽만 말하고 있었다. 8/19 장기물 바이백 상한 상향(공식)과 TGA 현금을 바이백 재원으로 검토한다는 보도(미확정)를 라벨로 구분해 덧붙였다.</span></span></div>
 
         <div class="chg-day"><span class="chg-date">2026-08-06</span><span class="chg-cnt">6건</span></div>
         <div class="chg-it"><span class="chg-tag x">FIX</span><span class="chg-txt">SOFR − IORB 카드를 날짜 대조 방식으로 교체<span class="chg-why">두 계열의 마지막 행을 그냥 빼고 있었다. IORB는 당일, SOFR은 T+1이라 최신 날짜가 어긋나 있어, FOMC가 IORB를 바꾸는 날 하루 동안 없는 스프레드가 만들어지고 그 값이 SRF 신호등 임계값을 그대로 굴린다. 바로 아래 추이 차트는 이미 날짜를 맞대고 있었다.</span></span></div>
@@ -1299,17 +1308,85 @@ const QRA_CASH={
   peak:1050, peakBand:50,                              // "could peak at $1.05 trillion (plus or minus $50 billion)"
   peakLabel:'2026년 10월 말', peakEnd:'2026-10-31',
   bills:'9월 단기물 축소(중순 법인세 유입) → 10월 커브 전반 증액',   // 같은 성명의 빌 발행 계획 = 재축적 재원
-  // ── 반대 방향(TGA 소진) 단서 두 건 — 둘 다 11/4 리펀딩까지 한시라 위 next·스테일 판정을 공유한다.
+  // ── 반대 방향(TGA 소진) 단서 — 셋 다 11/4 리펀딩까지 한시라 위 next·스테일 판정을 공유한다.
   buyback:{
     // 공식 — 장기물 유동성지원 바이백 '회당 상한' $2B→$4B+ 상향, 9/9 발효~11/4 (10Y~30Y 명목쿠폰)
+    // '상한'까지가 성명이 말한 전부다. 실제 회차·실시 상한·낙찰액은 /api/buyback이
+    // 재무부 fiscaldata에서 받아 아래 '실시' 줄에 덧붙인다 — 여기에 수기로 적지 말 것.
     op:{ id:'sb0607', date:'2026-08-19',
          url:'https://home.treasury.gov/news/press-releases/sb0607',
-         sizeOld:2, sizeNew:4, sectors:'10Y~20Y·20Y~30Y', from:'2026-09-09' },
+         sizeOld:2, sizeNew:4, sectors:'10Y~20Y·20Y~30Y', from:'2026-09-09', until:'2026-11-04' },
+    // 시장 반응 — 상한을 3배로 올린 첫 실시 공고에도 장기금리는 되레 올랐다.
+    // '바이백 확대 = 금리 하락'으로 읽히는 걸 막으려 같이 박아둔다(시황이라 API가 없다 → 수기).
+    reaction:{ date:'2026-09-09', y10:4.85, bp:6, high:'2023-11 이후 최고',
+               view:'시장은 규모 부족으로 해석 — $7B는 돼야 서프라이즈(BNP파리바)', src:'로이터',
+               url:'https://www.brecorder.com/news/40438804/us-treasury-to-buy-up-to-6-billion-in-sept-10-buyback-operation' },
     // 보도·미확정 — 재무부 관계자, 바이백 '가용 현금' 기준을 과거 $550~600B → 최대 ~$950B로 검토(금액·시점 미정)
     tgaFund:{ date:'2026-08-24', prevLo:550, prevHi:600, avail:950,
               src:'CNBC', url:'https://finance.yahoo.com/economy/policy/articles/treasury-eyes-950b-cash-account-120527032.html' }
   }
 };
+
+// 장기물 바이백 '실시' 이력 — /api/buyback → 재무부 fiscaldata `buybacks_operations`.
+// 위 QRA_CASH가 든 건 성명 '본문' 문구뿐이다. 회차·실시 상한·낙찰액까지 수기로 두면
+// 실시할 때마다 손으로 고쳐야 하고, 안 고치면 '상향 예고'가 최신 상태인 척 남는다.
+// 패널의 공식·시장·보도 줄은 loadQRA가 이미 그려놨으므로 여기선 가운데 한 칸만 채운다.
+async function loadBuybackOps(){
+  const el=document.getElementById('c-tgapath-bbops');
+  if(!el)return;
+  const warn=m=>{el.innerHTML='<b style="color:#58a6ff">실시</b> <span style="color:var(--muted)">'+m+'</span>';};
+  try{
+    const r=await fetch('/api/buyback');
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const d=await r.json();
+    const ops=(d&&d.longEnd)||[];
+    if(!ops.length){warn('실시 이력이 비어 있다 — 위 정책 수치만 표시한다.');return;}
+
+    const o=QRA_CASH.buyback.op;
+    const md=v=>v?v.slice(5).replace('-','/'):'—';        // 2026-09-10 → 09/10
+    const bk=v=>String(v).replace(' to ','~');            // '10Y to 20Y' → '10Y~20Y'
+    const amt=v=>v==null?'—':'$'+(v>=10?Math.round(v):Number(v.toFixed(1)))+'B';
+
+    const top=ops[0];
+    // 상향 발효(o.from) 직전 회차와 나란히 놔야 '몇 배'가 보인다. 비교는 상한끼리 한다 —
+    // 낙찰액은 응찰에 따라 상한에 못 미칠 수 있어 분모로 쓰면 배수가 부풀려진다.
+    const prev=ops.find(x=>x.date<o.from&&x.maxB);
+    const mult=(prev&&top.maxB)?top.maxB/prev.maxB:null;
+
+    const head = top.pending
+      ? `<b style="color:var(--tx)">${md(top.date)} ${bk(top.bucket)} 상한 ${amt(top.maxB)}</b> — 결과 대기 `
+        +`<span style="color:var(--muted)">(마감 ${top.closeET||'—'} ET · 결제 ${md(top.settle)})</span>`
+      : `<b style="color:var(--tx)">${md(top.date)} ${bk(top.bucket)} 상한 ${amt(top.maxB)}</b> · 낙찰 ${amt(top.acceptedB)} `
+        +`<span style="color:var(--muted)">(응찰 ${amt(top.offeredB)}${top.issues?' · '+top.issues+'종목':''})</span>`;
+    const cmp = mult
+      ? ` · 상향 전 ${md(prev.date)} ${amt(prev.maxB)} 대비 <b style="color:#3fb950">${mult.toFixed(1)}배</b>`
+      : '';
+
+    const rows=ops.slice(0,6).map(x=>{
+      const up=x.date>=o.from;                            // 상향 발효 이후 실시분
+      return `<tr>`
+        +`<td>${x.date}${up?' <span style="color:#3fb950">▲</span>':''}</td>`
+        +`<td style="color:var(--muted)">${bk(x.bucket)}</td>`
+        +`<td style="color:${up?'#3fb950':'var(--tx)'};font-weight:${up?600:400}">${amt(x.maxB)}</td>`
+        +`<td>${x.pending?'<span style="color:var(--muted)">대기</span>':amt(x.acceptedB)}</td>`
+        +`<td style="color:var(--muted)">${x.pending?'—':amt(x.offeredB)}</td>`
+        +`</tr>`;
+    }).join('');
+
+    el.innerHTML=
+      `<div style="margin-bottom:6px"><b style="color:#58a6ff">실시</b> ${head}${cmp}</div>`
+      +`<div class="tw" style="min-width:0"><table>`
+        +`<thead><tr><th>실시일</th><th>만기대</th><th>회당 상한</th><th>낙찰</th><th>응찰</th></tr></thead>`
+        +`<tbody>${rows}</tbody>`
+      +`</table></div>`
+      +`<div style="font-size:10px;color:var(--muted);margin-top:5px;line-height:1.6">`
+        +`재무부 fiscaldata 바이백 실시 이력 · 30분 캐시 · ▲ = ${o.from} 상한 상향 발효 이후 · 결과 칸은 운영 마감(14:00 ET) 뒤에 채워진다`
+      +`</div>`;
+  }catch(e){
+    console.error('buybackOps:',e);
+    warn('실시 이력을 불러오지 못했다 — 위 정책 수치만 표시한다.');
+  }
+}
 
 async function loadQRA(){
   // ⓪ 현금잔액 경로 — /api/qra보다 먼저, 별도 try로 그린다.
@@ -1379,17 +1456,24 @@ async function loadQRA(){
     // 반대 방향(소진) 단서 — 위 '재축적 → NL 하락' 해석의 균형. 공식·보도를 라벨로 구분한다.
     const bbEl=document.getElementById('c-tgapath-buyback');
     if(bbEl){
-      const o=QRA_CASH.buyback.op, t=QRA_CASH.buyback.tgaFund;
+      const o=QRA_CASH.buyback.op, t=QRA_CASH.buyback.tgaFund, rc=QRA_CASH.buyback.reaction;
       const lnk=(u,s)=>`<a href="${u}" target="_blank" rel="noopener" style="color:#58a6ff;text-decoration:none">${s} ↗</a>`;
       bbEl.style.display='block';
       bbEl.innerHTML=
         `<div style="color:var(--tx);font-weight:600;margin-bottom:6px">반대 방향 단서 — TGA 소진(바이백)</div>`
         +`<div style="color:#8b949e;margin-bottom:5px">`
-          +`<b style="color:#3fb950">공식</b> 장기물 유동성지원 바이백 회당 상한 $${o.sizeOld}B→$${o.sizeNew}B+ (${o.sectors}), ${o.from} 발효 · ${lnk(o.url,o.date+' '+o.id)}`
+          +`<b style="color:#3fb950">공식</b> 장기물 유동성지원 바이백 회당 상한 $${o.sizeOld}B→$${o.sizeNew}B+ (${o.sectors}), ${o.from} 발효~${o.until} · ${lnk(o.url,o.date+' '+o.id)}`
+        +`</div>`
+        +`<div id="c-tgapath-bbops" style="color:#8b949e;margin-bottom:5px">`
+          +`<b style="color:#58a6ff">실시</b> <span style="color:var(--muted)">이력 불러오는 중…</span>`
+        +`</div>`
+        +`<div style="color:#8b949e;margin-bottom:5px">`
+          +`<b style="color:#f85149">시장</b> 확대에도 10년물 ${rc.y10}%(+${rc.bp}bp · ${rc.high}) — ${rc.view}. 바이백 확대가 곧 장기금리 하락은 아니다 · ${lnk(rc.url,rc.src+'·'+rc.date)}`
         +`</div>`
         +`<div style="color:#8b949e">`
           +`<b style="color:#d29922">보도·미확정</b> 재무부 관계자, 바이백 가용 현금 기준 $${t.prevLo}~${t.prevHi}B → 최대 ~$${t.avail}B 검토(금액·시점 미정) → 재축적 대신 <b style="color:#3fb950">소진 시 NL 상승 요인</b> · ${lnk(t.url,t.src+'·'+t.date)}`
         +`</div>`;
+      loadBuybackOps();   // innerHTML로 c-tgapath-bbops가 생긴 뒤라야 채울 수 있다
     }
   }catch(e){console.error('qraCash:',e);}
 
