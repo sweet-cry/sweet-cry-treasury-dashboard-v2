@@ -36,7 +36,12 @@ export default async function handler(req, res) {
   const freq = url.searchParams.get('freq') || '';
   if (!series) return res.status(400).json({ error: 'series required' });
 
-  const KEY = '3d022b35a44eabf7bb45dbdd9a1cfa01';
+  // 키는 코드에 두지 않는다(공개 저장소) — Vercel 프로젝트 환경변수 FRED_API_KEY
+  const KEY = process.env.FRED_API_KEY;
+  if (!KEY) {
+    res.setHeader('Cache-Control', 'no-store');
+    return res.status(500).json({ error: 'FRED_API_KEY 환경변수가 설정되지 않음' });
+  }
   let fredUrl = `https://api.stlouisfed.org/fred/series/observations?series_id=${series}&api_key=${KEY}&file_type=json&sort_order=desc&limit=${count}`;
   if (freq) fredUrl += `&frequency=${freq}`;
 
@@ -50,12 +55,22 @@ export default async function handler(req, res) {
       return res.status(503).json({ error: 'FRED rate limit', retry_after: 60 });
     }
 
+    // 429 외의 FRED 오류(잘못된 시리즈·일시 장애 등)나 관측치 없는 응답은 캐시하지 않는다.
+    // 예전엔 이런 응답도 200으로 s-maxage(최대 6시간) 동안 CDN에 남아, 몇 초짜리 장애가 몇 시간짜리 빈 차트가 됐다.
+    // 프론트 fred()는 observations가 없으면 빈 배열로 처리하므로 본문 모양은 그대로 둔다.
+    if (!r.ok || d.error_code || !Array.isArray(d.observations)) {
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Cache-Control', 'no-store');
+      return res.status(200).json(d);
+    }
+
     const maxAge = getCacheMaxAge(series);
     res.setHeader('Access-Control-Allow-Origin', '*');
     // stale-while-revalidate 대폭 증가 → CDN이 백그라운드 갱신 중에도 캐시 제공
     res.setHeader('Cache-Control', `s-maxage=${maxAge}, stale-while-revalidate=${maxAge * 2}`);
     res.status(200).json(d);
   } catch (e) {
+    res.setHeader('Cache-Control', 'no-store');
     res.status(500).json({ error: e.message });
   }
 }

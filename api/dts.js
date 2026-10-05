@@ -33,9 +33,12 @@ export default async function handler(req, res) {
     const [dts, tga] = await Promise.all([dtsR.json(), tgaR.json()]);
 
     res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Cache-Control", "s-maxage=3600");
+    // 원천이 실패했거나 비어 온 응답은 캐시하지 않는다(다음 요청에서 바로 다시 받게) — 본문 모양은 그대로
+    const ok = dtsR.ok && tgaR.ok && Array.isArray(dts.data) && dts.data.length && Array.isArray(tga.data) && tga.data.length;
+    res.setHeader("Cache-Control", ok ? "s-maxage=3600" : "no-store");
     res.status(200).json({ data: dts.data, tga: tga.data || [] });
   } catch(e) {
+    res.setHeader("Cache-Control", "no-store");
     res.status(500).json({ error: e.message });
   }
 }

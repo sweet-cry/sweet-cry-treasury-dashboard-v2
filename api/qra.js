@@ -114,9 +114,11 @@ export default async function handler(req, res) {
       .sort((a, b) => b.date.localeCompare(a.date));
 
     res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Cache-Control", "s-maxage=3600");
+    // 경매 원천이 실패해 비어 온 응답은 캐시하지 않는다 — 본문 모양은 그대로
+    res.setHeader("Cache-Control", (r.ok && rows.length) ? "s-maxage=3600" : "no-store");
     res.status(200).json({ quarters, upcoming, recent, data: rows });
   } catch(e) {
+    res.setHeader("Cache-Control", "no-store");
     res.status(500).json({ error: e.message });
   }
 }
