@@ -52,7 +52,8 @@ export default async function handler(req, res) {
     const result = mergeData(HIST, curr);
 
     res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Cache-Control", "s-maxage=3600");
+    // 최신 표(slt_table5)를 못 받으면 내장 이력만 나간다 — 그 응답은 짧게만(5분) 캐시해 곧 다시 시도하게
+    res.setHeader("Cache-Control", Object.keys(curr).length ? "s-maxage=3600" : "s-maxage=300");
     res.status(200).json(result);
   } catch (e) {
     res.status(500).json({ error: e.message });

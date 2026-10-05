@@ -5,6 +5,7 @@ Treasury Dashboard 일일 신호 요약 → 카카오톡 나에게 보내기
 필요한 GitHub Secrets:
   KAKAO_REST_KEY      : 카카오 앱 REST API 키
   KAKAO_REFRESH_TOKEN : 최초 1회 발급한 리프레시 토큰
+  FRED_API_KEY        : FRED API 키 (공개 저장소라 코드에 두지 않는다)
 """
 
 import os, json, requests
@@ -13,7 +14,7 @@ from datetime import datetime, timezone, timedelta
 # ── 설정 ──────────────────────────────────────────────────────────
 KAKAO_REST_KEY      = os.environ["KAKAO_REST_KEY"]
 KAKAO_REFRESH_TOKEN = os.environ["KAKAO_REFRESH_TOKEN"]
-FRED_KEY            = "3d022b35a44eabf7bb45dbdd9a1cfa01"
+FRED_KEY            = os.environ["FRED_API_KEY"]
 DASHBOARD_URL       = "https://sweet-cry-treasury-dashboard-v2.vercel.app"
 KST                 = timezone(timedelta(hours=9))
 
@@ -38,14 +39,26 @@ def fred_latest(series, n=3):
     return [(o["date"], float(o["value"])) for o in obs if o["value"] != "."]
 
 # ── TGA (Treasury DTS) ────────────────────────────────────────────
-def get_tga():
+# 대시보드(api/dts.js)와 같은 데이터셋·계정: operating_cash_balance의 'TGA Closing Balance'.
+# 예전엔 dts_table_1의 'Federal Reserve Account'(2021년 개편 전 이름)·개장 잔액을 읽어
+# 값이 비거나 대시보드보다 하루 밀렸다. 마감 행의 실제 값은 open_today_bal 칸에 담겨 온다(api/dts.js 주석).
+def get_tga(n=12):
     url = ("https://api.fiscaldata.treasury.gov/services/api/fiscal_service"
-           "/v1/accounting/dts/dts_table_1"
-           "?fields=record_date,open_today_bal"
-           "&filter=account_type:eq:Federal%20Reserve%20Account"
-           "&sort=-record_date&page[size]=3")
+           "/v1/accounting/dts/operating_cash_balance"
+           "?fields=record_date,account_type,open_today_bal"
+           "&filter=account_type:eq:Treasury%20General%20Account%20(TGA)%20Closing%20Balance"
+           f"&sort=-record_date&page[size]={n}")
     data = requests.get(url, timeout=10).json().get("data", [])
-    return [(x["record_date"], float(x["open_today_bal"])) for x in data if x.get("open_today_bal")]
+    return [(x["record_date"], float(x["open_today_bal"])) for x in data
+            if x.get("open_today_bal") not in (None, "", "null")]
+
+
+def value_on_or_before(series, day):
+    """[(YYYY-MM-DD, 값)] 최신순 목록에서 day 이전(같은 날 포함) 가장 가까운 값."""
+    for d, v in series:
+        if d <= day:
+            return v
+    return None
 
 # ── QRA 데이터 ────────────────────────────────────────────────────
 def get_qra_signal():
@@ -71,11 +84,11 @@ def get_qra_signal():
                 bill += amt
     bill_pct = bill / total * 100 if total > 0 else 0
 
-    # 분기 경과율
+    # 분기 경과율 — 분기 끝 = 다음 분기 첫날.
+    # 예전 식은 1~3분기 끝을 '마지막 달 1일'(3/1·6/1·9/1)로 잡아 그 달이 되면 이미 100%로 나왔다.
     q_idx   = int(cur_q[-1])
     q_start = datetime(today.year, (q_idx-1)*3+1, 1, tzinfo=KST)
-    q_end   = datetime(today.year, q_idx*3 % 12 + (1 if q_idx*3 % 12 == 0 else 0),
-                       1, tzinfo=KST) if q_idx < 4 else datetime(today.year+1, 1, 1, tzinfo=KST)
+    q_end   = datetime(today.year, q_idx*3+1, 1, tzinfo=KST) if q_idx < 4 else datetime(today.year+1, 1, 1, tzinfo=KST)
     q_pct   = min(int((today - q_start).days / (q_end - q_start).days * 100), 100)
 
     return cur_q, round(total), round(bill_pct), q_pct
@@ -85,7 +98,7 @@ def format_message():
     now = datetime.now(KST)
 
     walcl   = fred_latest("WALCL",   2)   # millions USD
-    rrp     = fred_latest("RRPONTSYD", 2) # billions USD
+    rrp     = fred_latest("RRPONTSYD", 12) # billions USD — 1주 전 비교용으로 넉넉히
     wresbal = fred_latest("WRESBAL", 2)   # millions USD
     sp500   = fred_latest("SP500",   2)
     tga_raw = get_tga()                   # millions USD
@@ -101,13 +114,18 @@ def format_message():
     sp_v    = sp500[0][1]   if sp500   else None
 
     # NL 근사 (WALCL - TGA - RRP, 단위 billions)
+    # 비교는 '1주 전'으로 한다. WALCL은 주간(수요일)이라 [1]은 전일이 아니라 전주다 —
+    # 예전엔 이걸 일간 TGA·RRP의 전일값과 섞어 '전일比'라고 적었다. 이제 1주 전 WALCL 날짜의
+    # TGA·RRP(그날 이전 가장 가까운 값)를 써서 같은 시점끼리 뺀다.
     if walcl_v and tga_v and rrp_v:
         nl_b = walcl_v/1e3 - tga_v/1e3 - rrp_v  # millions/1000 = billions
         nl_str = fmt_B(nl_b)
         nl_chg = None
-        if len(walcl) > 1 and len(rrp) > 1 and len(tga_raw) > 1:
-            nl_prev = walcl[1][1]/1e3 - tga_raw[1][1]/1e3 - rrp[1][1]
-            nl_chg  = nl_b - nl_prev
+        if len(walcl) > 1:
+            d_prev = walcl[1][0]
+            tga_p, rrp_p = value_on_or_before(tga_raw, d_prev), value_on_or_before(rrp, d_prev)
+            if tga_p is not None and rrp_p is not None:
+                nl_chg = nl_b - (walcl[1][1]/1e3 - tga_p/1e3 - rrp_p)
     else:
         nl_str, nl_chg = "—", None
 
@@ -117,7 +135,7 @@ def format_message():
     elif bill_pct < 40: nl_sig, sig_emoji = "NL 압박↓", "🔴"
     else:               nl_sig, sig_emoji = "혼합 구성", "🟡"
 
-    chg_str = (f" (전일比 {'+' if nl_chg>=0 else ''}{nl_chg:,.0f}B$)"
+    chg_str = (f" (1주 전比 {'+' if nl_chg>=0 else ''}{nl_chg:,.0f}B$)"
                if nl_chg is not None else "")
 
     msg = "\n".join([

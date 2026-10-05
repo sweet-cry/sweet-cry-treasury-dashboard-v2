@@ -74,6 +74,7 @@ export default async function handler(req, res) {
       fetchedAt: new Date().toISOString()
     });
   } catch (e) {
+    res.setHeader('Cache-Control', 'no-store');
     res.status(500).json({ error: e.message });
   }
 }

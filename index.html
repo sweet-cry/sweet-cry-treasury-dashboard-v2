@@ -298,11 +298,16 @@ tr:hover td{background:var(--surf2)}
       <div class="chg-hd">
         <div>
           <div class="chg-ti" id="chgTitle">📋 업데이트 내역</div>
-          <div class="chg-sub">2026-05-21 ~ 09-10 · 최근 주요 작업 중심</div>
+          <div class="chg-sub">2026-05-21 ~ 10-05 · 최근 주요 작업 중심</div>
         </div>
         <button class="chg-x" onclick="chgClose()" aria-label="닫기">✕ 닫기</button>
       </div>
       <div class="chg-bd">
+
+        <div class="chg-day"><span class="chg-date">2026-10-05</span><span class="chg-cnt">3건</span></div>
+        <div class="chg-it"><span class="chg-tag x">FIX</span><span class="chg-txt">일시 장애가 몇 시간짜리 빈 차트로 남던 것<span class="chg-why">FRED가 429 말고 다른 오류를 주거나 재무부 API가 비어 오면, 그 응답도 정상처럼 CDN에 최대 6시간(DTS·경매는 1시간) 캐시됐다. 이제 실패·빈 응답은 캐시하지 않아 다음 요청에서 바로 다시 받는다. TIC는 최신 표를 못 받으면 5분만 캐시.</span></span></div>
+        <div class="chg-it"><span class="chg-tag x">FIX</span><span class="chg-txt">카카오 일일 요약의 TGA·분기 경과율·NL 변화<span class="chg-why">TGA를 대시보드와 같은 '마감 잔액'(operating_cash_balance)으로 읽는다 — 예전엔 2021년 개편 전 계정명·개장 잔액이라 비거나 하루 밀렸다. 분기 경과율은 1~3분기 마지막 달이 되면 100%로 나오던 계산을 고쳤고, NL 변화는 주간 WALCL과 일간 값을 섞은 '전일比'를 같은 시점끼리 뺀 '1주 전比'로 바꿨다.</span></span></div>
+        <div class="chg-it"><span class="chg-tag x">FIX</span><span class="chg-txt">FRED API 키를 코드에서 뺐다<span class="chg-why">공개 저장소에 키가 그대로 있어 누구나 쓸 수 있었고, 남이 많이 쓰면 이 화면이 FRED 한도에 걸린다. 이제 Vercel 환경변수·GitHub Secret(FRED_API_KEY)에서 읽는다.</span></span></div>
 
         <div class="chg-day"><span class="chg-date">2026-09-10</span><span class="chg-cnt">2건</span></div>
         <div class="chg-it"><span class="chg-tag f">NEW</span><span class="chg-txt">바이백 '실시' 이력을 재무부 fiscaldata에서 직접 수집<span class="chg-why">성명 '본문' 수치와 달리 실시 이력엔 API가 있다(buybacks_operations). 회차·회당 상한·낙찰/응찰을 자동으로 받아 실시할 때마다 손으로 고치던 스테일을 없앴다. 결과 유무는 날짜가 아니라 낙찰액 유무로 가른다 — 공고 행이 운영 1~2일 전에 먼저 올라오고 결과 칸만 비어 있다. 장기물 판정엔 security_type이 필요하다: 만기대만 보면 TIPS 바이백('10Y to 30Y')이 명목 장기물로 섞여 든다.</span></span></div>
