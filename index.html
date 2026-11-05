@@ -298,11 +298,15 @@ tr:hover td{background:var(--surf2)}
       <div class="chg-hd">
         <div>
           <div class="chg-ti" id="chgTitle">📋 업데이트 내역</div>
-          <div class="chg-sub">2026-05-21 ~ 09-10 · 최근 주요 작업 중심</div>
+          <div class="chg-sub">2026-05-21 ~ 11-05 · 최근 주요 작업 중심</div>
         </div>
         <button class="chg-x" onclick="chgClose()" aria-label="닫기">✕ 닫기</button>
       </div>
       <div class="chg-bd">
+
+        <div class="chg-day"><span class="chg-date">2026-11-05</span><span class="chg-cnt">2건</span></div>
+        <div class="chg-it"><span class="chg-tag x">FIX</span><span class="chg-txt">TGA 경로 패널을 11/4 리펀딩 성명(sb0678)으로 갱신<span class="chg-why">패널이 8/5 성명(9월말 950B$·10월말 고점 1.05T$)에 멈춰 스테일 배너가 떠 있었다. 12월말 가정 850B$, 11월 말·1월 말 고점 1.025T$(±50B), 빌 계획(11월 말 단기 CMB 가능 → 12월 축소 → 1월 증액), 다음 성명 2027-02-03으로 교체. 쿠폰 경매 규모는 3년 580·10년 420·30년 250억$로 동결.</span></span></div>
+        <div class="chg-it"><span class="chg-tag x">FIX</span><span class="chg-txt">바이백 단서를 새 분기 프로그램으로 교체<span class="chg-why">8/19 '상한 상향 9/9~11/4' 문구는 11/4로 만료됐다. 11/4 성명은 다음 분기 유동성지원 최대 70B$ + 현금관리(1M~2Y) 최대 25B$를 밝혔고, 잠정 일정표상 장기물 회당 상한은 60억$다(9/9 이전 20억$). 'TGA 현금을 바이백 재원으로 검토'(8/24 보도)는 11/4 성명 본문에 없어 '성명 미반영'을 함께 표기한다.</span></span></div>
 
         <div class="chg-day"><span class="chg-date">2026-09-10</span><span class="chg-cnt">2건</span></div>
         <div class="chg-it"><span class="chg-tag f">NEW</span><span class="chg-txt">바이백 '실시' 이력을 재무부 fiscaldata에서 직접 수집<span class="chg-why">성명 '본문' 수치와 달리 실시 이력엔 API가 있다(buybacks_operations). 회차·회당 상한·낙찰/응찰을 자동으로 받아 실시할 때마다 손으로 고치던 스테일을 없앴다. 결과 유무는 날짜가 아니라 낙찰액 유무로 가른다 — 공고 행이 운영 1~2일 전에 먼저 올라오고 결과 칸만 비어 있다. 장기물 판정엔 security_type이 필요하다: 만기대만 보면 TIPS 바이백('10Y to 30Y')이 명목 장기물로 섞여 든다.</span></span></div>
@@ -1301,27 +1305,31 @@ async function loadDTS(){
 // 분기 1회 갱신이라 다음 성명일을 함께 박아두고, 그날이 지나면 패널이 스스로 스테일을 알린다.
 // (갱신을 잊으면 지난 분기 전망이 현재 전망처럼 보인다 — 하드코딩 전망 박스의 전형적 사고.)
 const QRA_CASH={
-  stmt:'2026-08-05', id:'sb0590',
-  url:'https://home.treasury.gov/news/press-releases/sb0590',
-  next:'2026-11-04',                                   // 성명 말미 "next quarterly refunding announcement"
-  qEnd:950,  qEndLabel:'2026년 9월말',                  // "assuming a $950 billion cash balance at the end of September"
-  peak:1050, peakBand:50,                              // "could peak at $1.05 trillion (plus or minus $50 billion)"
-  peakLabel:'2026년 10월 말', peakEnd:'2026-10-31',
-  bills:'9월 단기물 축소(중순 법인세 유입) → 10월 커브 전반 증액',   // 같은 성명의 빌 발행 계획 = 재축적 재원
-  // ── 반대 방향(TGA 소진) 단서 — 셋 다 11/4 리펀딩까지 한시라 위 next·스테일 판정을 공유한다.
+  stmt:'2026-11-04', id:'sb0678',
+  url:'https://home.treasury.gov/news/press-releases/sb0678',
+  next:'2027-02-03',                                   // 성명 말미 "next quarterly refunding announcement will take place on Wednesday, February 3, 2027"
+  qEnd:850,  qEndLabel:'2026년 12월말',                 // "assuming an $850 billion cash balance at the end of December"
+  peak:1025, peakBand:50,                              // "TGA could peak at $1.025 trillion (plus or minus $50 billion)" — 11월 말·1월 말
+  peakLabel:'2026년 11월 말·2027년 1월 말', peakEnd:'2027-01-31',
+  bills:'11월 말 단기 CMB 가능 → 12월 단기물 축소 → 1월 증액',   // 같은 성명의 빌 발행 계획 = 재축적 재원
+  // ── 반대 방향(TGA 소진) 단서 — 공식·시장 줄은 다음 리펀딩(next)까지 한시라 위 스테일 판정을 공유한다.
   buyback:{
-    // 공식 — 장기물 유동성지원 바이백 '회당 상한' $2B→$4B+ 상향, 9/9 발효~11/4 (10Y~30Y 명목쿠폰)
-    // '상한'까지가 성명이 말한 전부다. 실제 회차·실시 상한·낙찰액은 /api/buyback이
-    // 재무부 fiscaldata에서 받아 아래 '실시' 줄에 덧붙인다 — 여기에 수기로 적지 말 것.
-    op:{ id:'sb0607', date:'2026-08-19',
-         url:'https://home.treasury.gov/news/press-releases/sb0607',
-         sizeOld:2, sizeNew:4, sectors:'10Y~20Y·20Y~30Y', from:'2026-09-09', until:'2026-11-04' },
+    // 공식 — 11/4 성명: 다음 분기 유동성지원 최대 $70B(여러 버킷) + 현금관리(1M~2Y) 최대 $25B.
+    // 잠정 일정표(11/4 공표)상 장기(10Y~20Y·20Y~30Y) 명목쿠폰 회당 상한은 $6B — 9/9 이전 $2B의 3배.
+    // 성명 본문엔 회당 상한이 없고 일정표에만 있다(일정표는 잠정, 변경 가능).
+    // 실제 회차·실시 상한·낙찰액은 /api/buyback이 재무부 fiscaldata에서 받아 아래 '실시' 줄에 덧붙인다 — 여기에 수기로 적지 말 것.
+    op:{ id:'sb0678', date:'2026-11-04',
+         url:'https://home.treasury.gov/news/press-releases/sb0678',
+         sizeOld:2, sizeNew:6, sectors:'10Y~20Y·20Y~30Y', from:'2026-09-09', until:'2027-01-31',
+         liqTotal:70, cashTotal:25, cashBucket:'1M~2Y',
+         schedUrl:'https://home.treasury.gov/system/files/221/Tentative-Buyback-Schedule.pdf' },
     // 시장 반응 — 상한을 3배로 올린 첫 실시 공고에도 장기금리는 되레 올랐다.
     // '바이백 확대 = 금리 하락'으로 읽히는 걸 막으려 같이 박아둔다(시황이라 API가 없다 → 수기).
     reaction:{ date:'2026-09-09', y10:4.85, bp:6, high:'2023-11 이후 최고',
                view:'시장은 규모 부족으로 해석 — $7B는 돼야 서프라이즈(BNP파리바)', src:'로이터',
                url:'https://www.brecorder.com/news/40438804/us-treasury-to-buy-up-to-6-billion-in-sept-10-buyback-operation' },
     // 보도·미확정 — 재무부 관계자, 바이백 '가용 현금' 기준을 과거 $550~600B → 최대 ~$950B로 검토(금액·시점 미정)
+    // 11/4 성명 본문에는 이 언급이 없다(확인 2026-11-05) → 화면에 '성명 미반영'을 함께 적는다.
     tgaFund:{ date:'2026-08-24', prevLo:550, prevHi:600, avail:950,
               src:'CNBC', url:'https://finance.yahoo.com/economy/policy/articles/treasury-eyes-950b-cash-account-120527032.html' }
   }
@@ -1462,7 +1470,7 @@ async function loadQRA(){
       bbEl.innerHTML=
         `<div style="color:var(--tx);font-weight:600;margin-bottom:6px">반대 방향 단서 — TGA 소진(바이백)</div>`
         +`<div style="color:#8b949e;margin-bottom:5px">`
-          +`<b style="color:#3fb950">공식</b> 장기물 유동성지원 바이백 회당 상한 $${o.sizeOld}B→$${o.sizeNew}B+ (${o.sectors}), ${o.from} 발효~${o.until} · ${lnk(o.url,o.date+' '+o.id)}`
+          +`<b style="color:#3fb950">공식</b> 다음 분기 바이백 유동성지원 최대 $${o.liqTotal}B + 현금관리(${o.cashBucket}) 최대 $${o.cashTotal}B · 장기물(${o.sectors}) 회당 상한 $${o.sizeNew}B(9/9 이전 $${o.sizeOld}B) — ${lnk(o.schedUrl,'잠정 일정표')}(변경 가능) · ${lnk(o.url,o.date+' '+o.id)}`
         +`</div>`
         +`<div id="c-tgapath-bbops" style="color:#8b949e;margin-bottom:5px">`
           +`<b style="color:#58a6ff">실시</b> <span style="color:var(--muted)">이력 불러오는 중…</span>`
@@ -1471,7 +1479,7 @@ async function loadQRA(){
           +`<b style="color:#f85149">시장</b> 확대에도 10년물 ${rc.y10}%(+${rc.bp}bp · ${rc.high}) — ${rc.view}. 바이백 확대가 곧 장기금리 하락은 아니다 · ${lnk(rc.url,rc.src+'·'+rc.date)}`
         +`</div>`
         +`<div style="color:#8b949e">`
-          +`<b style="color:#d29922">보도·미확정</b> 재무부 관계자, 바이백 가용 현금 기준 $${t.prevLo}~${t.prevHi}B → 최대 ~$${t.avail}B 검토(금액·시점 미정) → 재축적 대신 <b style="color:#3fb950">소진 시 NL 상승 요인</b> · ${lnk(t.url,t.src+'·'+t.date)}`
+          +`<b style="color:#d29922">보도·미확정</b> 재무부 관계자, 바이백 가용 현금 기준 $${t.prevLo}~${t.prevHi}B → 최대 ~$${t.avail}B 검토(금액·시점 미정) · <b style="color:#d29922">11/4 성명 본문엔 언급 없음</b> → 실현 시 재축적 대신 <b style="color:#3fb950">소진 → NL 상승 요인</b> · ${lnk(t.url,t.src+'·'+t.date)}`
         +`</div>`;
       loadBuybackOps();   // innerHTML로 c-tgapath-bbops가 생긴 뒤라야 채울 수 있다
     }
