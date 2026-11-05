@@ -304,7 +304,10 @@ tr:hover td{background:var(--surf2)}
       </div>
       <div class="chg-bd">
 
-        <div class="chg-day"><span class="chg-date">2026-11-05</span><span class="chg-cnt">2건</span></div>
+        <div class="chg-day"><span class="chg-date">2026-11-05</span><span class="chg-cnt">5건</span></div>
+        <div class="chg-it"><span class="chg-tag x">FIX</span><span class="chg-txt">경매 데이터를 TreasuryDirect로 보강하고 지연 가드 추가<span class="chg-why">재무부 fiscaldata의 경매 표가 1~2주 뒤처져(마지막 10/22) 이번 분기 합계가 덜 잡혀 '발행 13%p 뒤처짐 — 발행 지연 신호'와 T-Bill 91%, '예정 경매 없음'이 가짜로 떴다. 최근 구간만 TreasuryDirect(같은 날 낙찰·공고 반영)로 덮어쓰고 과거 분기는 fiscaldata를 그대로 쓴다. 최신 낙찰이 4일 넘게 비면 진행도 판단을 보류하고 종합 신호에서 뺀다.</span></span></div>
+        <div class="chg-it"><span class="chg-tag x">FIX</span><span class="chg-txt">H.4.1 탭의 낡은 QT 표기 정리<span class="chg-why">QT는 2025-12-01 종료됐는데 'QT 진행' 배지, UST 25B$·MBS 35B$ 상한 눈금, 만기 차트의 '캡 초과(빨강)'가 남아 있었다. 상한 대비 비율을 없애고 최근 4주 증감만 보여주며 설명·툴팁도 QT 종료 기준으로 고쳤다.</span></span></div>
+        <div class="chg-it"><span class="chg-tag x">FIX</span><span class="chg-txt">M2·TIC 탭의 낡은 문구 수정<span class="chg-why">'2026 초 Fed QT taper 가능성' 문장은 QT 종료 사실에 맞게 바꿨고, TIC 설명의 '일본 $1.2T'는 실제 데이터(2026-08 $1.07T)에 맞췄다. 관세 전쟁 표현도 데이터로 확인되는 사실(중국 1년 새 약 $109B 감소) 위주로 고쳤다.</span></span></div>
         <div class="chg-it"><span class="chg-tag x">FIX</span><span class="chg-txt">TGA 경로 패널을 11/4 리펀딩 성명(sb0678)으로 갱신<span class="chg-why">패널이 8/5 성명(9월말 950B$·10월말 고점 1.05T$)에 멈춰 스테일 배너가 떠 있었다. 12월말 가정 850B$, 11월 말·1월 말 고점 1.025T$(±50B), 빌 계획(11월 말 단기 CMB 가능 → 12월 축소 → 1월 증액), 다음 성명 2027-02-03으로 교체. 쿠폰 경매 규모는 3년 580·10년 420·30년 250억$로 동결.</span></span></div>
         <div class="chg-it"><span class="chg-tag x">FIX</span><span class="chg-txt">바이백 단서를 새 분기 프로그램으로 교체<span class="chg-why">8/19 '상한 상향 9/9~11/4' 문구는 11/4로 만료됐다. 11/4 성명은 다음 분기 유동성지원 최대 70B$ + 현금관리(1M~2Y) 최대 25B$를 밝혔고, 잠정 일정표상 장기물 회당 상한은 60억$다(9/9 이전 20억$). 'TGA 현금을 바이백 재원으로 검토'(8/24 보도)는 11/4 성명 본문에 없어 '성명 미반영'을 함께 표기한다.</span></span></div>
 
@@ -498,28 +501,28 @@ tr:hover td{background:var(--surf2)}
   <!-- ── H41 ── -->
   <div id="t-h41" style="display:none">
 
-  <div class="tdesc"><div class="tdesc-hdr"><div class="tdesc-icon">H41</div><div><div class="tdesc-title">H.4.1 — 연준 대차대조표 상세</div><div class="tdesc-src">TREAST · WSHOMCB · H41RESPPALDKNWW · WLCFLPCL · FRED 주간</div></div></div><div class="tdesc-body">매주 수요일 기준 대차대조표, 목요일 16:30 ET 발표 (FRED 반영은 통상 목 저녁~금 오전). UST·MBS 감소 추세로 QT 진행 속도 확인. BTFP는 2023년 SVB 사태 대응 긴급 창구로 현재 잔액 소멸 진행 중. Discount Window 잔액 급등 시 특정 은행의 유동성 압박 또는 광범위한 시장 스트레스 신호.</div><div class="tdesc-tags"><span class="tdesc-tag b">QT 속도 주시</span><span class="tdesc-tag g">BTFP 만료 확인</span><span class="tdesc-tag r">DW 급증 = 위기</span><span class="tdesc-tag ">MBS 감소 완만</span><span class="tdesc-tag a">주간 발표</span></div><div class="tdesc-rels"><span><span style="color:#58a6ff">→</span> UST 감소 둔화 = QT 종료 신호</span><span><span style="color:#f85149">→</span> DW 급등 = 은행 스트레스</span><span><span style="color:#3fb950">→</span> BTFP 0 = 은행권 안정</span></div><div class="tdesc-links"><a class="tdesc-link" href="https://fred.stlouisfed.org/series/TREAST" target="_blank">TREAST ↗</a><a class="tdesc-link" href="https://fred.stlouisfed.org/series/WSHOMCB" target="_blank">WSHOMCB ↗</a><a class="tdesc-link" href="https://fred.stlouisfed.org/series/H41RESPPALDKNWW" target="_blank">BTFP ↗</a><a class="tdesc-link" href="https://fred.stlouisfed.org/series/WLCFLPCL" target="_blank">WLCFLPCL ↗</a><a class="tdesc-link" href="https://www.federalreserve.gov/releases/h41/" target="_blank">H.4.1 원문 ↗</a></div></div>
+  <div class="tdesc"><div class="tdesc-hdr"><div class="tdesc-icon">H41</div><div><div class="tdesc-title">H.4.1 — 연준 대차대조표 상세</div><div class="tdesc-src">TREAST · WSHOMCB · H41RESPPALDKNWW · WLCFLPCL · FRED 주간</div></div></div><div class="tdesc-body">매주 수요일 기준 대차대조표, 목요일 16:30 ET 발표 (FRED 반영은 통상 목 저녁~금 오전). UST·MBS 보유 변화로 QT 종료(2025-12-01) 이후 대차대조표 방향 확인. BTFP는 2023년 SVB 사태 대응 긴급 창구로 현재 잔액 소멸 진행 중. Discount Window 잔액 급등 시 특정 은행의 유동성 압박 또는 광범위한 시장 스트레스 신호.</div><div class="tdesc-tags"><span class="tdesc-tag b">보유 추이 주시</span><span class="tdesc-tag g">BTFP 만료 확인</span><span class="tdesc-tag r">DW 급증 = 위기</span><span class="tdesc-tag ">MBS 감소 완만</span><span class="tdesc-tag a">주간 발표</span></div><div class="tdesc-rels"><span><span style="color:#58a6ff">→</span> UST 증가 = 준비금 공급 확대</span><span><span style="color:#f85149">→</span> DW 급등 = 은행 스트레스</span><span><span style="color:#3fb950">→</span> BTFP 0 = 은행권 안정</span></div><div class="tdesc-links"><a class="tdesc-link" href="https://fred.stlouisfed.org/series/TREAST" target="_blank">TREAST ↗</a><a class="tdesc-link" href="https://fred.stlouisfed.org/series/WSHOMCB" target="_blank">WSHOMCB ↗</a><a class="tdesc-link" href="https://fred.stlouisfed.org/series/H41RESPPALDKNWW" target="_blank">BTFP ↗</a><a class="tdesc-link" href="https://fred.stlouisfed.org/series/WLCFLPCL" target="_blank">WLCFLPCL ↗</a><a class="tdesc-link" href="https://www.federalreserve.gov/releases/h41/" target="_blank">H.4.1 원문 ↗</a></div></div>
     <div class="sec">
       <div class="stitle">H.4.1 — 연준 대차대조표</div>
       <div class="cards">
-        <div class="card"><div class="cl">UST 보유 <span class="badge badge-blue" style="margin-left:2px">QT 진행</span></div><div class="cv" id="c-ust">—</div><div class="cs" id="c-ust-d">TREAST</div></div>
+        <div class="card"><div class="cl">UST 보유</div><div class="cv" id="c-ust">—</div><div class="cs" id="c-ust-d">TREAST</div></div>
         <div class="card"><div class="cl">MBS 보유 <button class="ib" onclick="tip('mbs',this)">i</button></div><div class="cv" id="c-mbs">—</div><div class="cs" id="c-mbs-d">WSHOMCB</div></div>
         <div class="card"><div class="cl">Discount Window <button class="ib" onclick="tip('dw',this)">i</button></div><div class="cv" id="c-dw">—</div><div class="cs" id="c-dw-d">WLCFLPCL</div></div>
-        <div class="card"><div class="cl">UST 월간 감소</div><div class="cv" id="c-ust-chg">—</div><div class="cs" id="c-ust-chg-d">상한 $25B 대비 —</div></div>
+        <div class="card"><div class="cl">UST 4주 변화</div><div class="cv" id="c-ust-chg">—</div><div class="cs" id="c-ust-chg-d">4주 전 대비 —</div></div>
       </div>
     </div>
     <!-- QT 속도 게이지 -->
     <div class="qt-gauge">
-      <div class="qt-title">QT 진행 속도 — 월별 감소폭 vs 상한</div>
+      <div class="qt-title">UST·MBS 보유 변화 — 최근 4주 (QT는 2025-12-01 종료)</div>
       <div class="qt-row">
-        <div class="qt-head"><span class="qt-label">국채 (UST) 감소 <span id="qt-ust-badge" style="display:none;font-size:9px;padding:2px 6px;border-radius:4px;font-weight:600;background:rgba(248,81,73,.15);color:var(--red);margin-left:4px">QT 중단</span></span><span class="qt-val" id="c-qt-ust-val" style="color:var(--amber)">— / 상한 25B$</span></div>
+        <div class="qt-head"><span class="qt-label">국채 (UST) 4주 변화</span><span class="qt-val" id="c-qt-ust-val" style="color:var(--amber)">—</span></div>
         <div class="qt-bar-bg" id="qt-bar-ust-bg" style="height:22px"><div class="qt-bar-fill" id="qt-bar-ust" style="width:0%;background:var(--amber);height:100%"></div></div>
-        <div class="qt-foot"><span>0</span><span>상한 $25B</span></div>
+        <div class="qt-foot"><span>0</span><span>눈금 50B$</span></div>
       </div>
       <div class="qt-row">
-        <div class="qt-head"><span class="qt-label">MBS 감소 <span style="font-size:10px;color:#484f58">(자연감소)</span></span><span class="qt-val" id="c-qt-mbs-val" style="color:var(--green)">— / 상한 35B$</span></div>
+        <div class="qt-head"><span class="qt-label">MBS 감소 <span style="font-size:10px;color:#484f58">(자연감소)</span></span><span class="qt-val" id="c-qt-mbs-val" style="color:var(--green)">—</span></div>
         <div class="qt-bar-bg"><div class="qt-bar-fill" id="qt-bar-mbs" style="width:0%;background:var(--green)"></div></div>
-        <div class="qt-foot"><span>0</span><span>상한 $35B</span></div>
+        <div class="qt-foot"><span>0</span><span>눈금 50B$</span></div>
       </div>
       <div class="qt-interp" id="c-qt-interp">데이터 로딩 중...</div>
     </div>
@@ -559,7 +562,7 @@ tr:hover td{background:var(--surf2)}
       </div>
       <div style="display:flex;flex-direction:column;gap:14px">
         <div class="cc" style="flex:1">
-          <div class="ct">향후 12개월 월별 만기 <span style="font-size:10px;color:#484f58">(B$ · 빨강=캡 초과)</span></div>
+          <div class="ct">향후 12개월 월별 만기 <span style="font-size:10px;color:#484f58">(B$)</span></div>
           <div style="position:relative;height:160px"><canvas id="somaMonthlyChart"></canvas></div>
           <div class="qt-interp" id="c-soma-12m" style="margin-top:8px">12개월 합계: —</div>
         </div>
@@ -625,7 +628,7 @@ tr:hover td{background:var(--surf2)}
     <div class="ct">Reserves/GDP 추이 (24개월) <button class="ib" onclick="tip('lclor-calc',this)">i</button></div>
     <div class="leg"><span><span class="ld" style="background:#58a6ff"></span>Reserves/GDP %</span></div>
     <div style="position:relative;height:180px"><canvas id="lclorChart"></canvas></div>
-    <div style="font-size:10px;color:var(--muted);margin-top:4px;line-height:1.5">파란 실선이 8% scarce 기준선에 접근 시 QT 종료 압력 본격화. 2025 하반기부터 8% 근접 추세 → 2026 초 Fed QT taper 가능성 상승.</div>
+    <div style="font-size:10px;color:var(--muted);margin-top:4px;line-height:1.5">파란 실선이 8% scarce 기준선에 접근하면 준비금 부족 신호 — Fed는 2025-12-01 QT(대차대조표 축소)를 종료했고, 이 선에 가까워질수록 추가 준비금 공급 압력이 커진다.</div>
   </div>
 
   </div>
@@ -842,7 +845,7 @@ tr:hover td{background:var(--surf2)}
 
   <div id="t-tic" style="display:none">
 
-  <div class="tdesc"><div class="tdesc-hdr"><div class="tdesc-icon">TIC</div><div><div class="tdesc-title">TIC — 국가별 미국채 보유</div><div class="tdesc-src">미 재무부 월간 · 약 6주 후행</div><div class="tdesc-links"><a class="tdesc-link" href="https://home.treasury.gov/data/treasury-international-capital-tic-system-home-page" target="_blank">TIC 홈 ↗</a><a class="tdesc-link" href="https://home.treasury.gov/news/press-releases" target="_blank">Treasury 보도 ↗</a><a class="tdesc-link" href="https://ticdata.treasury.gov/" target="_blank">TIC 데이터 ↗</a></div></div></div><div class="tdesc-body">외국 정부·기관의 미국채 보유 현황. 일본이 최대 보유국($1.2T), 중국은 감소 추세. 보유 감소 = 달러 약세 + 미국채 금리 상승 압력. 최근 미·중 무역 갈등과 관세 전쟁으로 중국의 미국채 무기화(전략적 매도) 우려가 시장 리스크로 부상.</div><div class="tdesc-tags"><span class="tdesc-tag b">일본 = 최대 보유국</span><span class="tdesc-tag r">중국 감소 추세</span><span class="tdesc-tag a">케이맨 과소집계</span><span class="tdesc-tag ">지정학 리스크</span><span class="tdesc-tag ">6주 후행 발표</span></div><div class="tdesc-rels"><span><span style="color:#f85149">→</span> 보유 감소 = 미국채 금리 상방 압력</span><span><span style="color:#58a6ff">→</span> 일본 BOJ 정책 변화와 연동</span><span><span style="color:#d29922">→</span> 중국 매도 = 달러 약세 동반</span></div></div>
+  <div class="tdesc"><div class="tdesc-hdr"><div class="tdesc-icon">TIC</div><div><div class="tdesc-title">TIC — 국가별 미국채 보유</div><div class="tdesc-src">미 재무부 월간 · 약 6주 후행</div><div class="tdesc-links"><a class="tdesc-link" href="https://home.treasury.gov/data/treasury-international-capital-tic-system-home-page" target="_blank">TIC 홈 ↗</a><a class="tdesc-link" href="https://home.treasury.gov/news/press-releases" target="_blank">Treasury 보도 ↗</a><a class="tdesc-link" href="https://ticdata.treasury.gov/" target="_blank">TIC 데이터 ↗</a></div></div></div><div class="tdesc-body">외국 정부·기관의 미국채 보유 현황. 일본이 최대 보유국(약 $1.07T, 2026-08 기준)이고 영국($1.01T)이 바짝 뒤따르며, 중국은 약 $591B로 1년 새 약 $109B 줄었다. 보유 감소 = 달러 약세 + 미국채 금리 상승 압력. 중국 보유 감소가 전략적 매도인지 수탁국(벨기에·룩셈부르크 등) 이전인지는 이 통계로 구분되지 않아 미국채 무기화(전략적 매도) 우려가 시장 리스크로 부상.</div><div class="tdesc-tags"><span class="tdesc-tag b">일본 = 최대 보유국</span><span class="tdesc-tag r">중국 감소 추세</span><span class="tdesc-tag a">케이맨 과소집계</span><span class="tdesc-tag ">지정학 리스크</span><span class="tdesc-tag ">6주 후행 발표</span></div><div class="tdesc-rels"><span><span style="color:#f85149">→</span> 보유 감소 = 미국채 금리 상방 압력</span><span><span style="color:#58a6ff">→</span> 일본 BOJ 정책 변화와 연동</span><span><span style="color:#d29922">→</span> 중국 매도 = 달러 약세 동반</span></div></div>
     <div class="sec">
       <div class="stitle" id="ticDateLbl">TIC — 국가별 미국채 보유</div>
       <div class="cards" id="ticCards"><div class="loading">로딩 중...</div></div>
@@ -875,7 +878,7 @@ tr:hover td{background:var(--surf2)}
 
   <!-- ── CALENDAR ── -->
   <div id="t-cal" style="display:none">
-  <div class="tdesc"><div class="tdesc-hdr"><div class="tdesc-icon">CAL</div><div><div class="tdesc-title">재정 캘린더 — 유동성 이벤트 일정</div><div class="tdesc-src">FOMC · H.4.1 · QRA · Tax Day · 국채 만기</div></div></div><div class="tdesc-body">유동성에 영향을 미치는 주요 재정·통화 이벤트를 한눈에. FOMC → 금리 방향, H.4.1(매주 수요일) → QT 진행 확인, QRA → 발행 구성, Tax Day → TGA 급증.</div><div class="tdesc-tags"><span class="tdesc-tag b">FOMC</span><span class="tdesc-tag b">H.4.1 수요일</span><span class="tdesc-tag r">Tax Day</span><span class="tdesc-tag a">QRA 발표</span><span class="tdesc-tag g">국채 만기</span></div><div class="tdesc-links"><a class="tdesc-link" href="https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm" target="_blank">FOMC 일정 ↗</a><a class="tdesc-link" href="https://www.federalreserve.gov/releases/h41/" target="_blank">H.4.1 릴리스 ↗</a><a class="tdesc-link" href="https://home.treasury.gov/policy-issues/financing-the-government/quarterly-refunding" target="_blank">QRA 발표 ↗</a><a class="tdesc-link" href="https://fiscaldata.treasury.gov/datasets/daily-treasury-statement/federal-reserve-account-balance" target="_blank">TGA 잔액 ↗</a></div></div>
+  <div class="tdesc"><div class="tdesc-hdr"><div class="tdesc-icon">CAL</div><div><div class="tdesc-title">재정 캘린더 — 유동성 이벤트 일정</div><div class="tdesc-src">FOMC · H.4.1 · QRA · Tax Day · 국채 만기</div></div></div><div class="tdesc-body">유동성에 영향을 미치는 주요 재정·통화 이벤트를 한눈에. FOMC → 금리 방향, H.4.1(매주 수요일) → 대차대조표 방향 확인, QRA → 발행 구성, Tax Day → TGA 급증.</div><div class="tdesc-tags"><span class="tdesc-tag b">FOMC</span><span class="tdesc-tag b">H.4.1 수요일</span><span class="tdesc-tag r">Tax Day</span><span class="tdesc-tag a">QRA 발표</span><span class="tdesc-tag g">국채 만기</span></div><div class="tdesc-links"><a class="tdesc-link" href="https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm" target="_blank">FOMC 일정 ↗</a><a class="tdesc-link" href="https://www.federalreserve.gov/releases/h41/" target="_blank">H.4.1 릴리스 ↗</a><a class="tdesc-link" href="https://home.treasury.gov/policy-issues/financing-the-government/quarterly-refunding" target="_blank">QRA 발표 ↗</a><a class="tdesc-link" href="https://fiscaldata.treasury.gov/datasets/daily-treasury-statement/federal-reserve-account-balance" target="_blank">TGA 잔액 ↗</a></div></div>
   <div class="two">
     <div class="cal full" style="max-width:100%">
       <div class="cal-hdr"><h2>재정 캘린더</h2><div class="cal-nav"><button onclick="calMove(-1)">‹</button><span id="cal-month-label"></span><button onclick="calMove(1)">›</button></div></div>
@@ -1126,37 +1129,32 @@ async function loadH41(){
         chgEl.textContent=(isQTon?'-':'+')+Math.abs(ustChgB).toFixed(0)+'B$';
         chgEl.className='cv '+(isQTon?'dn':'up');
       }
-      const capPct=isQTon?Math.round(ustChgB/25*100):0;
-      if(chgDs)chgDs.textContent=isQTon?('상한 $25B 대비 '+capPct+'%'):'순증가 — QT 중단/둔화';
-      // QT 게이지
-      const ustPct=isQTon?Math.min(Math.round(ustChgB/25*100),100):0;
+      // QT는 2025-12-01 종료 — 상한(캡) 대비 비율은 더 이상 의미가 없어 4주 증감 자체만 보여준다.
+      // 막대 길이는 눈금(50B$) 대비 비례일 뿐 기준선이 아니다. 증가=초록, 감소=주황.
+      if(chgDs)chgDs.textContent=isQTon?'4주 전 대비 감소':'4주 전 대비 증가';
+      const ustPct=Math.min(Math.round(Math.abs(ustChgB)/50*100),100);
       const el1=document.getElementById('qt-bar-ust'),ev1=document.getElementById('c-qt-ust-val');
-      const bg1=document.getElementById('qt-bar-ust-bg'),badge1=document.getElementById('qt-ust-badge');
-      if(el1){el1.style.width=ustPct+'%';el1.style.background=isQTon?'var(--amber)':'transparent';}
-      if(ev1){ev1.textContent=(isQTon?('-'+ustChgB.toFixed(0)+'B$ / 상한 25B$'):('+'+Math.abs(ustChgB).toFixed(0)+'B$ 순증가'));ev1.style.color=isQTon?'var(--amber)':'var(--red)';}
-      if(bg1){if(isQTon){bg1.classList.remove('qt-bar-paused');}else{bg1.classList.add('qt-bar-paused');}}
-      if(badge1)badge1.style.display=isQTon?'none':'inline';
+      if(el1){el1.style.width=ustPct+'%';el1.style.background=isQTon?'var(--amber)':'var(--green)';}
+      if(ev1){ev1.textContent=(isQTon?'-':'+')+Math.abs(ustChgB).toFixed(0)+'B$';ev1.style.color=isQTon?'var(--amber)':'var(--green)';}
     }
     if(mbs.length>=5){
       const recent=mbs.slice(-5);
       const mbsChgB=(recent[0].v-recent[4].v)/1e3;
-      const mbsPct=mbsChgB>0?Math.min(Math.round(mbsChgB/35*100),100):0;
+      const mbsPct=Math.min(Math.round(Math.abs(mbsChgB)/50*100),100);
       const el2=document.getElementById('qt-bar-mbs'),ev2=document.getElementById('c-qt-mbs-val');
       if(el2)el2.style.width=mbsPct+'%';
-      if(ev2)ev2.textContent=mbsChgB>0?('-'+mbsChgB.toFixed(0)+'B$ / 상한 35B$'):('+'+Math.abs(mbsChgB).toFixed(0)+'B$ 순증가');
+      if(ev2)ev2.textContent=(mbsChgB>0?'-':'+')+Math.abs(mbsChgB).toFixed(0)+'B$';
     }
     const qtInterp=document.getElementById('c-qt-interp');
     if(qtInterp&&ust.length>=5&&mbs.length>=5){
       const ustChgB=(ust.slice(-5)[0].v-ust.slice(-5)[4].v)/1e3;
       const mbsChgB=(mbs.slice(-5)[0].v-mbs.slice(-5)[4].v)/1e3;
+      qtInterp.style.borderLeftColor='';qtInterp.style.background='';
+      const mbsTxt=mbsChgB>0?'MBS 자연상환 -'+mbsChgB.toFixed(0)+'B$':'MBS +'+Math.abs(mbsChgB).toFixed(0)+'B$';
       if(ustChgB<=0){
-        qtInterp.style.borderLeftColor='var(--red)';
-        qtInterp.style.background='rgba(248,81,73,0.07)';
-        qtInterp.innerHTML='<b style="color:var(--red)">⚠ UST QT 중단</b> — 4주간 +'+Math.abs(ustChgB).toFixed(0)+'B$ 순증가 (만기 전액 재투자 또는 순매입 중) · MBS 자연상환 '+Math.abs(mbsChgB).toFixed(0)+'B$ 진행';
+        qtInterp.innerHTML='UST <b style="color:var(--green)">+'+Math.abs(ustChgB).toFixed(0)+'B$</b> 순증가 (4주) — QT 종료(2025-12-01) 이후 보유 증가 구간 · '+mbsTxt;
       }else{
-        qtInterp.style.borderLeftColor='';qtInterp.style.background='';
-        const ustPct=Math.round(ustChgB/25*100);
-        qtInterp.innerHTML='UST 감소 <b style="color:var(--amber)">-'+ustChgB.toFixed(0)+'B$</b> — 상한($25B)의 '+ustPct+'% 소화 중 · MBS 자연상환 '+Math.abs(mbsChgB).toFixed(0)+'B$'+(ustPct<30?' <span style="color:var(--red)">⚠ QT 속도 30% 미만 — 중단 임박</span>':'');
+        qtInterp.innerHTML='UST <b style="color:var(--amber)">-'+ustChgB.toFixed(0)+'B$</b> 순감소 (4주) — 보유 감소가 재개됐는지 확인 필요 · '+mbsTxt;
       }
     }
     // 차트 — 연도 레이블 처리
@@ -1225,12 +1223,12 @@ async function loadSOMA(){
       const key=d2.getFullYear()+'-'+String(d2.getMonth()+1).padStart(2,'0');
       const val=Math.round(monthly[key]||0);
       moLabels.push(String(d2.getMonth()+1).padStart(2,'0')+'/'+String(d2.getFullYear()).slice(2));
-      moData.push(val);moColors.push(val>25?'#f85149':'#58a6ff');
+      moData.push(val);moColors.push('#58a6ff');
     }
     mk('somaMonthlyChart','bar',moLabels,[{label:'만기(B$)',data:moData,backgroundColor:moColors,borderRadius:3,borderSkipped:false}]);
     const total12=moData.reduce((s,v)=>s+v,0);
     const m12El=document.getElementById('c-soma-12m');
-    if(m12El)m12El.textContent='12개월 합계: '+total12+'B$ · 월평균: '+Math.round(total12/12)+'B$ · 캡 초과월: '+moData.filter(v=>v>25).length+'개월';
+    if(m12El)m12El.textContent='12개월 합계: '+total12+'B$ · 월평균: '+Math.round(total12/12)+'B$';
     const ag=d.mbs.byAgency||{};
     const totalMBS=(ag.FNMA||0)+(ag.FHLMC||0)+(ag.GNMA||0)+(ag.OTHER||0);
     if(totalMBS>0){
@@ -1499,9 +1497,11 @@ async function loadQRA(){
       // 이 차트는 '공고가 난 경매'를 쌓는다 — 아직 실시 전인 공고분도 이미 들어와 있다.
       // 빠지는 건 공고 전 물량뿐이라 진행 중인 분기 막대는 분기 말로 갈수록 채워진다.
       const curAnn=(d.quarters.find(q=>q.q===todayQ)||{}).announced||0;
-      document.getElementById('qraQtrNote').textContent = curAnn>0
+      const frN=d.freshness||null;
+      const srcTxt=frN&&frN.lastAuction?` · 최신 낙찰 ${frN.lastAuction}${frN.stale?' (⚠ 데이터 지연)':''}`:'';
+      document.getElementById('qraQtrNote').textContent = (curAnn>0
         ? `— 공고 기준 누계 · 이번 분기 미실시 공고분 ${Math.round(curAnn).toLocaleString()}B$ 포함`
-        : '— 공고 기준 누계 · 공고 전 물량 미포함';
+        : '— 공고 기준 누계 · 공고 전 물량 미포함')+srcTxt;
       try{mk('qraQtrChart','bar',qtrs.map(q=>q.q),[
         {label:'T-Bill', data:qtrs.map(q=>Math.round(q.bill)), backgroundColor:'rgba(88,166,255,0.75)', stack:'s'},
         {label:'Notes',  data:qtrs.map(q=>Math.round(q.note)), backgroundColor:'rgba(63,185,80,0.75)',  stack:'s'},
@@ -1579,11 +1579,15 @@ async function loadQRA(){
         document.getElementById('c-qra-avg-label').textContent=`평균 ${N(Math.round(avg))}B$`;
         // 해석
         const diff=iPct-qPct;
-        const interp=diff>8?`발행 ${diff}%p 앞서 — 조기 발행 가속`:diff<-8?`발행 ${Math.abs(diff)}%p 뒤처짐 — 발행 지연 신호`:`정상 속도 (경과 기준 ±${Math.abs(diff)}%p)`;
-        const interpColor=diff>8?'#d29922':diff<-8?'#f85149':'#3fb950';
+        // 경매 데이터가 뒤처졌으면(fiscaldata 갱신 지연 등) 발행액이 덜 잡혀 '뒤처짐'이 가짜로 뜬다 → 판단 보류
+        const fr=d.freshness||null;
+        const qStale=!!(fr&&fr.stale);
+        const interp=qStale?`경매 데이터가 ${fr.lagDays==null?'':fr.lagDays+'일 '}지연돼 진행도 판단 보류 (최신 낙찰 ${fr.lastAuction||'—'})`
+          :diff>8?`발행 ${diff}%p 앞서 — 조기 발행 가속`:diff<-8?`발행 ${Math.abs(diff)}%p 뒤처짐 — 발행 지연 신호`:`정상 속도 (경과 기준 ±${Math.abs(diff)}%p)`;
+        const interpColor=qStale?'#8b949e':diff>8?'#d29922':diff<-8?'#f85149':'#3fb950';
         const interpEl=document.getElementById('c-qra-prog-interp');
         if(interpEl){interpEl.textContent=`분기 ${qPct}% 경과 · 발행 ${iPct}% 완료 → ${interp}`;interpEl.style.color=interpColor;}
-        _sigData.qra={billPct};
+        _sigData.qra={billPct,stale:qStale,lagDays:fr?fr.lagDays:null};
       }
     }
 
@@ -1805,7 +1809,7 @@ function _updateSignals(){updateSignalPanel(_sigData);}
 
 const TIPS={
 'nl':['Net Liquidity','FRED','NL = WALCL − TGA − RRP. Fed 대차대조표에서 재무부(TGA)와 MMF(RRP)가 흡수한 자금을 차감한 실질 시중 유동성.','NL 상승 → 은행 준비금 증가 → 위험자산 매수 여력 확대. SPX와 약 0.7 상관관계. NL 감소 전환 시 주식 조정 선행 신호.'],
-'walcl':['WALCL — Fed 총자산','FRED 주간','연준이 보유한 국채·MBS·대출 등 모든 자산의 합계. QE 시 자산매입으로 증가, QT 시 만기도래분 미재투자로 감소.','QT 속도 $600B/년 → 주 ~$115B 감소. WALCL 감소 = NL 직접 감소. 속도 둔화·중단 뉴스 → 시장 유동성 기대 상승.'],
+'walcl':['WALCL — Fed 총자산','FRED 주간','연준이 보유한 국채·MBS·대출 등 모든 자산의 합계. QE·준비금 관리 매입 시 증가, QT 시 만기도래분 미재투자로 감소.','QT는 2025-12-01 종료. WALCL 감소 = NL 직접 감소, 증가 = NL 우호. 증감 방향 전환이 시장 유동성 기대를 바꾼다.'],
 'tga':['TGA — 재무부 당좌계좌','FRED 일간','재무부가 Fed에 보유한 운영계좌. 세수 유입·국채 발행 시 증가(NL↓), 재정 지출 시 감소(NL↑). 부채한도 협상과 직결.','TGA 고갈 → NL 인위 상승(착시). 해소 후 TGA 재충전 → NL 급감 위험. 4월·9월 세금 납부 시즌 전후 급등락 주의.'],
 'rrp':['RRP — 역레포 잔액','FRED 일간','MMF가 Fed에 단기 예치하는 자금. 잔액 증가 = 시중 자금이 Fed로 흡수. T-Bill 금리 > RRP 금리 시 잔액 감소 → NL 증가.','RRP 잔액 $0 접근 = 유동성 추가 공급 여력 소진 신호. 잔액 재증가 = MMF가 Fed 선호 → 시장 유동성 축소.'],
 'wresbal':['WRESBAL — 은행 지급준비금','FRED 주간','시중은행이 Fed에 예치한 준비금. 최저 적정 준비금(LCLoR) ~$3T 이하 시 repo 금리 급등 위험. 2019년 9월 repo 대란 사례.','준비금 감소 추세 + repo 스프레드 확대 = QT 한계 도달 신호. Fed QT 속도 조절·중단 검토 기준선.'],
@@ -1816,7 +1820,7 @@ const TIPS={
 'spread':['SOFR−IORB 스프레드','계산값','SOFR에서 IORB를 뺀 값(bp). 음수 확대 = repo 시장 자금 공급 과잉 → 유동성 완화 환경.','음수 심화 → 유동성 완화. 양수 급등 → repo 스트레스 → 2019년 9월 패턴 주의.'],
 'sofr_chart':['금리 4종 추이','FRED','SOFR·IORB·T-Bill·EFFR 동시 표시. 4개 금리 수렴 = 정책 의도대로 작동 중.','금리 간 스프레드 확대 = 시장 마찰 증가. SOFR 급등 = repo 경색 신호.'],
 'yield':['10Y−2Y 장단기 금리차','FRED 일간','10년물−2년물 금리 차이. 역전(음수) = 경기침체 선행지표. 역사적으로 역전 후 12~18개월 내 침체.','역전 해소(재역전) 후 실업률 상승 본격화 패턴. 현재 금리차 방향이 경기 사이클 위치 확인 핵심.'],
-'ust':['UST — 연준 미국채 보유','FRED H.4.1 주간','Fed 보유 미국채 총액(TREAST). QT로 만기도래분 미재투자 중. 상한 $600B/년.','보유액 감소 둔화·중단 = QT 종료 신호 → 시장 유동성 기대 상승.'],
+'ust':['UST — 연준 미국채 보유','FRED H.4.1 주간','Fed 보유 미국채 총액(TREAST). QT는 2025-12-01 종료 — 이후 만기도래분 재투자 및 준비금 관리 매입으로 증가 전환 여부를 본다.','보유액 증가 = 준비금 공급 확대 → 시장 유동성 우호, 감소 재개 = NL 압박.'],
 'mbs':['MBS — 연준 주택저당증권','FRED H.4.1 주간','Fed 보유 MBS(MBST). 만기 도래분 재투자 중단으로 자연 감소. 능동 매각 없음.','MBS 감소 속도가 UST보다 느림. 30Y 모기지 금리와 연동.'],
 'btfp':['BTFP — Bank Term Funding','FRED','2023년 SVB 사태 후 긴급 은행 지원 창구. 국채·MBS 액면가 담보 1년 대출. 2024년 3월 만료.','잔액 0 수렴 = 은행 위기 완화 확인. 잔액 재증가 = 은행권 유동성 스트레스 재발 신호.'],
 'dw':['Discount Window — 재할인창구','FRED','Fed 최후 대출자. 담보 제공 후 단기 자금 조달. 정책금리 +0.1%. 사용 시 시장에 스트레스 신호.','DW 잔액 급증 = 은행 유동성 압박. 2023년 이후 낙인 효과 감소 중.'],
@@ -1933,8 +1937,11 @@ function updateSignalPanel(data){
   if(data.qra){
     const billPct=data.qra.billPct;
     const col=billPct>50?'#3fb950':billPct<30?'#f85149':'#d29922';
-    setSig('qra','T-Bill '+Math.round(billPct)+'%',billPct>50?'T-Bill 위주. NL 영향 중립~우호.':billPct<30?'쿠폰채 위주. NL 압박 확대.':'발행 구성 균형.',billPct,col);
-    scores.push(billPct>50?2:billPct<30?0:1);
+    // 경매 데이터가 며칠 이상 뒤처졌으면 분기 구성비가 한쪽(빌/쿠폰)으로 쏠려 보인다 — 종합 점수에서 빼고 사유를 밝힌다
+    const qStale=data.qra.stale;
+    const baseDesc=billPct>50?'T-Bill 위주. NL 영향 중립~우호.':billPct<30?'쿠폰채 위주. NL 압박 확대.':'발행 구성 균형.';
+    setSig('qra','T-Bill '+Math.round(billPct)+'%',qStale?'경매 데이터 '+(data.qra.lagDays==null?'':data.qra.lagDays+'일 ')+'지연 — 참고용 · 종합 제외':baseDesc,billPct,qStale?'#8b949e':col);
+    if(!qStale)scores.push(billPct>50?2:billPct<30?0:1);
   }
   const avg=scores.length?scores.reduce((a,b)=>a+b,0)/scores.length:1;
   const overall=document.getElementById('sp-overall');
