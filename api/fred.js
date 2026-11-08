@@ -18,7 +18,7 @@ function getCacheMaxAge(series) {
   }
 
   // 일간 지표 (SOFR, IORB, SP500, RRPONTSYD 등)
-  const daily = ['SOFR','IORB','DTB3','EFFR','T10Y2Y','SP500','RRPONTSYD','RPONTSYD','SOFR99'];
+  const daily = ['SOFR','IORB','DTB3','EFFR','T10Y2Y','SP500','RRPONTSYD','RPONTSYD','SOFR99','TGCR','SOFRVOL','DFEDTARL','RRPONTSYAWARD'];
   if (daily.includes(series)) {
     // 17:00~20:00 ET (FRED 일간 업데이트 직후): 5분
     if (hourET >= 17 && hourET < 20) return 300;

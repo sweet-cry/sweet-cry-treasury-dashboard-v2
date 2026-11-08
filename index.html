@@ -491,6 +491,14 @@ tr:hover td{background:var(--surf2)}
     <div class="leg"><span><span class="ld" style="background:#58a6ff"></span>SOFR-IORB (bp)</span></div>
     <div style="position:relative;height:180px"><canvas id="srfSpreadChart"></canvas></div>
     <div style="font-size:10px;color:var(--muted);margin-top:4px;line-height:1.5">0bp 기준선 돌파가 반복되면 레포 시장 경직 신호. 2019.9 스파이크 이전에도 8월부터 스프레드가 +2~5bp로 부풀어 있었음.</div>
+    <div class="ct" style="margin-top:18px">TGCR − 기준금리 하단 (%p) <span id="tgcr-last" style="font-weight:400;color:var(--muted);margin-left:6px"></span></div>
+    <div class="leg"><span><span class="ld" style="background:#00b0f0"></span>TGCR</span><span><span class="ld" style="background:#f85149"></span>IORB</span><span><span class="ld" style="background:#f0883e"></span>EFFR</span><span><span class="ld" style="background:#d070d0"></span>RRP</span><span><span class="ld" style="background:#3fb950"></span>SRF 최소·FIMA 익일물 0.25</span><span><span class="ld" style="background:#79c0ff"></span>FIMA 7일물 0.40</span></div>
+    <div style="position:relative;height:240px"><canvas id="tgcrFloorChart"></canvas></div>
+    <div style="font-size:10px;color:var(--muted);margin-top:4px;line-height:1.5">각 금리 − 연방기금 목표 하단(DFEDTARL). TGCR이 IORB 점선(0.15) 위로 올라서면 담보 자금 압력, 0.25(SRF 최소) 근접 시 레포 경색 신호. 0.25·0.40 기준선은 하드코딩이라 FOMC 금리 변경 시 갱신 필요.</div>
+    <div class="ct" style="margin-top:18px">SOFR 거래량 (조 달러) <span id="sofrvol-last" style="font-weight:400;color:var(--muted);margin-left:6px"></span></div>
+    <div class="leg"><span><span class="ld" style="background:#4a9be0"></span>SOFR 거래량 (SOFRVOL)</span><span><span class="ld" style="background:#fff;border:1px solid #1f6f8b"></span>분기말 마지막 거래일</span></div>
+    <div style="position:relative;height:220px"><canvas id="sofrVolChart"></canvas></div>
+    <div style="font-size:10px;color:var(--muted);margin-top:4px;line-height:1.5">SOFR 산출 기준 일일 레포 거래량(FRED SOFRVOL, 십억$ → 조$ 환산). 분기말에 일시 급증하는 패턴이 반복되며, 추세 하락은 담보 자금 수요 위축 신호.</div>
     <div class="ct" style="margin-top:14px">SRF 일일 이용액 (90일)</div>
     <div style="position:relative;height:140px"><canvas id="srfUtilChart"></canvas></div>
     <div style="font-size:10px;color:var(--muted);margin-top:4px;line-height:1.5">초록 = 평시 $0 / 노랑 = $0 초과 / 빨강 = $10B 초과. 분기말(quarter-end) $5~30B 일시 발생은 정상 범위.</div>
@@ -1875,7 +1883,7 @@ function sw(name,btn){
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
   if(btn)btn.classList.add('on');
   if(name==='cal')renderCal();
-  if(name==='rates')loadRatesSRF();
+  if(name==='rates'){loadRatesSRF();loadRatesLong();}
   if(name==='m2')loadLCLoR();
   if(name==='dts')setTimeout(()=>{if(C['qraQtrChart'])C['qraQtrChart'].resize();},50);
 }
@@ -2185,6 +2193,54 @@ async function loadRatesSRF(){
       srfUtilChartObj=mk('srfUtilChart','bar',srf.map(x=>x.date.slice(5)),[{label:'SRF($M)',data:srf.map(x=>x.v),backgroundColor:srf.map(x=>x.v>10000?'#f85149':x.v>0?'#d29922':'#3fb950')}]);
     }
   }catch(e){console.error('SRF load fail:',e);}
+}
+
+/* ═══════════════════════ TGCR 하단 대비 · SOFR 거래량 (장기) ═══════════════════════ */
+let _longLoaded=false;
+async function loadRatesLong(){
+  if(_longLoaded)return;
+  try{
+    const [tgcr,iorb,effr,rrp,floor,vol] = await Promise.all([
+      fred('TGCR',520), fred('IORB',520), fred('EFFR',520), fred('RRPONTSYAWARD',520), fred('DFEDTARL',520), fred('SOFRVOL',760)
+    ]);
+    const mp=a=>Object.fromEntries(a.map(x=>[x.date,x.v]));
+    const iM=mp(iorb), eM=mp(effr), rM=mp(rrp), fM=mp(floor);
+    const rows=tgcr.filter(x=>fM[x.date]!=null);
+    const d3=(v,f)=>v==null?null:+(v-f).toFixed(3);
+    if(rows.length){
+      const lab=rows.map(x=>x.date);
+      const lineBase={borderWidth:1.5,pointRadius:0,tension:0,fill:false};
+      C['tgcrFloorChart']&&C['tgcrFloorChart'].destroy();
+      mk('tgcrFloorChart','line',lab,[
+        {label:'TGCR',data:rows.map(x=>d3(x.v,fM[x.date])),borderColor:'#00b0f0',...lineBase,borderWidth:1.8},
+        {label:'IORB',data:rows.map(x=>d3(iM[x.date],fM[x.date])),borderColor:'#f85149',...lineBase,borderDash:[2,3]},
+        {label:'EFFR',data:rows.map(x=>d3(eM[x.date],fM[x.date])),borderColor:'#f0883e',...lineBase,stepped:true},
+        {label:'RRP',data:rows.map(x=>d3(rM[x.date],fM[x.date])),borderColor:'#d070d0',...lineBase},
+        {label:'SRF 최소·FIMA 익일물',data:rows.map(()=>0.25),borderColor:'#3fb950',...lineBase,borderDash:[2,3]},
+        {label:'FIMA 7일물',data:rows.map(()=>0.40),borderColor:'#79c0ff',...lineBase,borderDash:[2,3]}
+      ],{opts:{scales:{x:{...sb,ticks:{...sb.ticks,maxTicksLimit:8,maxRotation:0}},y:{...sb,min:0,suggestedMax:0.45}}}});
+      const L=rows[rows.length-1];
+      const el=document.getElementById('tgcr-last');
+      if(el)el.textContent='최신 '+d3(L.v,fM[L.date]).toFixed(2)+' · '+L.date.slice(5)+' 기준';
+    }
+    // SOFR 거래량 — 2024-01 이후, 분기말 마지막 거래일 마커
+    const v=vol.filter(x=>x.date>='2024-01-01');
+    if(v.length){
+      const lastOfMonth={};
+      v.forEach(x=>{lastOfMonth[x.date.slice(0,7)]=x.date;});
+      const isQE=d=>{const m=+d.slice(5,7);return [3,6,9,12].includes(m)&&lastOfMonth[d.slice(0,7)]===d;};
+      C['sofrVolChart']&&C['sofrVolChart'].destroy();
+      mk('sofrVolChart','line',v.map(x=>x.date),[{
+        label:'SOFR 거래량(조$)',data:v.map(x=>+(x.v/1000).toFixed(3)),
+        borderColor:'#4a9be0',borderWidth:1.5,tension:0,fill:false,
+        pointRadius:v.map(x=>isQE(x.date)?4:0),pointBackgroundColor:'#ffffff',pointBorderColor:'#1f6f8b',pointBorderWidth:1.5
+      }],{opts:{scales:{x:{...sb,ticks:{...sb.ticks,maxTicksLimit:8,maxRotation:0}},y:{...sb}}}});
+      const L=v[v.length-1];
+      const el=document.getElementById('sofrvol-last');
+      if(el)el.textContent='최신 '+(L.v/1000).toFixed(3)+'조$ · '+L.date.slice(5)+' 기준';
+    }
+    _longLoaded=rows.length>0&&v.length>0;
+  }catch(e){console.error('Rates long load fail:',e);}
 }
 
 /* ═══════════════════════ LCLoR ═══════════════════════ */
