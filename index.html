@@ -498,7 +498,7 @@ tr:hover td{background:var(--surf2)}
     <div class="ct" style="margin-top:18px">TGCR − 기준금리 하단 (%p) <span id="tgcr-last" style="font-weight:400;color:var(--muted);margin-left:6px"></span></div>
     <div class="leg"><span><span class="ld" style="background:#00b0f0"></span>TGCR</span><span><span class="ld" style="background:#f85149"></span>IORB</span><span><span class="ld" style="background:#f0883e"></span>EFFR</span><span><span class="ld" style="background:#d070d0"></span>RRP</span><span><span class="ld" style="background:#3fb950"></span>SRF 최소·FIMA 익일물 0.25</span><span><span class="ld" style="background:#79c0ff"></span>FIMA 7일물 0.40</span></div>
     <div style="position:relative;height:240px"><canvas id="tgcrFloorChart"></canvas></div>
-    <div style="font-size:10px;color:var(--muted);margin-top:4px;line-height:1.5">각 금리 − 연방기금 목표 하단(DFEDTARL). TGCR이 IORB 점선(0.15) 위로 올라서면 담보 자금 압력, 0.25(SRF 최소) 근접 시 레포 경색 신호. 0.25·0.40 기준선은 하드코딩이라 FOMC 금리 변경 시 갱신 필요.</div>
+    <div style="font-size:10px;color:var(--muted);margin-top:4px;line-height:1.5">각 금리 − 연방기금 목표 하단(DFEDTARL, TGCR은 NY Fed).  TGCR이 IORB 점선(0.15) 위로 올라서면 담보 자금 압력, 0.25(SRF 최소) 근접 시 레포 경색 신호. 0.25·0.40 기준선은 하드코딩이라 FOMC 금리 변경 시 갱신 필요.</div>
     <div class="ct" style="margin-top:18px">SOFR 거래량 (조 달러) <span id="sofrvol-last" style="font-weight:400;color:var(--muted);margin-left:6px"></span></div>
     <div class="leg"><span><span class="ld" style="background:#4a9be0"></span>SOFR 거래량 (SOFRVOL)</span><span><span class="ld" style="background:#fff;border:1px solid #1f6f8b"></span>분기말 마지막 거래일</span></div>
     <div style="position:relative;height:220px"><canvas id="sofrVolChart"></canvas></div>
@@ -2200,12 +2200,22 @@ async function loadRatesSRF(){
 }
 
 /* ═══════════════════════ TGCR 하단 대비 · SOFR 거래량 (장기) ═══════════════════════ */
+// FRED에 TGCR 계열이 없어 NY Fed API(/api/nyfed)로 받는다 — fred()와 같은 {date,v}(오름차순, % 단위) 모양으로 맞춘다.
+async function nyfedTGCR(n){
+  try{
+    const r=await fetch('/api/nyfed?type=tgcr&count='+n);
+    if(!r.ok)return[];
+    const d=await r.json();
+    if(!d.refRates)return[];
+    return d.refRates.filter(x=>x.percentRate!=null).map(x=>({date:x.effectiveDate,v:+x.percentRate})).sort((p,q)=>p.date<q.date?-1:1);
+  }catch(e){console.warn('NY Fed TGCR fail:',e);return[];}
+}
 let _longLoaded=false;
 async function loadRatesLong(){
   if(_longLoaded)return;
   try{
     const [tgcr,iorb,effr,rrp,floor,vol] = await Promise.all([
-      fred('TGCR',520), fred('IORB',520), fred('EFFR',520), fred('RRPONTSYAWARD',520), fred('DFEDTARL',520), fred('SOFRVOL',760)
+      nyfedTGCR(520), fred('IORB',520), fred('EFFR',520), fred('RRPONTSYAWARD',520), fred('DFEDTARL',520), fred('SOFRVOL',760)
     ]);
     const mp=a=>Object.fromEntries(a.map(x=>[x.date,x.v]));
     const iM=mp(iorb), eM=mp(effr), rM=mp(rrp), fM=mp(floor);
