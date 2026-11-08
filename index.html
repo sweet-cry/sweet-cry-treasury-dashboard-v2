@@ -298,11 +298,15 @@ tr:hover td{background:var(--surf2)}
       <div class="chg-hd">
         <div>
           <div class="chg-ti" id="chgTitle">📋 업데이트 내역</div>
-          <div class="chg-sub">2026-05-21 ~ 11-05 · 최근 주요 작업 중심</div>
+          <div class="chg-sub">2026-05-21 ~ 11-08 · 최근 주요 작업 중심</div>
         </div>
         <button class="chg-x" onclick="chgClose()" aria-label="닫기">✕ 닫기</button>
       </div>
       <div class="chg-bd">
+
+        <div class="chg-day"><span class="chg-date">2026-11-08</span><span class="chg-cnt">2건</span></div>
+        <div class="chg-it"><span class="chg-tag f">NEW</span><span class="chg-txt">IR 탭에 TGCR − 기준금리 하단 차트 추가<span class="chg-why">TGCR·IORB·EFFR·RRP를 각각 연방기금 목표 하단(DFEDTARL)과의 차이(%p)로 약 2년치 표시하고, SRF 최소·FIMA 익일물 0.25, FIMA 7일물 0.40 기준선을 점선으로 겹쳤다. TGCR이 IORB 점선 위로 올라서면 담보 자금 압력, 0.25 근접 시 레포 경색 신호로 읽는다. 기준선은 하드코딩이라 FOMC 금리 변경 시 갱신이 필요하다.</span></span></div>
+        <div class="chg-it"><span class="chg-tag f">NEW</span><span class="chg-txt">IR 탭에 SOFR 거래량 차트 추가<span class="chg-why">FRED SOFRVOL(십억$)을 조$로 환산해 2024-01부터 표시하고 분기말 마지막 거래일에 마커를 찍었다. 분기말 일시 급증 패턴과 추세 하락(담보 자금 수요 위축)을 한눈에 보기 위함이다.</span></span></div>
 
         <div class="chg-day"><span class="chg-date">2026-11-05</span><span class="chg-cnt">5건</span></div>
         <div class="chg-it"><span class="chg-tag x">FIX</span><span class="chg-txt">경매 데이터를 TreasuryDirect로 보강하고 지연 가드 추가<span class="chg-why">재무부 fiscaldata의 경매 표가 1~2주 뒤처져(마지막 10/22) 이번 분기 합계가 덜 잡혀 '발행 13%p 뒤처짐 — 발행 지연 신호'와 T-Bill 91%, '예정 경매 없음'이 가짜로 떴다. 최근 구간만 TreasuryDirect(같은 날 낙찰·공고 반영)로 덮어쓰고 과거 분기는 fiscaldata를 그대로 쓴다. 최신 낙찰이 4일 넘게 비면 진행도 판단을 보류하고 종합 신호에서 뺀다.</span></span></div>
