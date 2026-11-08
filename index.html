@@ -91,6 +91,8 @@ tr:hover td{background:var(--surf2)}
 #c-tgapath-bbops th,#c-tgapath-bbops td{padding:5px 8px}
 
 .loading{color:var(--muted);font-size:13px;padding:24px;text-align:center}
+.qt th,.qt td{padding:6px 8px;white-space:nowrap;font-size:12px}
+@media(max-width:600px){.qt th,.qt td{padding:5px 6px;font-size:11px}}
 
 /* badge */
 .badge{font-size:9px;padding:2px 6px;border-radius:4px;font-weight:500}
@@ -682,6 +684,18 @@ tr:hover td{background:var(--surf2)}
   <!-- ── QRA (국채발행 하단) ── -->
   <div class="sec" style="margin-top:20px;padding-top:20px;border-top:1px solid var(--brd)">
 <div class="tdesc"><div class="tdesc-hdr"><div class="tdesc-icon">QRA</div><div><div class="tdesc-title">QRA — 분기 국채 발행 계획</div><div class="tdesc-src">fiscaldata.treasury.gov · 분기 발표</div></div></div><div class="tdesc-body">재무부 분기 차입 계획. T-Bill 위주 발행 시 MMF RRP 자금이 T-Bill로 이동 → NL 영향 중립. 쿠폰채(Notes·Bonds) 위주 시 은행 준비금 직접 흡수 → NL 감소 압박. 발행 구성 비율과 총액이 향후 NL 경로를 결정하는 핵심 변수.</div><div class="tdesc-tags"><span class="tdesc-tag g">T-Bill 위주 = NL 중립</span><span class="tdesc-tag r">쿠폰채 위주 = NL↓</span><span class="tdesc-tag a">총 발행 $20T+/년</span><span class="tdesc-tag b">분기 발표 = 시장 이벤트</span><span class="tdesc-tag ">재정적자 반영</span></div><div class="tdesc-rels"><span><span style="color:#3fb950">→</span> T-Bill 비중 확대 = 유동성 압박 완화</span><span><span style="color:#f85149">→</span> 쿠폰채 급증 = 준비금 흡수 → 금리 상승</span><span><span style="color:#d29922">→</span> QRA 발표일 = 시장 변동성 주의</span></div></div>
+    <!-- 1·2차 QRA · TBAC 역할 해설 (QRA 탭 도입부) -->
+    <div class="sec" style="margin-top:14px">
+      <div class="stitle">1차·2차 QRA와 TBAC의 역할</div>
+      <div style="background:var(--surf);border:1px solid var(--brd);border-radius:var(--rl);padding:14px 16px;font-size:12px;line-height:1.7;color:var(--tx)">
+        <div><b>TBAC</b> (Treasury Borrowing Advisory Committee) — 재무부가 초청한 민간 자문위원회. 딜러·자산운용사·헤지펀드 등이 참여해 "어떤 만기로 얼마나 빌릴지"에 시장 의견을 낸다. 권고는 구속력이 없고 최종 결정은 재무부가 한다.</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin-top:10px">
+          <div style="background:var(--surf2);border-radius:8px;padding:9px 11px"><div style="color:#58a6ff;font-weight:600">① 1차 QRA · 월요일</div><div style="color:var(--muted);margin-top:3px">"얼마나 빌릴지" — Treasury Announces Marketable Borrowing Estimates. 분기 차입 규모와 분기말 TGA 가정을 발표한다.</div></div>
+          <div style="background:var(--surf2);border-radius:8px;padding:9px 11px"><div style="color:#d29922;font-weight:600">② TBAC · 화요일</div><div style="color:var(--muted);margin-top:3px">"어떻게(어떤 만기로) 빌릴지" — TBAC Recommended Financing Schedule. 시장 전문가 권고를 재무부에 제출한다.</div></div>
+          <div style="background:var(--surf2);border-radius:8px;padding:9px 11px"><div style="color:#3fb950;font-weight:600">③ 2차 QRA · 수요일</div><div style="color:var(--muted);margin-top:3px">TBAC 의견을 참고해 최종 경매 계획(쿠폰 규모·빌 비중)을 발표한다. 이번 분기: 11/2(월) 1차, 11/4(수) 2차.</div></div>
+        </div>
+      </div>
+    </div>
     <!-- 분기별 발행 추이 -->
     <div class="cc" style="margin-top:14px">
       <div class="ct">분기별 국채 발행 추이 <span id="qraQtrNote" style="font-size:11px;color:var(--muted);font-weight:400"></span></div>
@@ -811,21 +825,10 @@ tr:hover td{background:var(--surf2)}
         <div id="c-tgapath-note" style="font-size:10px;color:var(--muted);line-height:1.65;margin-top:8px">—</div>
       </div>
     </div>
-    <!-- 1·2차 QRA · TBAC 해설 + 자금조달 표 + 쿠폰 경매 규모 -->
-    <div class="sec" style="margin-top:14px">
-      <div class="stitle">1차·2차 QRA와 TBAC의 역할</div>
-      <div style="background:var(--surf);border:1px solid var(--brd);border-radius:var(--rl);padding:14px 16px;font-size:12px;line-height:1.7;color:var(--tx)">
-        <div><b>TBAC</b> (Treasury Borrowing Advisory Committee) — 재무부가 초청한 민간 자문위원회. 딜러·자산운용사·헤지펀드 등이 참여해 "어떤 만기로 얼마나 빌릴지"에 시장 의견을 낸다. 권고는 구속력이 없고 최종 결정은 재무부가 한다.</div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin-top:10px">
-          <div style="background:var(--surf2);border-radius:8px;padding:9px 11px"><div style="color:#58a6ff;font-weight:600">① 1차 QRA · 월요일</div><div style="color:var(--muted);margin-top:3px">"얼마나 빌릴지" — Treasury Announces Marketable Borrowing Estimates. 분기 차입 규모와 분기말 TGA 가정을 발표한다.</div></div>
-          <div style="background:var(--surf2);border-radius:8px;padding:9px 11px"><div style="color:#d29922;font-weight:600">② TBAC · 화요일</div><div style="color:var(--muted);margin-top:3px">"어떻게(어떤 만기로) 빌릴지" — TBAC Recommended Financing Schedule. 시장 전문가 권고를 재무부에 제출한다.</div></div>
-          <div style="background:var(--surf2);border-radius:8px;padding:9px 11px"><div style="color:#3fb950;font-weight:600">③ 2차 QRA · 수요일</div><div style="color:var(--muted);margin-top:3px">TBAC 의견을 참고해 최종 경매 계획(쿠폰 규모·빌 비중)을 발표한다. 이번 분기: 11/2(월) 1차, 11/4(수) 2차.</div></div>
-        </div>
-      </div>
-    </div>
-    <div class="sec" style="margin-top:14px">
+    <!-- 자금조달 표 + 쿠폰 경매 규모 -->
+        <div class="sec" style="margin-top:14px">
       <div class="stitle">Sources and Uses 조정표 (10억 달러)</div>
-      <div class="tw"><table>
+      <div class="tw"><table class="qt">
         <thead><tr><th style="text-align:center">분기</th><th style="text-align:left">발표일</th><th>자금조달 필요액<br>(1)</th><th>국채발행<br>(2)</th><th>기타<br>(3)</th><th>전체<br>(4)=(2)+(3)</th><th>TGA 변화<br>(5)=(4)-(1)</th><th>분기말 TGA<br>(6)</th></tr></thead>
         <tbody>
             <tr><td rowspan="3" style="text-align:center;font-weight:600;background:var(--surf2);border-right:1px solid var(--brd)">26/3분기</td><td style="text-align:left">2026-08-03</td><td style="background:rgba(210,153,34,.16)">633</td><td style="background:rgba(31,111,235,.18)">739</td><td>-75</td><td>664</td><td>31</td><td style="background:rgba(31,111,235,.18)">950</td></tr>
@@ -841,7 +844,7 @@ tr:hover td{background:var(--surf2)}
     </div>
     <div class="sec" style="margin-top:14px">
       <div class="stitle">쿠폰 경매 규모 — 입찰 월별 (억 달러)</div>
-      <div class="tw"><table>
+      <div class="tw"><table class="qt">
         <thead>
           <tr><th rowspan="2" style="text-align:center">분기</th><th rowspan="2" style="text-align:left">입찰 월</th><th colspan="5" style="text-align:center">Notes</th><th colspan="2" style="text-align:center">Bonds</th><th colspan="3" style="text-align:center">TIPS</th><th rowspan="2">FRN</th><th rowspan="2" style="text-align:center">분기 합</th></tr>
           <tr><th>2</th><th>3</th><th>5</th><th>7</th><th>10</th><th style="color:#f85149">20</th><th>30</th><th>5</th><th>10</th><th>30</th></tr>
